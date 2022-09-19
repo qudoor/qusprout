@@ -1,0 +1,22 @@
+log:
+  logLevel: 0
+  logPath: /var/log
+  logNamePrefix: master
+common:
+  verbose: 0
+rpc:
+  listenPort: 9091
+  sendTimeout: 0
+  recvTimeout: 0
+  listenSysPort: 9092
+task:
+  cleanTaskInterval: 150
+  taskTimeOutDuration: 300
+resource:
+  cleanResourceInterval: 60
+  resourceTimeOutDuration: 120
+  resourceHeartInterval: 20
+client:
+  clientConnTimeout: 300000
+  clientSendTimeout: 300000
+  clientRecvTimeout: 300000

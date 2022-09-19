@@ -1,0 +1,7 @@
+common:
+  verbose: 1
+  
+log:
+  appname: qusprout-work
+  logpath: /var/log
+  loglevel: 0

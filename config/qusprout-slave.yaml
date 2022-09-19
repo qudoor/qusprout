@@ -1,0 +1,34 @@
+log:
+  logLevel: 0
+  logPath: /var/log
+  logNamePrefix: slave
+common:
+  verbose: 0
+  processName: qusprout-slave
+  statisticsInterval: 60
+rpc:
+  listenPort: 9095
+  sendTimeout: 0
+  recvTimeout: 0
+task:
+  cleanTaskInterval: 150
+  taskTimeOutDuration: 300
+resource:
+  cleanResourceInterval: 3
+  resourceTimeOutDuration: 120
+register:
+  cleanHeartbeatInterval: 20
+master:
+  masterPort: 9092
+  masterAddr: 127.0.0.1
+work:
+  workBinPath: /usr/local/bin
+  workBinName: qusprout-work
+  workConfigPath: /usr/local/etc/qusprout
+  workConfigName: qusprout-work.yaml
+  waitRpcTimeout: 120
+  waitMpiRpcTimeout: 300
+client:
+  clientConnTimeout: 300000
+  clientSendTimeout: 300000
+  clientRecvTimeout: 300000
