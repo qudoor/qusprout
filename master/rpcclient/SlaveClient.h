@@ -7,7 +7,7 @@
 #include <transport/TBufferTransports.h>
 #include <transport/TTransportException.h>
 #include <transport/TServerSocket.h>
-#include "interface/SlaveServer.h"
+#include "interface/QuSproutServer.h"
 #include "interface/qusproutdata_types.h"
 #include "comm/Base.h"
 
@@ -30,10 +30,6 @@ public:
     //关闭客户端
     void close();
 
-    //重新初始化客户端
-    int reInit();
-
-public:
     //qubit初始化
     void initQubits(InitQubitsResp& resp, const InitQubitsReq& req);
 
@@ -69,13 +65,37 @@ public:
 
     //获取泡利算子乘积之和的期望值
     void getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req);
- 
+
+    //获取测量结果
+    void measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req);
+
+    //注册一些自定义量子门，单次任务有效
+    void addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req);
+
+    //添加量子门操作
+    void addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req);
+
+    //追加量子比特到当前的量子电路
+    void appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req);
+
+    //重置指定的qubits
+    void resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req);
+
+    //获取当前量子状态向量
+    void getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req);
+
+    //获取当前所有可能状态组合的概率
+    void getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req);
+
 private:
-    std::mutex m_mutex;
+    //重新初始化客户端
+    int reInit();
+
+private:
     std::string m_addr{""};
     int m_port{0};
     bool m_isInit{false};
-    std::shared_ptr<SlaveServerClient> m_client{nullptr};
+    std::shared_ptr<QuSproutServerClient> m_client{nullptr};
     std::shared_ptr<TTransport> m_transport{nullptr};
 };
 

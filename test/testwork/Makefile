@@ -15,7 +15,7 @@ TARGET = testwork
 COMM_OBJS = ../../common/crc32.o ../../common/qulog.o ../../common/SystemHandle.o ../../common/TimerTask.o
 
 OBJS = ../../work/command/executor.o ../../work/config/Config.o ../../work/interface/ecode_constants.o ../../work/interface/ecode_types.o ../../work/interface/qusproutdata_types.o \
-	../../work/interface/WorkServer.o ../../work/common/QuESTIniter.o main.o \
+	../../work/interface/QuSproutServer.o ../../work/common/QuESTIniter.o main.o \
 	testGateCNOT.o testGateCP.o testGateCRX.o testGateCRY.o testGateCRZ.o \
 	testGateCX.o testGateCY.o testGateCZ.o testGateH.o testGateP.o \
 	testGateRX.o testGateRXX.o testGateRY.o testGateRYY.o testGateRZ.o \
@@ -23,7 +23,7 @@ OBJS = ../../work/command/executor.o ../../work/config/Config.o ../../work/inter
 	testGateSwap.o testGateT.o testGateTdg.o testGateX.o testGateY.o \
 	testGateZ.o testGateU1.o testGateR.o testGateU2.o testGateU3.o \
 	testGateX1.o testGateY1.o testGateZ1.o testGateiSwap.o testGateCR.o \
-	testGateCU.o testGateU.o testGateCU1.o testGateCU3.o
+	testGateCU.o testGateU.o testGateCU1.o testGateCU3.o testGateGetPauli.o testAll.o
 
 #定义库文件路径变量	    
 STATCI_LIBS = -L. -L/usr/local/lib64 -L/usr/local/lib -L/usr/lib -L/usr/lib64 -L../../lib -Wl,-Bstatic -lyaml-cpp -lthrift -lglog -lgflags -lQuEST -lmpi -lhwloc -lgtest

@@ -8,6 +8,7 @@
 #include "taskmanager/TaskManager.h"
 #include "ResourceTimer.h"
 #include "TaskTimer.h"
+#include "QuRootTimer.h"
 
 CTimerHandle::CTimerHandle()
 {
@@ -29,6 +30,12 @@ void CTimerHandle::init()
     SINGLETON(CTimer)->start();
     SINGLETON(CTimerManager)->addTimer(restimer);
     SINGLETON(CTimerManager)->addTimer(tasktimer);
+    if (1 == SINGLETON(CConfig)->m_qurootEnable)
+    {
+        auto quroottimer = std::make_shared<CQurootTimer>(SINGLETON(CConfig)->m_qurootHeartInterval);
+        quroottimer->init();
+        SINGLETON(CTimerManager)->addTimer(quroottimer);
+    }
 }
 
 void CTimerHandle::stop()

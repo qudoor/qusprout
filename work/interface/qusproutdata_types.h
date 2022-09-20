@@ -112,6 +112,38 @@ class GetExpecPauliSumReq;
 
 class GetExpecPauliSumResp;
 
+class MeasureQubitsReq;
+
+class MeasureQubitsResp;
+
+class GateMatrix;
+
+class AddCustomGateByMatrixReq;
+
+class AddCustomGateByMatrixResp;
+
+class SubCircuit;
+
+class AddSubCircuitReq;
+
+class AddSubCircuitResp;
+
+class AppendQubitsReq;
+
+class AppendQubitsResp;
+
+class ResetQubitsReq;
+
+class ResetQubitsResp;
+
+class GetStateOfAllQubitsReq;
+
+class GetStateOfAllQubitsResp;
+
+class GetProbabilitiesReq;
+
+class GetProbabilitiesResp;
+
 
 class Cmd : public virtual ::apache::thrift::TBase {
  public:
@@ -1476,6 +1508,675 @@ class GetExpecPauliSumResp : public virtual ::apache::thrift::TBase {
 void swap(GetExpecPauliSumResp &a, GetExpecPauliSumResp &b);
 
 std::ostream& operator<<(std::ostream& out, const GetExpecPauliSumResp& obj);
+
+
+class MeasureQubitsReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  MeasureQubitsReq(const MeasureQubitsReq&);
+  MeasureQubitsReq& operator=(const MeasureQubitsReq&);
+  MeasureQubitsReq() noexcept
+                   : id() {
+  }
+
+  virtual ~MeasureQubitsReq() noexcept;
+  std::string id;
+  std::vector<int32_t>  qubits;
+
+  void __set_id(const std::string& val);
+
+  void __set_qubits(const std::vector<int32_t> & val);
+
+  bool operator == (const MeasureQubitsReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    if (!(qubits == rhs.qubits))
+      return false;
+    return true;
+  }
+  bool operator != (const MeasureQubitsReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const MeasureQubitsReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(MeasureQubitsReq &a, MeasureQubitsReq &b);
+
+std::ostream& operator<<(std::ostream& out, const MeasureQubitsReq& obj);
+
+typedef struct _MeasureQubitsResp__isset {
+  _MeasureQubitsResp__isset() : results(false) {}
+  bool results :1;
+} _MeasureQubitsResp__isset;
+
+class MeasureQubitsResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  MeasureQubitsResp(const MeasureQubitsResp&);
+  MeasureQubitsResp& operator=(const MeasureQubitsResp&);
+  MeasureQubitsResp() noexcept {
+  }
+
+  virtual ~MeasureQubitsResp() noexcept;
+   ::BaseCode base;
+  std::vector<MeasureResult>  results;
+  std::vector<Outcome>  outcomes;
+
+  _MeasureQubitsResp__isset __isset;
+
+  void __set_base(const  ::BaseCode& val);
+
+  void __set_results(const std::vector<MeasureResult> & val);
+
+  void __set_outcomes(const std::vector<Outcome> & val);
+
+  bool operator == (const MeasureQubitsResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    if (__isset.results != rhs.__isset.results)
+      return false;
+    else if (__isset.results && !(results == rhs.results))
+      return false;
+    if (!(outcomes == rhs.outcomes))
+      return false;
+    return true;
+  }
+  bool operator != (const MeasureQubitsResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const MeasureQubitsResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(MeasureQubitsResp &a, MeasureQubitsResp &b);
+
+std::ostream& operator<<(std::ostream& out, const MeasureQubitsResp& obj);
+
+
+class GateMatrix : public virtual ::apache::thrift::TBase {
+ public:
+
+  GateMatrix(const GateMatrix&);
+  GateMatrix& operator=(const GateMatrix&);
+  GateMatrix() noexcept
+             : name(),
+               qubits(0) {
+  }
+
+  virtual ~GateMatrix() noexcept;
+  std::string name;
+  int32_t qubits;
+  std::vector<double>  matrix;
+
+  void __set_name(const std::string& val);
+
+  void __set_qubits(const int32_t val);
+
+  void __set_matrix(const std::vector<double> & val);
+
+  bool operator == (const GateMatrix & rhs) const
+  {
+    if (!(name == rhs.name))
+      return false;
+    if (!(qubits == rhs.qubits))
+      return false;
+    if (!(matrix == rhs.matrix))
+      return false;
+    return true;
+  }
+  bool operator != (const GateMatrix &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const GateMatrix & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(GateMatrix &a, GateMatrix &b);
+
+std::ostream& operator<<(std::ostream& out, const GateMatrix& obj);
+
+
+class AddCustomGateByMatrixReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  AddCustomGateByMatrixReq(const AddCustomGateByMatrixReq&);
+  AddCustomGateByMatrixReq& operator=(const AddCustomGateByMatrixReq&);
+  AddCustomGateByMatrixReq() noexcept
+                           : id() {
+  }
+
+  virtual ~AddCustomGateByMatrixReq() noexcept;
+  std::string id;
+  GateMatrix gate;
+
+  void __set_id(const std::string& val);
+
+  void __set_gate(const GateMatrix& val);
+
+  bool operator == (const AddCustomGateByMatrixReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    if (!(gate == rhs.gate))
+      return false;
+    return true;
+  }
+  bool operator != (const AddCustomGateByMatrixReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AddCustomGateByMatrixReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AddCustomGateByMatrixReq &a, AddCustomGateByMatrixReq &b);
+
+std::ostream& operator<<(std::ostream& out, const AddCustomGateByMatrixReq& obj);
+
+
+class AddCustomGateByMatrixResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  AddCustomGateByMatrixResp(const AddCustomGateByMatrixResp&);
+  AddCustomGateByMatrixResp& operator=(const AddCustomGateByMatrixResp&);
+  AddCustomGateByMatrixResp() noexcept {
+  }
+
+  virtual ~AddCustomGateByMatrixResp() noexcept;
+   ::BaseCode base;
+
+  void __set_base(const  ::BaseCode& val);
+
+  bool operator == (const AddCustomGateByMatrixResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    return true;
+  }
+  bool operator != (const AddCustomGateByMatrixResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AddCustomGateByMatrixResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AddCustomGateByMatrixResp &a, AddCustomGateByMatrixResp &b);
+
+std::ostream& operator<<(std::ostream& out, const AddCustomGateByMatrixResp& obj);
+
+
+class SubCircuit : public virtual ::apache::thrift::TBase {
+ public:
+
+  SubCircuit(const SubCircuit&);
+  SubCircuit& operator=(const SubCircuit&);
+  SubCircuit() noexcept
+             : name() {
+  }
+
+  virtual ~SubCircuit() noexcept;
+  std::string name;
+  Circuit circuit;
+
+  void __set_name(const std::string& val);
+
+  void __set_circuit(const Circuit& val);
+
+  bool operator == (const SubCircuit & rhs) const
+  {
+    if (!(name == rhs.name))
+      return false;
+    if (!(circuit == rhs.circuit))
+      return false;
+    return true;
+  }
+  bool operator != (const SubCircuit &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const SubCircuit & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(SubCircuit &a, SubCircuit &b);
+
+std::ostream& operator<<(std::ostream& out, const SubCircuit& obj);
+
+
+class AddSubCircuitReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  AddSubCircuitReq(const AddSubCircuitReq&);
+  AddSubCircuitReq& operator=(const AddSubCircuitReq&);
+  AddSubCircuitReq() noexcept
+                   : id() {
+  }
+
+  virtual ~AddSubCircuitReq() noexcept;
+  std::string id;
+  SubCircuit sub_circuit;
+
+  void __set_id(const std::string& val);
+
+  void __set_sub_circuit(const SubCircuit& val);
+
+  bool operator == (const AddSubCircuitReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    if (!(sub_circuit == rhs.sub_circuit))
+      return false;
+    return true;
+  }
+  bool operator != (const AddSubCircuitReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AddSubCircuitReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AddSubCircuitReq &a, AddSubCircuitReq &b);
+
+std::ostream& operator<<(std::ostream& out, const AddSubCircuitReq& obj);
+
+
+class AddSubCircuitResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  AddSubCircuitResp(const AddSubCircuitResp&);
+  AddSubCircuitResp& operator=(const AddSubCircuitResp&);
+  AddSubCircuitResp() noexcept {
+  }
+
+  virtual ~AddSubCircuitResp() noexcept;
+   ::BaseCode base;
+
+  void __set_base(const  ::BaseCode& val);
+
+  bool operator == (const AddSubCircuitResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    return true;
+  }
+  bool operator != (const AddSubCircuitResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AddSubCircuitResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AddSubCircuitResp &a, AddSubCircuitResp &b);
+
+std::ostream& operator<<(std::ostream& out, const AddSubCircuitResp& obj);
+
+
+class AppendQubitsReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  AppendQubitsReq(const AppendQubitsReq&);
+  AppendQubitsReq& operator=(const AppendQubitsReq&);
+  AppendQubitsReq() noexcept
+                  : id(),
+                    qubits(0) {
+  }
+
+  virtual ~AppendQubitsReq() noexcept;
+  std::string id;
+  int32_t qubits;
+
+  void __set_id(const std::string& val);
+
+  void __set_qubits(const int32_t val);
+
+  bool operator == (const AppendQubitsReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    if (!(qubits == rhs.qubits))
+      return false;
+    return true;
+  }
+  bool operator != (const AppendQubitsReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AppendQubitsReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AppendQubitsReq &a, AppendQubitsReq &b);
+
+std::ostream& operator<<(std::ostream& out, const AppendQubitsReq& obj);
+
+
+class AppendQubitsResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  AppendQubitsResp(const AppendQubitsResp&);
+  AppendQubitsResp& operator=(const AppendQubitsResp&);
+  AppendQubitsResp() noexcept {
+  }
+
+  virtual ~AppendQubitsResp() noexcept;
+   ::BaseCode base;
+
+  void __set_base(const  ::BaseCode& val);
+
+  bool operator == (const AppendQubitsResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    return true;
+  }
+  bool operator != (const AppendQubitsResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const AppendQubitsResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(AppendQubitsResp &a, AppendQubitsResp &b);
+
+std::ostream& operator<<(std::ostream& out, const AppendQubitsResp& obj);
+
+
+class ResetQubitsReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  ResetQubitsReq(const ResetQubitsReq&);
+  ResetQubitsReq& operator=(const ResetQubitsReq&);
+  ResetQubitsReq() noexcept
+                 : id() {
+  }
+
+  virtual ~ResetQubitsReq() noexcept;
+  std::string id;
+  std::vector<int32_t>  qubits;
+
+  void __set_id(const std::string& val);
+
+  void __set_qubits(const std::vector<int32_t> & val);
+
+  bool operator == (const ResetQubitsReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    if (!(qubits == rhs.qubits))
+      return false;
+    return true;
+  }
+  bool operator != (const ResetQubitsReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ResetQubitsReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(ResetQubitsReq &a, ResetQubitsReq &b);
+
+std::ostream& operator<<(std::ostream& out, const ResetQubitsReq& obj);
+
+
+class ResetQubitsResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  ResetQubitsResp(const ResetQubitsResp&);
+  ResetQubitsResp& operator=(const ResetQubitsResp&);
+  ResetQubitsResp() noexcept {
+  }
+
+  virtual ~ResetQubitsResp() noexcept;
+   ::BaseCode base;
+
+  void __set_base(const  ::BaseCode& val);
+
+  bool operator == (const ResetQubitsResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    return true;
+  }
+  bool operator != (const ResetQubitsResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ResetQubitsResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(ResetQubitsResp &a, ResetQubitsResp &b);
+
+std::ostream& operator<<(std::ostream& out, const ResetQubitsResp& obj);
+
+
+class GetStateOfAllQubitsReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  GetStateOfAllQubitsReq(const GetStateOfAllQubitsReq&);
+  GetStateOfAllQubitsReq& operator=(const GetStateOfAllQubitsReq&);
+  GetStateOfAllQubitsReq() noexcept
+                         : id() {
+  }
+
+  virtual ~GetStateOfAllQubitsReq() noexcept;
+  std::string id;
+
+  void __set_id(const std::string& val);
+
+  bool operator == (const GetStateOfAllQubitsReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    return true;
+  }
+  bool operator != (const GetStateOfAllQubitsReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const GetStateOfAllQubitsReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(GetStateOfAllQubitsReq &a, GetStateOfAllQubitsReq &b);
+
+std::ostream& operator<<(std::ostream& out, const GetStateOfAllQubitsReq& obj);
+
+typedef struct _GetStateOfAllQubitsResp__isset {
+  _GetStateOfAllQubitsResp__isset() : state_vector(false) {}
+  bool state_vector :1;
+} _GetStateOfAllQubitsResp__isset;
+
+class GetStateOfAllQubitsResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  GetStateOfAllQubitsResp(const GetStateOfAllQubitsResp&);
+  GetStateOfAllQubitsResp& operator=(const GetStateOfAllQubitsResp&);
+  GetStateOfAllQubitsResp() noexcept {
+  }
+
+  virtual ~GetStateOfAllQubitsResp() noexcept;
+   ::BaseCode base;
+  std::vector<double>  state_vector;
+
+  _GetStateOfAllQubitsResp__isset __isset;
+
+  void __set_base(const  ::BaseCode& val);
+
+  void __set_state_vector(const std::vector<double> & val);
+
+  bool operator == (const GetStateOfAllQubitsResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    if (!(state_vector == rhs.state_vector))
+      return false;
+    return true;
+  }
+  bool operator != (const GetStateOfAllQubitsResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const GetStateOfAllQubitsResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(GetStateOfAllQubitsResp &a, GetStateOfAllQubitsResp &b);
+
+std::ostream& operator<<(std::ostream& out, const GetStateOfAllQubitsResp& obj);
+
+
+class GetProbabilitiesReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  GetProbabilitiesReq(const GetProbabilitiesReq&);
+  GetProbabilitiesReq& operator=(const GetProbabilitiesReq&);
+  GetProbabilitiesReq() noexcept
+                      : id() {
+  }
+
+  virtual ~GetProbabilitiesReq() noexcept;
+  std::string id;
+
+  void __set_id(const std::string& val);
+
+  bool operator == (const GetProbabilitiesReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    return true;
+  }
+  bool operator != (const GetProbabilitiesReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const GetProbabilitiesReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(GetProbabilitiesReq &a, GetProbabilitiesReq &b);
+
+std::ostream& operator<<(std::ostream& out, const GetProbabilitiesReq& obj);
+
+typedef struct _GetProbabilitiesResp__isset {
+  _GetProbabilitiesResp__isset() : probabilities(false) {}
+  bool probabilities :1;
+} _GetProbabilitiesResp__isset;
+
+class GetProbabilitiesResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  GetProbabilitiesResp(const GetProbabilitiesResp&);
+  GetProbabilitiesResp& operator=(const GetProbabilitiesResp&);
+  GetProbabilitiesResp() noexcept {
+  }
+
+  virtual ~GetProbabilitiesResp() noexcept;
+   ::BaseCode base;
+  std::vector<double>  probabilities;
+
+  _GetProbabilitiesResp__isset __isset;
+
+  void __set_base(const  ::BaseCode& val);
+
+  void __set_probabilities(const std::vector<double> & val);
+
+  bool operator == (const GetProbabilitiesResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    if (__isset.probabilities != rhs.__isset.probabilities)
+      return false;
+    else if (__isset.probabilities && !(probabilities == rhs.probabilities))
+      return false;
+    return true;
+  }
+  bool operator != (const GetProbabilitiesResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const GetProbabilitiesResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(GetProbabilitiesResp &a, GetProbabilitiesResp &b);
+
+std::ostream& operator<<(std::ostream& out, const GetProbabilitiesResp& obj);
 
 
 

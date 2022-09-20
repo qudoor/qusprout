@@ -22,7 +22,8 @@ int _kErrCodeValues[] = {
   ErrCode::QUROOT_MEM_NOT_ENOUGH,
   ErrCode::QUROOT_NOT_INIT,
   ErrCode::QUROOT_NOT_REGISTER,
-  ErrCode::QUROOT_NOT_RESOURCE
+  ErrCode::QUROOT_NOT_RESOURCE,
+  ErrCode::QUROOT_PRASE_ERROR
 };
 const char* _kErrCodeNames[] = {
   "COM_SUCCESS",
@@ -33,9 +34,10 @@ const char* _kErrCodeNames[] = {
   "QUROOT_MEM_NOT_ENOUGH",
   "QUROOT_NOT_INIT",
   "QUROOT_NOT_REGISTER",
-  "QUROOT_NOT_RESOURCE"
+  "QUROOT_NOT_RESOURCE",
+  "QUROOT_PRASE_ERROR"
 };
-const std::map<int, const char*> _ErrCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(9, _kErrCodeValues, _kErrCodeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
+const std::map<int, const char*> _ErrCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(10, _kErrCodeValues, _kErrCodeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
 
 std::ostream& operator<<(std::ostream& out, const ErrCode::type& val) {
   std::map<int, const char*>::const_iterator it = _ErrCode_VALUES_TO_NAMES.find(val);

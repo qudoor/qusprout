@@ -3,9 +3,36 @@
 
 #include <string>
 #include <sstream>
+#include <thread>
 #include <transport/TTransportException.h>
 #include "interface/ecode_constants.h"
 #include "interface/ecode_types.h"
+
+#define CALL_WITH_SERVICE(CALL, req) \
+int retry = 3; \
+do { \
+    try { \
+        CALL; \
+        if (resp.base.code == ErrCode::COM_SUCCESS) { \
+            break; \
+        } \
+    } catch (const TTransportException& e) { \
+        std::string reqbuf = getPrint(req); \
+        LOG(ERROR) << "call exception(reqbuf:" << reqbuf << ",err:" << e.what() << ")."; \
+        setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+        if (isNeedReConnectCode(e)) { \
+            std::this_thread::sleep_for(std::chrono::seconds(1)); \
+            reInit(); \
+            continue; \
+        } \
+        break; \
+    } catch (...) { \
+        std::string reqbuf = getPrint(req); \
+        LOG(ERROR) << "call other exception(reqbuf:" << reqbuf << ")."; \
+        setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+        break; \
+    } \
+} while(retry-- > 0);
 
 class CBase
 {

@@ -25,9 +25,4 @@ rm -rf ${dest_dir}/qusprout
 cp -r ./gen-py/qusprout ${dest_dir}/qusprout
 # rm -rf ./gen-py
 
-thrift --gen py:package_prefix='qutrunk.sim.qusprout.' work.thrift
-rm -rf ${dest_dir}/work 
-cp -r ./gen-py/work ${dest_dir}/work
-rm -rf ./gen-py
-
 echo [thrift] update python file done!

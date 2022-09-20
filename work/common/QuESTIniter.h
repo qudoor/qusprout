@@ -15,12 +15,14 @@ public:
     void createWorkQureg(Qureg& workqureg);
     void destroyWorkQureg(Qureg& workqureg);
     
+    void reInit(const int qubits);
+
 public:
     QuESTEnv        m_env;
     Qureg           m_qureg;
-    int             m_qubits;
-    bool            m_isInit;
-    bool            m_density;
+    int             m_qubits{0};
+    bool            m_isInit{false};
+    bool            m_density{0};
 };
 
 #endif

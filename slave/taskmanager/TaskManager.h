@@ -6,7 +6,7 @@
 #include <mutex>
 #include <memory>
 #include "interface/ecode_constants.h"
-#include "interface/WorkServer.h"
+#include "interface/QuSproutServer.h"
 #include "interface/qusproutdata_types.h"
 #include "interface/statistics_types.h"
 #include "rpcclient/WorkClient.h"
@@ -78,6 +78,27 @@ public:
     //获取泡利算子乘积之和的期望值
     void getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req, InitQubitsReq& initInfo);
 
+    //获取测量结果
+    void measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req, InitQubitsReq& initInfo);
+
+    //注册一些自定义量子门，单次任务有效
+    void addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req, InitQubitsReq& initInfo);
+
+    //添加量子门操作
+    void addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req, InitQubitsReq& initInfo);
+
+    //追加量子比特到当前的量子电路
+    void appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req, InitQubitsReq& initInfo);
+
+    //重置指定的qubits
+    void resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req, InitQubitsReq& initInfo);
+
+    //获取当前量子状态向量
+    void getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req, InitQubitsReq& initInfo);
+
+    //获取当前所有可能状态组合的概率
+    void getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req, InitQubitsReq& initInfo);
+
     //定时清理资源
     void timerCleanTask();
     
@@ -92,7 +113,7 @@ private:
     void cleanTask(const int timeOutDuration = 0);
 
     //查找任务
-    std::shared_ptr<CTask> getTask(const std::string& id);
+    std::shared_ptr<CTask> getTask(const std::string& id, const bool isupdatetime = true);
 
     //模拟器初始化
     void initSimulator(InitQubitsResp& resp, const InitQubitsReq& req);

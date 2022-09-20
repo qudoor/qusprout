@@ -89,6 +89,30 @@ void CWorkNodeHandler::getExpecPauliSum(const GetExpecPauliSumReq& pauli_sum)
     mpiexecute(CMDTYPE_PAULISUM);
 }
 
+void CWorkNodeHandler::addCustomGateByMatrix(const GateMatrix& matrix)
+{
+    m_matrix = matrix;
+
+    mpiexecute(CMDTYPE_ADDGATE);
+}
+
+void CWorkNodeHandler::resetQubits(const std::vector<int32_t>& qubits)
+{
+    m_reset_qubits = qubits;
+
+    mpiexecute(CMDTYPE_RESETQUBITS);
+}
+
+void CWorkNodeHandler::getStateOfAllQubits()
+{
+    mpiexecute(CMDTYPE_STATEOFALL);
+}
+
+void CWorkNodeHandler::getProbabilities()
+{
+    mpiexecute(CMDTYPE_PROBAMPALL);
+}
+
 void CWorkNodeHandler::mpiexecute(int cmdtype)
 {
     char* packbuf = new char[PACKSIZE+1];
@@ -164,6 +188,18 @@ void CWorkNodeHandler::packdata(int cmdtype, char* packbuf, int& packsize)
         case CMDTYPE_PAULISUM:
             data.packpaulisum(m_pauli_sum, packbuf, packsize);
             break;
+        case CMDTYPE_ADDGATE:
+            data.packaddgate(m_matrix, packbuf, packsize);
+            break;
+        case CMDTYPE_RESETQUBITS:
+            data.packresetqubits(m_reset_qubits, packbuf, packsize);
+            break;
+        case CMDTYPE_STATEOFALL:
+            data.packstateofall(packbuf, packsize);
+            break;
+        case CMDTYPE_PROBAMPALL:
+            data.packprobampall(packbuf, packsize);
+            break;
         default:
             assert(false);
             break;
@@ -208,6 +244,18 @@ void CWorkNodeHandler::unpackdata(NodeData& nodedata, char* packbuf, int& packsi
         case CMDTYPE_PAULISUM:
             nodedata.unpackpaulisum(packbuf, packsize);
             break;
+        case CMDTYPE_ADDGATE:
+            nodedata.unpackaddgate(packbuf, packsize);
+            break;
+        case CMDTYPE_RESETQUBITS:
+            nodedata.unpackresetqubits(packbuf, packsize);
+            break;
+        case CMDTYPE_STATEOFALL:
+            nodedata.unpackstateofall(packbuf, packsize);
+            break;
+        case CMDTYPE_PROBAMPALL:
+            nodedata.unpackprobampall(packbuf, packsize);
+            break;
         default:
             assert(false);
             break;
@@ -220,6 +268,9 @@ void CWorkNodeHandler::execute(NodeData& nodedata)
     Circuit circuit;
     std::vector<double> dresult;
     std::vector<std::string> sresult;
+    std::vector<double> real;
+    std::vector<double> imag;
+    std::vector<double> probabilities;
 
     switch (nodedata.m_cmdtype)
     {
@@ -253,6 +304,18 @@ void CWorkNodeHandler::execute(NodeData& nodedata)
         break;
     case CMDTYPE_PAULISUM:
         m_executor.getExpecPauliSum(nodedata.m_pauli_sum.oper_type_list, nodedata.m_pauli_sum.term_coeff_list);
+        break;
+    case CMDTYPE_ADDGATE:
+        m_executor.addCustomGateByMatrix(nodedata.m_matrix);
+        break;
+    case CMDTYPE_RESETQUBITS:
+        m_executor.resetQubits(nodedata.m_reset_qubits);
+        break;
+    case CMDTYPE_STATEOFALL:
+        m_executor.getStateOfAllQubits(real, imag);
+        break;
+    case CMDTYPE_PROBAMPALL:
+        m_executor.getProbabilities(probabilities);
         break;
     default:
         assert(false);

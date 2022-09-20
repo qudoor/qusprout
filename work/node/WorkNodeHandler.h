@@ -25,6 +25,11 @@ public:
     void getExpecPauliProd(const std::vector<PauliProdInfo>& pauli_prod);
     void getExpecPauliSum(const GetExpecPauliSumReq& pauli_sum);
 
+    void addCustomGateByMatrix(const GateMatrix& matrix);
+    void resetQubits(const std::vector<int32_t>& qubits);
+    void getStateOfAllQubits();
+    void getProbabilities();
+
 private:
     QS::CmdExecutor m_executor;
 
@@ -38,6 +43,8 @@ private:
 
     std::vector<PauliProdInfo> m_pauli_prod;
     GetExpecPauliSumReq m_pauli_sum;
+    GateMatrix m_matrix;
+    std::vector<int32_t> m_reset_qubits;
     
     void packdata(int cmdtype, char* packbuf, int& packsize);
     void unpackdata(NodeData& nodedata, char* packbuf, int& packsize);

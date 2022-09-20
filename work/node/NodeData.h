@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "../interface/work_types.h"
+#include "../interface/qusproutdata_types.h"
 
 const int PACKSIZE = 1024 * 1024;
 
@@ -18,6 +18,10 @@ const int PACKSIZE = 1024 * 1024;
 #define CMDTYPE_CANCEL          (1 << 8)
 #define CMDTYPE_PAULIPROD       (1 << 9)
 #define CMDTYPE_PAULISUM        (1 << 10)
+#define CMDTYPE_ADDGATE         (1 << 11)
+#define CMDTYPE_RESETQUBITS     (1 << 12)
+#define CMDTYPE_STATEOFALL      (1 << 13)
+#define CMDTYPE_PROBAMPALL      (1 << 14)
 
 class NodeData
 {
@@ -61,6 +65,18 @@ public:
     void packpaulisum(const GetExpecPauliSumReq& paulisum, char* packbuf, int& packsize);
     void unpackpaulisum(char* packbuf, int& packsize);
 
+    void packaddgate(const GateMatrix& matrix, char* packbuf, int& packsize);
+    void unpackaddgate(char* packbuf, int& packsize);
+
+    void packresetqubits(const std::vector<int32_t>& qubits, char* packbuf, int& packsize);
+    void unpackresetqubits(char* packbuf, int& packsize);
+
+    void packstateofall(char* packbuf, int& packsize);
+    void unpackstateofall(char* packbuf, int& packsize);
+
+    void packprobampall(char* packbuf, int& packsize);
+    void unpackprobampall(char* packbuf, int& packsize);
+
     std::vector<Cmd> m_Cmds;
     std::vector<int> m_targets;
     int m_cmdtype;
@@ -72,6 +88,8 @@ public:
 
     std::vector<PauliProdInfo> m_pauli_prod;
     GetExpecPauliSumReq m_pauli_sum;
+    GateMatrix m_matrix;
+    std::vector<int32_t> m_reset_qubits;
     
 private:
     int m_position;

@@ -88,12 +88,12 @@ struct SisCodeCount {
 }
 
 //显存类型
-enum GpuType {
+enum SisGpuType {
     //默认
-    GpuType_Default = 0,
+    SisGpuType_Default = 0,
 
     //英伟达
-    GpuType_Nvidia = 1
+    SisGpuType_Nvidia = 1
 }
 
 //机器固定资源信息
@@ -105,7 +105,7 @@ struct MachineFixedInfo {
     2: required i64 cpu_memory
 
     //显存类型
-    3: optional GpuType gpu_type 
+    3: optional SisGpuType gpu_type 
 
     //总显存，单位：byte
     4: optional i64 gpu_memory

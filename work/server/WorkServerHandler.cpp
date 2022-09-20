@@ -20,23 +20,7 @@ CWorkServerHandler::~CWorkServerHandler()
 //qubit初始化
 void CWorkServerHandler::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
-    // try
-    // {
-    //     if (req.id.empty() || req.qubits <= 0)
-    //     {
-    //         LOG(ERROR) << "Invaild parameters(req.id.empty() || req.qubits <= 0) in CWorkServerHandler::initQubits()";
-    //         setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-    //         return;
-    //     }
-
-    //     m_executor.init(req.qubits, req.state, req.density);
-    //     setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    // }
-    // catch(const std::exception& e)
-    // {
-    //     LOG(ERROR) << "CWorkServerHandler::initQubits exception: " << e.what();
-    //     setBase(resp.base, ErrCode::type::COM_OTHRE);
-    // }
+    setBase(resp.base, ErrCode::type::COM_SUCCESS);
 }
 
 //执行任务
@@ -224,7 +208,7 @@ void CWorkServerHandler::run(RunCircuitResp& resp, const RunCircuitReq& req)
     }
     catch(const std::exception& e)
     {
-        LOG(ERROR) << "CWorkServerHandler::applyQFT exception: " << e.what();
+        LOG(ERROR) << "CWorkServerHandler::run exception: " << e.what();
         setBase(resp.base, ErrCode::type::COM_OTHRE);
     }
 }
@@ -329,6 +313,198 @@ void CWorkServerHandler::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetE
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getExpecPauliSum exception: " << e.what();
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+    }
+}
+
+//获取测量结果
+void CWorkServerHandler::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
+{
+    try
+    {
+        if (req.id.empty())
+        {
+            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::measureQubits()";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+
+        Result result;
+        m_executor.getMeasureResult(req.qubits, result);
+        resp.__set_results(result.measureSet);
+        resp.__set_outcomes(result.outcomeSet);
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "CWorkServerHandler::measureQubits exception: " << e.what();
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+    }
+}
+
+//注册一些自定义量子门，单次任务有效
+void CWorkServerHandler::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req)
+{
+    try
+    {
+        if (req.id.empty())
+        {
+            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::addCustomGateByMatrix()";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+
+        //Broadcast addCustomGateByMatrix to all node
+        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
+            workNodeHandler.addCustomGateByMatrix(req.gate);
+
+        m_executor.addCustomGateByMatrix(req.gate);
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "CWorkServerHandler::addCustomGateByMatrix exception: " << e.what();
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+    }
+}
+
+//添加量子门操作
+void CWorkServerHandler::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req)
+{
+    SendCircuitCmdResp cmdresp;
+    SendCircuitCmdReq cmdreq;
+    cmdreq.__set_id(req.id);
+    cmdreq.__set_circuit(req.sub_circuit.circuit);
+    for (auto& temp : cmdreq.circuit.cmds)
+    {
+        temp.gate = req.sub_circuit.name;
+    }
+    cmdreq.__set_final(false);
+    sendCircuitCmd(cmdresp, cmdreq);
+    resp.__set_base(cmdresp.base);
+}
+
+//追加量子比特到当前的量子电路
+void CWorkServerHandler::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req)
+{
+    try
+    {
+        if (req.id.empty())
+        {
+            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::appendQubits()";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+
+        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
+        {
+            LOG(ERROR) << "operator is not support mpi.";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+
+        int ret = m_executor.appendQubits(req.qubits);
+        if (ret != 0)
+        {
+            LOG(ERROR) << "appendQubits failed(ret:" << ret << ").";
+            setBase(resp.base, ErrCode::type::COM_OTHRE);
+            return;
+        }
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "CWorkServerHandler::appendQubits exception: " << e.what();
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+    }
+}
+
+//重置指定的qubits
+void CWorkServerHandler::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
+{
+    try
+    {
+        if (req.id.empty())
+        {
+            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::resetQubits()";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+
+        //Broadcast resetQubits to all node
+        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
+            workNodeHandler.resetQubits(req.qubits);
+
+        m_executor.resetQubits(req.qubits);
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "CWorkServerHandler::resetQubits exception: " << e.what();
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+    }
+}
+
+//获取当前量子状态向量
+void CWorkServerHandler::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req)
+{
+    try
+    {
+        if (req.id.empty())
+        {
+            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getStateOfAllQubits()";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+
+        //Broadcast resetQubits to all node
+        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
+            workNodeHandler.getStateOfAllQubits();
+
+        std::vector<double> real;
+        std::vector<double> imag;
+        m_executor.getStateOfAllQubits(real, imag);
+        size_t statenum = real.size();
+        std::vector<double> statevector;
+        for (size_t i = 0; i < statenum; ++i)
+        {
+            statevector.push_back(real[i]);
+            statevector.push_back(imag[i]);
+        }
+        resp.__set_state_vector(statevector);
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "CWorkServerHandler::getStateOfAllQubits exception: " << e.what();
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+    }
+}
+
+//获取当前所有可能状态组合的概率
+void CWorkServerHandler::getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req)
+{
+    try
+    {
+        if (req.id.empty())
+        {
+            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getProbabilities()";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+
+        //Broadcast resetQubits to all node
+        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
+            workNodeHandler.getProbabilities();
+
+        std::vector<double> probabilities;
+        m_executor.getProbabilities(probabilities);
+        resp.__set_probabilities(probabilities);
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "CWorkServerHandler::getProbabilities exception: " << e.what();
         setBase(resp.base, ErrCode::type::COM_OTHRE);
     }
 }

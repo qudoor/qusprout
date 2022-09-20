@@ -260,6 +260,80 @@ void NodeData::unpackpaulisum(char* packbuf, int& packsize)
     m_pauli_sum.__set_term_coeff_list(coeffitemp);
 }
 
+void NodeData::packaddgate(const GateMatrix& matrix, char* packbuf, int& packsize)
+{
+    //pack command type
+    packcmdtype(CMDTYPE_ADDGATE, packbuf, packsize);
+
+    packstring(matrix.name, packbuf, packsize);
+    packint(matrix.qubits, packbuf, packsize);
+    packint(matrix.matrix.size(), packbuf, packsize);
+    for(auto& temp : matrix.matrix)
+    {
+        packdouble(temp, packbuf, packsize);
+    }
+}
+
+void NodeData::unpackaddgate(char* packbuf, int& packsize)
+{
+    unpackstring(m_matrix.name, packbuf, packsize);
+    unpackint(m_matrix.qubits, packbuf, packsize);
+
+    int matrixsize = 0;
+    unpackint(matrixsize, packbuf, packsize);
+    for(int i = 0; i < matrixsize; i++)
+    {
+        double temp = 0;
+        unpackdouble(temp, packbuf, packsize);
+        m_matrix.matrix.push_back(temp);
+    }
+}
+
+void NodeData::packresetqubits(const std::vector<int32_t>& qubits, char* packbuf, int& packsize)
+{
+    //pack command type
+    packcmdtype(CMDTYPE_RESETQUBITS, packbuf, packsize);
+
+    packint(qubits.size(), packbuf, packsize);
+    for(auto& temp : qubits)
+    {
+        packint(temp, packbuf, packsize);
+    }
+}
+
+void NodeData::unpackresetqubits(char* packbuf, int& packsize)
+{
+    int qubitssize = 0;
+    unpackint(qubitssize, packbuf, packsize);
+    for(int i = 0; i < qubitssize; i++)
+    {
+        int32_t temp = 0;
+        unpackint(temp, packbuf, packsize);
+        m_reset_qubits.push_back(temp);
+    }
+}
+
+void NodeData::packstateofall(char* packbuf, int& packsize)
+{
+    //pack command type
+    packcmdtype(CMDTYPE_STATEOFALL, packbuf, packsize);
+}
+
+void NodeData::unpackstateofall(char* packbuf, int& packsize)
+{
+
+}
+
+void NodeData::packprobampall(char* packbuf, int& packsize)
+{
+    //pack command type
+    packcmdtype(CMDTYPE_PROBAMPALL, packbuf, packsize);
+}
+void NodeData::unpackprobampall(char* packbuf, int& packsize)
+{
+
+}
+
 void NodeData::packstring(const std::string& str, char* packbuf, int& packsize)
 {
     int size = str.size();

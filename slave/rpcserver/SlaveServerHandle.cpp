@@ -22,22 +22,7 @@ void CSlaveServerHandler::initQubits(InitQubitsResp& resp, const InitQubitsReq& 
 {
     CStatisticsTimeAndCount countsis(req.exec_type, Tag_Iinterface_initQubits, req.qubits);
 
-    try
-    {
-       SINGLETON(CTaskManager)->initQubits(resp, req);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<InitQubitsReq>(req);
-        LOG(ERROR) << "initQubits exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<InitQubitsReq>(req);
-        LOG(ERROR) << "initQubits other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->initQubits(resp, req);
 
     CStatisticsCodeCount codesis(req.exec_type, Tag_Iinterface_initQubits, req.qubits, resp.base.code);
 }
@@ -49,24 +34,9 @@ void CSlaveServerHandler::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCir
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_sendCircuitCmd);
 
-    try
-    {
-        SINGLETON(CTaskManager)->sendCircuitCmd(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<SendCircuitCmdReq>(req);
-        LOG(ERROR) << "sendCircuitCmd exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<SendCircuitCmdReq>(req);
-        LOG(ERROR) << "sendCircuitCmd other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->sendCircuitCmd(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_sendCircuitCmd, initinfo.qubits, resp.base.code);
 }
@@ -78,24 +48,9 @@ void CSlaveServerHandler::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_cancelCmd);
 
-    try
-    {
-        SINGLETON(CTaskManager)->cancelCmd(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<CancelCmdReq>(req);
-        LOG(ERROR) << "cancelCmd exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<CancelCmdReq>(req);
-        LOG(ERROR) << "cancelCmd other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->cancelCmd(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_cancelCmd, initinfo.qubits, resp.base.code);
 }
@@ -107,24 +62,9 @@ void CSlaveServerHandler::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& 
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getProbAmp);
 
-    try
-    {
-        SINGLETON(CTaskManager)->getProbAmp(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetProbAmpReq>(req);
-        LOG(ERROR) << "getProbAmp exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetProbAmpReq>(req);
-        LOG(ERROR) << "getProbAmp other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->getProbAmp(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getProbAmp, initinfo.qubits, resp.base.code);
 }
@@ -136,24 +76,9 @@ void CSlaveServerHandler::getProbOfOutcome(GetProbOfOutcomeResp& resp, const Get
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getProbOfOutcome);
 
-    try
-    {
-        SINGLETON(CTaskManager)->getProbOfOutcome(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetProbOfOutcomeReq>(req);
-        LOG(ERROR) << "getProbOfOutcome exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetProbOfOutcomeReq>(req);
-        LOG(ERROR) << "getProbOfOutcome other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->getProbOfOutcome(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getProbOfOutcome, initinfo.qubits, resp.base.code);
 }
@@ -165,24 +90,9 @@ void CSlaveServerHandler::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, cons
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getProbOfAllOutcome);
 
-    try
-    {
-        SINGLETON(CTaskManager)->getProbOfAllOutcome(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetProbOfAllOutcomReq>(req);
-        LOG(ERROR) << "getProbOfAllOutcome exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetProbOfAllOutcomReq>(req);
-        LOG(ERROR) << "getProbOfAllOutcome other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->getProbOfAllOutcome(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getProbOfAllOutcome, initinfo.qubits, resp.base.code);
 }
@@ -194,24 +104,9 @@ void CSlaveServerHandler::getAllState(GetAllStateResp& resp, const GetAllStateRe
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getAllState);
 
-    try
-    {
-        SINGLETON(CTaskManager)->getAllState(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetAllStateReq>(req);
-        LOG(ERROR) << "getAllState exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetAllStateReq>(req);
-        LOG(ERROR) << "getAllState other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->getAllState(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getAllState, initinfo.qubits, resp.base.code);
 }
@@ -223,24 +118,9 @@ void CSlaveServerHandler::run(RunCircuitResp& resp, const RunCircuitReq& req)
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_run);
 
-    try
-    {
-        SINGLETON(CTaskManager)->run(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<RunCircuitReq>(req);
-        LOG(ERROR) << "run exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<RunCircuitReq>(req);
-        LOG(ERROR) << "run other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->run(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_run, initinfo.qubits, resp.base.code);
 }
@@ -252,24 +132,9 @@ void CSlaveServerHandler::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_applyQFT);
 
-    try
-    {
-        SINGLETON(CTaskManager)->applyQFT(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<ApplyQFTReq>(req);
-        LOG(ERROR) << "applyQFT exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<ApplyQFTReq>(req);
-        LOG(ERROR) << "applyQFT other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->applyQFT(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_applyQFT, initinfo.qubits, resp.base.code);
 }
@@ -281,24 +146,9 @@ void CSlaveServerHandler::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQF
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_applyFullQFT);
 
-    try
-    {
-        SINGLETON(CTaskManager)->applyFullQFT(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<ApplyFullQFTReq>(req);
-        LOG(ERROR) << "applyFullQFT exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<ApplyFullQFTReq>(req);
-        LOG(ERROR) << "applyFullQFT other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->applyFullQFT(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_applyFullQFT, initinfo.qubits, resp.base.code);
 }
@@ -310,24 +160,9 @@ void CSlaveServerHandler::getExpecPauliProd(GetExpecPauliProdResp& resp, const G
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getExpecPauliProd);
 
-    try
-    {
-        SINGLETON(CTaskManager)->getExpecPauliProd(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetExpecPauliProdReq>(req);
-        LOG(ERROR) << "getExpecPauliProd exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetExpecPauliProdReq>(req);
-        LOG(ERROR) << "getExpecPauliProd other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->getExpecPauliProd(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getExpecPauliProd, initinfo.qubits, resp.base.code);
 }
@@ -339,24 +174,107 @@ void CSlaveServerHandler::getExpecPauliSum(GetExpecPauliSumResp& resp, const Get
     initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
     CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getExpecPauliSum);
 
-    try
-    {
-        SINGLETON(CTaskManager)->getExpecPauliSum(resp, req, initinfo);
-        countsis.setExecType(initinfo.exec_type);
-        countsis.setQubitNum(initinfo.qubits);
-    }
-    catch(const TTransportException& e)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetExpecPauliSumReq>(req);
-        LOG(ERROR) << "getExpecPauliSum exception(req:" << reqbuf << ",err:" << e.what() << ").";
-    }
-    catch(...)
-    {
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-        std::string reqbuf = getPrint<GetExpecPauliSumReq>(req);
-        LOG(ERROR) << "getExpecPauliSum other exception(req:" << reqbuf << ").";
-    }
+    SINGLETON(CTaskManager)->getExpecPauliSum(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
 
     CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getExpecPauliSum, initinfo.qubits, resp.base.code);
+}
+
+//获取测量结果
+void CSlaveServerHandler::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
+{
+    InitQubitsReq initinfo;
+    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
+    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_measureQubits);
+
+    SINGLETON(CTaskManager)->measureQubits(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
+
+    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_measureQubits, initinfo.qubits, resp.base.code);
+}
+
+//注册一些自定义量子门，单次任务有效
+void CSlaveServerHandler::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req)
+{
+    InitQubitsReq initinfo;
+    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
+    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_addCustomGateByMatrix);
+
+    SINGLETON(CTaskManager)->addCustomGateByMatrix(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
+
+    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_addCustomGateByMatrix, initinfo.qubits, resp.base.code);
+}
+
+//添加量子门操作
+void CSlaveServerHandler::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req)
+{
+    InitQubitsReq initinfo;
+    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
+    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_addSubCircuit);
+
+    SINGLETON(CTaskManager)->addSubCircuit(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
+
+    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_addSubCircuit, initinfo.qubits, resp.base.code);
+}
+
+//追加量子比特到当前的量子电路
+void CSlaveServerHandler::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req)
+{
+    InitQubitsReq initinfo;
+    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
+    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_appendQubits);
+
+    SINGLETON(CTaskManager)->appendQubits(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
+
+    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_appendQubits, initinfo.qubits, resp.base.code);
+}
+
+//重置指定的qubits
+void CSlaveServerHandler::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
+{
+    InitQubitsReq initinfo;
+    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
+    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_resetQubits);
+
+    SINGLETON(CTaskManager)->resetQubits(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
+
+    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_resetQubits, initinfo.qubits, resp.base.code);
+}
+
+//获取当前量子状态向量
+void CSlaveServerHandler::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req)
+{
+    InitQubitsReq initinfo;
+    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
+    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getStateOfAllQubits);
+
+    SINGLETON(CTaskManager)->getStateOfAllQubits(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
+
+    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getStateOfAllQubits, initinfo.qubits, resp.base.code);
+}
+
+//获取当前所有可能状态组合的概率
+void CSlaveServerHandler::getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req)
+{
+    InitQubitsReq initinfo;
+    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
+    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_getProbabilities);
+
+    SINGLETON(CTaskManager)->getProbabilities(resp, req, initinfo);
+    countsis.setExecType(initinfo.exec_type);
+    countsis.setQubitNum(initinfo.qubits);
+
+    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_getProbabilities, initinfo.qubits, resp.base.code);
 }

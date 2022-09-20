@@ -26,10 +26,6 @@ public:
     //关闭客户端
     void close();
 
-    //重新初始化客户端
-    int reInit(const bool isprint = true);
-
-public:
     //处理机器注册接口
     void registerResource(RegisterResp& resp, const RegisterReq& req);
 
@@ -47,6 +43,10 @@ public:
 
     //获取统计信息
     void GetStatisticsInfo(GetStatisticsInfoResp& resp, const GetStatisticsInfoReq& req);
+
+private:
+    //重新初始化客户端
+    int reInit(const bool isprint = true);
 
 private:
     std::string m_addr{""};
