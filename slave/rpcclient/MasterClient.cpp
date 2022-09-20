@@ -67,161 +67,43 @@ int CMasterClient::reInit(const bool isprint)
 //处理机器注册接口
 void CMasterClient::registerResource(RegisterResp& resp, const RegisterReq& req)
 {
-    std::string reqbuf = getPrint<RegisterReq>(req);
+    std::string reqbuf = getPrint(req);
     LOG(INFO) << "request registerResource(req:" << reqbuf << ").";
 
-    try
-    {
-        m_client->registerResource(resp, req);
-    }
-    catch(const TTransportException& e)
-    {
-        bool rnt = isNeedReConnectCode(e);
-        LOG(ERROR) << "registerResource exception(seq:" << req.seq << ",rnt:" << rnt << ",err:" << e.what() << ").";
-        if (rnt)
-        {   
-            reInit();
-        }
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    catch(...)
-    {
-        LOG(ERROR) << "registerResource other exception(seq:" << req.seq << ").";
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    
-    LOG(INFO) << "response registerResource(seq:" << req.seq << ",resp:" << getPrint<RegisterResp>(resp) << ").";
+    CALL_WITH_SERVICE(m_client->registerResource(resp, req), req);
+    LOG(INFO) << "response registerResource(seq:" << req.seq << ",resp:" << getPrint(resp) << ").";
 }
 
 //处理机器注销接口
 void CMasterClient::unRegister(UnRegisterResp& resp, const UnRegisterReq& req)
 {
-    std::string reqbuf = getPrint<UnRegisterReq>(req);
+    std::string reqbuf = getPrint(req);
     LOG(INFO) << "request unRegister(req:" << reqbuf << ").";
 
-    try
-    {
-        m_client->unRegister(resp, req);
-    }
-    catch(const TTransportException& e)
-    {
-        bool rnt = isNeedReConnectCode(e);
-        LOG(ERROR) << "unRegister exception(seq:" << req.seq << ",rnt:" << rnt << ",err:" << e.what() << ").";
-        if (rnt)
-        {   
-            reInit();
-        }
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    catch(...)
-    {
-        LOG(ERROR) << "unRegister other exception(seq:" << req.seq << ").";
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    
-    LOG(INFO) << "response unRegister(seq:" << req.seq << ",resp:" << getPrint<UnRegisterResp>(resp) << ").";
+    CALL_WITH_SERVICE(m_client->unRegister(resp, req), req);
+    LOG(INFO) << "response unRegister(seq:" << req.seq << ",resp:" << getPrint(resp) << ").";
 }
 
 //处理机器心跳接口
 void CMasterClient::heartbeat(HeartbeatResp& resp, const HeartbeatReq& req)
 {
-    try
-    {
-        m_client->heartbeat(resp, req);
-    }
-    catch(const TTransportException& e)
-    {
-        bool rnt = isNeedReConnectCode(e);
-        std::string reqbuf = getPrint<HeartbeatReq>(req);
-        LOG(ERROR) << "heartbeat exception(req:" << reqbuf << ",rnt:" << rnt << ",err:" << e.what() << ").";
-        if (rnt)
-        {   
-            reInit();
-        }
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    catch(...)
-    {
-        std::string reqbuf = getPrint<HeartbeatReq>(req);
-        LOG(ERROR) << "heartbeat other exception(req:" << reqbuf << ").";
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
+    CALL_WITH_SERVICE(m_client->heartbeat(resp, req), req);
 }
 
 //处理上报资源接口
 void CMasterClient::reportResource(ReportResourceResp& resp, const ReportResourceReq& req)
 {
-    try
-    {
-        m_client->reportResource(resp, req);
-    }
-    catch(const TTransportException& e)
-    {
-        bool rnt = isNeedReConnectCode(e);
-        std::string reqbuf = getPrint<ReportResourceReq>(req);
-        LOG(ERROR) << "reportResource exception(req:" << reqbuf << ",rnt:" << rnt << ",err:" << e.what() << ").";
-        if (rnt)
-        {   
-            reInit();
-        }
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    catch(...)
-    {
-        std::string reqbuf = getPrint<ReportResourceReq>(req);
-        LOG(ERROR) << "reportResource other exception(req:" << reqbuf << ").";
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
+    CALL_WITH_SERVICE(m_client->reportResource(resp, req), req);
 }
 
 //上报统计信息
 void CMasterClient::ReportStatisticsInfo(ReportStatisticsInfoResp& resp, const ReportStatisticsInfoReq& req)
 {
-    try
-    {
-        m_client->ReportStatisticsInfo(resp, req);
-    }
-    catch(const TTransportException& e)
-    {
-        bool rnt = isNeedReConnectCode(e);
-        std::string reqbuf = getPrint<ReportStatisticsInfoReq>(req);
-        LOG(ERROR) << "ReportStatisticsInfo exception(req:" << reqbuf << ",rnt:" << rnt << ",err:" << e.what() << ").";
-        if (rnt)
-        {   
-            reInit();
-        }
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    catch(...)
-    {
-        std::string reqbuf = getPrint<ReportStatisticsInfoReq>(req);
-        LOG(ERROR) << "ReportStatisticsInfo other exception(req:" << reqbuf << ").";
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
+    CALL_WITH_SERVICE(m_client->ReportStatisticsInfo(resp, req), req);
 }
 
 //获取统计信息
 void CMasterClient::GetStatisticsInfo(GetStatisticsInfoResp& resp, const GetStatisticsInfoReq& req)
 {
-    try
-    {
-        m_client->GetStatisticsInfo(resp, req);
-    }
-    catch(const TTransportException& e)
-    {
-        bool rnt = isNeedReConnectCode(e);
-        std::string reqbuf = getPrint<GetStatisticsInfoReq>(req);
-        LOG(ERROR) << "GetStatisticsInfo exception(req:" << reqbuf << ",rnt:" << rnt << ",err:" << e.what() << ").";
-        if (rnt)
-        {   
-            reInit();
-        }
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
-    catch(...)
-    {
-        std::string reqbuf = getPrint<GetStatisticsInfoReq>(req);
-        LOG(ERROR) << "GetStatisticsInfo other exception(req:" << reqbuf << ").";
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION);
-    }
+    CALL_WITH_SERVICE(m_client->GetStatisticsInfo(resp, req), req);
 }

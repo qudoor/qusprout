@@ -23,18 +23,18 @@
 
 
 
-struct GpuType {
+struct SisGpuType {
   enum type {
-    GpuType_Default = 0,
-    GpuType_Nvidia = 1
+    SisGpuType_Default = 0,
+    SisGpuType_Nvidia = 1
   };
 };
 
-extern const std::map<int, const char*> _GpuType_VALUES_TO_NAMES;
+extern const std::map<int, const char*> _SisGpuType_VALUES_TO_NAMES;
 
-std::ostream& operator<<(std::ostream& out, const GpuType::type& val);
+std::ostream& operator<<(std::ostream& out, const SisGpuType::type& val);
 
-std::string to_string(const GpuType::type& val);
+std::string to_string(const SisGpuType::type& val);
 
 class BaseTag;
 
@@ -437,7 +437,7 @@ class MachineFixedInfo : public virtual ::apache::thrift::TBase {
   MachineFixedInfo() noexcept
                    : cpu_num(0),
                      cpu_memory(0),
-                     gpu_type(static_cast<GpuType::type>(0)),
+                     gpu_type(static_cast<SisGpuType::type>(0)),
                      gpu_memory(0) {
   }
 
@@ -446,9 +446,9 @@ class MachineFixedInfo : public virtual ::apache::thrift::TBase {
   int64_t cpu_memory;
   /**
    * 
-   * @see GpuType
+   * @see SisGpuType
    */
-  GpuType::type gpu_type;
+  SisGpuType::type gpu_type;
   int64_t gpu_memory;
 
   _MachineFixedInfo__isset __isset;
@@ -457,7 +457,7 @@ class MachineFixedInfo : public virtual ::apache::thrift::TBase {
 
   void __set_cpu_memory(const int64_t val);
 
-  void __set_gpu_type(const GpuType::type val);
+  void __set_gpu_type(const SisGpuType::type val);
 
   void __set_gpu_memory(const int64_t val);
 

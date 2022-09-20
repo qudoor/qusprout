@@ -80,7 +80,7 @@ void startRpc()
 {
     //quroot接口初始化
     ::std::shared_ptr<CWorkServerHandler> quworkhandler(new CWorkServerHandler());
-    ::std::shared_ptr<TProcessor> quworkprocessor(new WorkServerProcessor(quworkhandler));
+    ::std::shared_ptr<TProcessor> quworkprocessor(new QuSproutServerProcessor(quworkhandler));
 
     //网络、协议等初始化
     ::std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(SINGLETON(CmdParams)->port));
@@ -89,7 +89,7 @@ void startRpc()
 
     //注册接口
     ::std::shared_ptr<TMultiplexedProcessor> multiProcessor(new TMultiplexedProcessor());
-    multiProcessor->registerProcessor("WorkServer", quworkprocessor);
+    multiProcessor->registerProcessor("QuSproutServer", quworkprocessor);
 
     //定义server
     ::std::shared_ptr<TThreadedServer> server(new TThreadedServer(multiProcessor, serverTransport, transportFactory, protocolFactory));

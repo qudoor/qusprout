@@ -2,6 +2,8 @@
 #define __H__CONFIG__H__
 
 #include <string>
+#include <map>
+#include <set>
 
 class CConfig
 {
@@ -40,6 +42,9 @@ public:
     //机器心跳间隔，单位：秒
     int m_resourceHeartInterval{20};
 
+    //rpc的地址
+    std::string m_listenAddr{""};
+
     //rpc监听的端口
     int m_listenPort{9090};
 
@@ -60,6 +65,21 @@ public:
 
     //客户端接收超时
     int m_clientRecvTimeout{0};
+
+    //quroot开关
+    int m_qurootEnable{0};
+
+    //quroot的端口
+    int m_qurootPort{0};
+
+    //quroot的地址
+    std::string m_qurootAddr{""};
+
+    //quroot的心跳间隔
+    int m_qurootHeartInterval{3};
+
+    //设备支持的量子门
+    std::map<std::string, std::set<std::string>> m_supportGate;
 };
 
 #endif

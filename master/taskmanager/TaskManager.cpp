@@ -42,26 +42,25 @@ void CTaskManager::initTask(InitQubitsResp& resp, const InitQubitsReq& req, cons
         taskhandle->taskinfo.__set_hosts(hosts);
     }
 
+    ret = addTask(req.id, taskhandle);
+    if (ret != 0)
     {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        auto iter  = m_taskList.find(req.id);
-        if (iter != m_taskList.end())
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+        return;
+    }
+    
+    {
+        std::lock_guard<std::mutex> guard(taskhandle->mutex);
+        taskhandle->client.initQubits(resp, taskhandle->taskinfo);
+        if (resp.base.code == ErrCode::type::COM_SUCCESS)
         {
-            //任务已经初始化
-            LOG(ERROR) << "initTask task is inited(taskid:" << req.id << ").";
-            setBase(resp.base, ErrCode::type::COM_SUCCESS);
             return;
         }
-        m_taskList.insert(std::pair<std::string, std::shared_ptr<CTask>>(req.id, taskhandle));
-        m_addrList[addr].insert(req.id);
     }
 
-    taskhandle->client.initQubits(resp, taskhandle->taskinfo);
-    if (resp.base.code != ErrCode::type::COM_SUCCESS)
     {
         std::lock_guard<std::mutex> guard(m_mutex);
         m_taskList.erase(req.id);
-        m_addrList[addr].erase(req.id);
     }
 }
 
@@ -107,6 +106,26 @@ void CTaskManager::initGpuSimulator(InitQubitsResp& resp, const InitQubitsReq& r
     return;
 }
 
+void CTaskManager::initFixedSimulator(InitQubitsResp& resp, const InitQubitsReq& req)
+{
+    //1.定义判断内存是否足够的函数
+    std::string addr = "";
+    std::string rpcaddr = "";
+    int rpcport = 0;
+    ErrCode::type code = SINGLETON(CResourceManager)->checkFixedResource(req, req.hosts, addr, rpcaddr, rpcport);
+    if (code != ErrCode::type::COM_SUCCESS)
+    {
+        //资源申请出错
+        LOG(ERROR) << "initFixedSimulator checkFixedResource is not success(taskid:" << req.id << ",code:" << code << ").";
+        setBase(resp.base, code);
+        return;
+    }
+
+    //2.创建slaver的rpc客户端
+    initTask(resp, req, addr, rpcaddr, rpcport, req.hosts);
+    return;
+}
+
 void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
     if (req.id.empty() || req.qubits <= 0)
@@ -117,7 +136,7 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     }
 
     //1.判断任务是否已经初始化
-    auto taskhandle = getTask(req.id);
+    auto taskhandle = getTask(req.id, false);
     if (taskhandle != nullptr)
     {
         //任务已经初始化
@@ -126,18 +145,19 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
         return;
     }
 
-    if (ExecCmdType::ExecTypeDefault == req.exec_type || ExecCmdType::ExecTypeCpuSingle == req.exec_type || ExecCmdType::ExecTypeCpuMpi == req.exec_type)
+    if (req.hosts.size() > 0)
     {
-        initCpuSimulator(resp, req);
+        initFixedSimulator(resp, req);
         return;
     }
-    else if (ExecCmdType::ExecTypeGpuSingle == req.exec_type)
+    
+    if (ExecCmdType::ExecTypeGpuSingle == req.exec_type)
     {
         initGpuSimulator(resp, req);
         return;
     }
     
-    setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+    initCpuSimulator(resp, req);
 }
 
 void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
@@ -192,7 +212,6 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     {
         std::lock_guard<std::mutex> guard(m_mutex);
         m_taskList.erase(req.id);
-        m_addrList[taskhandle->addr].erase(req.id);
     }
 
     return;
@@ -325,7 +344,6 @@ void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req)
     {
         std::lock_guard<std::mutex> guard(m_mutex);
         m_taskList.erase(req.id);
-        m_addrList[taskhandle->addr].erase(req.id);
     }
 
     return;
@@ -442,18 +460,200 @@ void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
     return;
 }
 
-std::shared_ptr<CTask> CTaskManager::getTask(const std::string& id)
+//获取测量结果
+void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "measureQubits taskid is null.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    } 
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle == nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "measureQubits task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.measureQubits(resp, req);
+
+    return;
+}
+
+//注册一些自定义量子门，单次任务有效
+void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "addCustomGateByMatrix taskid is null.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    } 
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle == nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "addCustomGateByMatrix task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.addCustomGateByMatrix(resp, req);
+
+    return;
+}
+
+//添加量子门操作
+void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "addSubCircuit taskid is null.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    } 
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle == nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "addSubCircuit task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.addSubCircuit(resp, req);
+
+    return;
+}
+
+//追加量子比特到当前的量子电路
+void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "appendQubits taskid is null.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    } 
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle == nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "appendQubits task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.appendQubits(resp, req);
+
+    return;
+}
+
+//重置指定的qubits
+void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "resetQubits taskid is null.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    } 
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle == nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "resetQubits task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.resetQubits(resp, req);
+
+    return;
+}
+
+//获取当前量子状态向量
+void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "getStateOfAllQubits taskid is null.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    } 
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle == nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "getStateOfAllQubits task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.getStateOfAllQubits(resp, req);
+
+    return;
+}
+
+//获取当前所有可能状态组合的概率
+void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "getProbabilities taskid is null.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    } 
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle == nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "getProbabilities task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.getProbabilities(resp, req);
+
+    return;
+}
+
+std::shared_ptr<CTask> CTaskManager::getTask(const std::string& id, const bool isupdatetime)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     auto iter  = m_taskList.find(id);
     if (iter != m_taskList.end())
     {
         //每次操作重新获取更新时间,代表最近使用了，为了清理不使用的任务
-        if (iter->second->client.isInit() == true)
+        if (isupdatetime)
         {
             iter->second->updatetime = time(NULL);
-            return iter->second;
         }
+        return iter->second;
     }
 
     return nullptr;
@@ -483,7 +683,6 @@ void CTaskManager::cleanTask(const int timeOutDuration)
                 std::lock_guard<std::mutex> guard(iter->second->mutex);
                 iter->second->client.cancelCmd(resp, req);
             }
-            m_addrList[iter->second->addr].erase(req.id);
             iter = m_taskList.erase(iter);
         }
         else
@@ -501,18 +700,32 @@ void CTaskManager::cleanTask(const std::string& addr)
     CancelCmdResp resp;
     CancelCmdReq req;
     std::lock_guard<std::mutex> guard(m_mutex);
-    auto iter = m_addrList.find(addr);
-    if (iter !=  m_addrList.end())
+    auto iter = m_taskList.begin();
+    while (iter !=  m_taskList.end())
     {
-        for (auto taskid : iter->second)
+        if (iter->second->addr == addr)
         {
-            req.__set_id(taskid);
-            {
-                std::lock_guard<std::mutex> guard(m_taskList[taskid]->mutex);
-                m_taskList[taskid]->client.cancelCmd(resp, req);
-            }
-            m_taskList.erase(taskid);
+            std::lock_guard<std::mutex> guard(iter->second->mutex);
+            req.__set_id(iter->second->taskinfo.id);
+            iter->second->client.cancelCmd(resp, req);
+            iter = m_taskList.erase(iter);
+        }
+        else
+        {
+            ++iter;
         }
     }
-    m_addrList.erase(addr);
+}
+
+int CTaskManager::addTask(const std::string& id, std::shared_ptr<CTask> task)
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    if (m_taskList.find(id) != m_taskList.end())
+    {
+        LOG(ERROR) << "task is inited(taskid:" << id << ").";
+        return -1;
+    }
+    m_taskList.insert(std::pair<std::string, std::shared_ptr<CTask>>(id, task));
+
+    return 0;
 }

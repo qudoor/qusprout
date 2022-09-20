@@ -4,6 +4,7 @@
 #include <math.h>
 #include <time.h>
 #include <fstream>
+#include <algorithm>
 #include "../config/Config.h"
 #include <algorithm>
 #include "../../common/utility.h"
@@ -18,52 +19,59 @@ using namespace std;
 using GateFunc = void (CmdExecutor::*)(const Cmd& cmd);
 
 map<string, GateFunc> g_gateMap = {
-    make_pair<string, GateFunc>("H", &CmdExecutor::H),
-    make_pair<string, GateFunc>("Measure", &CmdExecutor::Measure),
-    make_pair<string, GateFunc>("P", &CmdExecutor::P),
-    make_pair<string, GateFunc>("CP", &CmdExecutor::CP),
-    make_pair<string, GateFunc>("R", &CmdExecutor::R),
-    make_pair<string, GateFunc>("Rx", &CmdExecutor::Rx), 
-    make_pair<string, GateFunc>("Ry", &CmdExecutor::Ry),
-    make_pair<string, GateFunc>("Rz", &CmdExecutor::Rz),
-    make_pair<string, GateFunc>("Rxx", &CmdExecutor::Rxx),
-    make_pair<string, GateFunc>("Ryy", &CmdExecutor::Ryy),
-    make_pair<string, GateFunc>("Rzz", &CmdExecutor::Rzz),
-    make_pair<string, GateFunc>("X", &CmdExecutor::X),
-    make_pair<string, GateFunc>("Y", &CmdExecutor::Y),
-    make_pair<string, GateFunc>("Z", &CmdExecutor::Z),
-    make_pair<string, GateFunc>("S", &CmdExecutor::S),
-    make_pair<string, GateFunc>("T", &CmdExecutor::T),
-    make_pair<string, GateFunc>("Sdg", &CmdExecutor::Sdg),
-    make_pair<string, GateFunc>("Tdg", &CmdExecutor::Tdg),
-    make_pair<string, GateFunc>("SqrtX", &CmdExecutor::SqrtX),
-    make_pair<string, GateFunc>("SqrtSwap", &CmdExecutor::SqrtSwap),
-    make_pair<string, GateFunc>("Swap", &CmdExecutor::Swap),
-    make_pair<string, GateFunc>("CNOT", &CmdExecutor::CNOT),
-    make_pair<string, GateFunc>("MCX", &CmdExecutor::CNOT),
-    make_pair<string, GateFunc>("CY", &CmdExecutor::CY),
-    make_pair<string, GateFunc>("MCZ", &CmdExecutor::CZ),
-    make_pair<string, GateFunc>("U3", &CmdExecutor::U3),
-    make_pair<string, GateFunc>("U2", &CmdExecutor::U2),
-    make_pair<string, GateFunc>("U1", &CmdExecutor::U1),
-    make_pair<string, GateFunc>("CRx", &CmdExecutor::CRx),
-    make_pair<string, GateFunc>("CRy", &CmdExecutor::CRy),
-    make_pair<string, GateFunc>("CRz", &CmdExecutor::CRz),
-    make_pair<string, GateFunc>("X1", &CmdExecutor::X1),
-    make_pair<string, GateFunc>("Y1", &CmdExecutor::Y1),
-    make_pair<string, GateFunc>("Z1", &CmdExecutor::Z1),
-    make_pair<string, GateFunc>("CU1", &CmdExecutor::CU1),
-    make_pair<string, GateFunc>("CU3", &CmdExecutor::CU3),
-    make_pair<string, GateFunc>("U", &CmdExecutor::U),
-    make_pair<string, GateFunc>("CU", &CmdExecutor::CU),
-    make_pair<string, GateFunc>("CR", &CmdExecutor::CR),
-    make_pair<string, GateFunc>("iSwap", &CmdExecutor::iSwap),
-    make_pair<string, GateFunc>("Id", &CmdExecutor::id),
-    make_pair<string, GateFunc>("CH", &CmdExecutor::CH),
-    make_pair<string, GateFunc>("SqrtXdg", &CmdExecutor::SqrtXdg),
-    make_pair<string, GateFunc>("CSqrtX", &CmdExecutor::CSqrtX),
-    make_pair<string, GateFunc>("CSwap", &CmdExecutor::CSwap)
+    make_pair<string, GateFunc>("h", &CmdExecutor::H),
+    make_pair<string, GateFunc>("measure", &CmdExecutor::Measure),
+    make_pair<string, GateFunc>("p", &CmdExecutor::P),
+    make_pair<string, GateFunc>("cp", &CmdExecutor::CP),
+    make_pair<string, GateFunc>("r", &CmdExecutor::R),
+    make_pair<string, GateFunc>("rx", &CmdExecutor::Rx), 
+    make_pair<string, GateFunc>("ry", &CmdExecutor::Ry),
+    make_pair<string, GateFunc>("rz", &CmdExecutor::Rz),
+    make_pair<string, GateFunc>("rxx", &CmdExecutor::Rxx),
+    make_pair<string, GateFunc>("ryy", &CmdExecutor::Ryy),
+    make_pair<string, GateFunc>("rzz", &CmdExecutor::Rzz),
+    make_pair<string, GateFunc>("x", &CmdExecutor::X),
+    make_pair<string, GateFunc>("y", &CmdExecutor::Y),
+    make_pair<string, GateFunc>("z", &CmdExecutor::Z),
+    make_pair<string, GateFunc>("s", &CmdExecutor::S),
+    make_pair<string, GateFunc>("t", &CmdExecutor::T),
+    make_pair<string, GateFunc>("sdg", &CmdExecutor::Sdg),
+    make_pair<string, GateFunc>("tdg", &CmdExecutor::Tdg),
+    make_pair<string, GateFunc>("sqrtx", &CmdExecutor::SqrtX),
+    make_pair<string, GateFunc>("sqrtswap", &CmdExecutor::SqrtSwap),
+    make_pair<string, GateFunc>("swap", &CmdExecutor::Swap),
+    make_pair<string, GateFunc>("cnot", &CmdExecutor::CNOT),
+    make_pair<string, GateFunc>("mcx", &CmdExecutor::CNOT),
+    make_pair<string, GateFunc>("cy", &CmdExecutor::CY),
+    make_pair<string, GateFunc>("mcz", &CmdExecutor::CZ),
+    make_pair<string, GateFunc>("u3", &CmdExecutor::U3),
+    make_pair<string, GateFunc>("u2", &CmdExecutor::U2),
+    make_pair<string, GateFunc>("u1", &CmdExecutor::U1),
+    make_pair<string, GateFunc>("crx", &CmdExecutor::CRx),
+    make_pair<string, GateFunc>("cry", &CmdExecutor::CRy),
+    make_pair<string, GateFunc>("crz", &CmdExecutor::CRz),
+    make_pair<string, GateFunc>("x1", &CmdExecutor::X1),
+    make_pair<string, GateFunc>("y1", &CmdExecutor::Y1),
+    make_pair<string, GateFunc>("z1", &CmdExecutor::Z1),
+    make_pair<string, GateFunc>("cu1", &CmdExecutor::CU1),
+    make_pair<string, GateFunc>("cu3", &CmdExecutor::CU3),
+    make_pair<string, GateFunc>("u", &CmdExecutor::U),
+    make_pair<string, GateFunc>("cu", &CmdExecutor::CU),
+    make_pair<string, GateFunc>("cr", &CmdExecutor::CR),
+    make_pair<string, GateFunc>("iswap", &CmdExecutor::iSwap),
+    make_pair<string, GateFunc>("id", &CmdExecutor::id),
+    make_pair<string, GateFunc>("ch", &CmdExecutor::CH),
+    make_pair<string, GateFunc>("sqrtxdg", &CmdExecutor::SqrtXdg),
+    make_pair<string, GateFunc>("csqrtx", &CmdExecutor::CSqrtX),
+    make_pair<string, GateFunc>("cswap", &CmdExecutor::CSwap),
+    make_pair<string, GateFunc>("ph", &CmdExecutor::Ph)
 };
+
+inline string toLowerCase(string str) 
+{
+    transform(str.begin(), str.end(), str.begin(), ::tolower);
+    return str;
+}
 
 CmdExecutor::CmdExecutor()
 {
@@ -225,7 +233,6 @@ void CmdExecutor::run(Result& result, int32_t shots) {
     while (run_times > 0) {
         m_result.measureSet.clear();
         
-        // 每次运行需要重置状态
         initZeroState(m_qureg);
 
         for (const auto & circuit : m_circuitCache) {
@@ -276,7 +283,7 @@ void CmdExecutor::packMeasureResult() {
 }
 
 void CmdExecutor::execCmd(const Cmd& cmd) {
-    const auto it = g_gateMap.find(cmd.gate);
+    const auto it = g_gateMap.find(toLowerCase(cmd.gate));
     if (it == g_gateMap.end()) {
         return;
     }
@@ -350,6 +357,128 @@ double CmdExecutor::getExpecPauliSum(const std::vector<PauliOperType::type>& ope
 
     SINGLETON(CQuESTIniter)->destroyWorkQureg(workqureg);
     return expectvalue;
+}
+
+void CmdExecutor::getMeasureResult(const std::vector<int32_t>& qubits, Result& result)
+{
+    if (qubits.size() == 0)
+    {
+        result = m_result;
+        return;
+    }
+
+    for (auto id : qubits)
+    {
+        for (auto measure: m_result.measureSet)
+        {
+            if (id == measure.id)
+            {
+                result.measureSet.push_back(measure);
+            }
+        }
+    }
+}
+
+int CmdExecutor::addCustomGateByMatrix(const GateMatrix& matrix)
+{
+    int numrows = 1 << matrix.qubits;
+    if (numrows*numrows != matrix.matrix.size())
+    {
+        LOG(ERROR) << "matrix size is invaild(matrixsize:" << matrix.matrix.size() << ",numrows*numrows:" << numrows*numrows << ").";
+        return -1;
+    }
+    auto name = toLowerCase(matrix.name);
+    m_gateMatrix.insert(std::pair<std::string, GateMatrix>(name, matrix));
+    g_gateMap.insert(std::pair<string, GateFunc>(name, &CmdExecutor::MatrixN));
+    return 0;
+}
+
+int CmdExecutor::appendQubits(const int add_qubits)
+{
+    if (add_qubits <= 0)
+    {
+        return -1;
+    }
+
+    int newqubits = SINGLETON(CQuESTIniter)->m_qubits + add_qubits;
+    long long int oldmaxindex = 1LL << SINGLETON(CQuESTIniter)->m_qubits;
+    long long int newmaxindex = 1LL << newqubits;
+    std::unique_ptr<qreal []> ampsreal(new qreal[newmaxindex]());
+    std::unique_ptr<qreal []> ampsimag(new qreal[newmaxindex]());
+    for (long long int index = 0; index < oldmaxindex; ++index)
+    {
+        Complex temp = getAmp(m_qureg, index);
+        ampsreal[index] = temp.real;
+        ampsimag[index] = temp.imag;
+    }
+
+    reInit(newqubits);
+
+    for (long long int index = oldmaxindex; index < newmaxindex; ++index)
+    {
+        Complex temp = getAmp(m_qureg, index);
+        ampsreal[index] = temp.real;
+        ampsimag[index] = temp.imag;
+    }
+    
+    initStateFromAmps(m_qureg, ampsreal.get(), ampsimag.get());
+
+    return 0;
+}
+
+void CmdExecutor::reInit(const int qubits)
+{
+    SINGLETON(CQuESTIniter)->reInit(qubits);
+    m_qureg = SINGLETON(CQuESTIniter)->m_qureg;
+
+    m_circuitCache.clear();
+    m_result.measureSet.clear();
+    m_result.outcomeSet.clear();
+}
+
+void CmdExecutor::resetQubits(const std::vector<int32_t>& qubits)
+{
+    for (auto qubit : qubits)
+    {
+        double probability = getProbOfOutcome(qubit, 0);
+        ComplexMatrix2 m = {
+                {
+                    {1.0 / sqrt(probability), 0}, 
+                    {0, 0}
+                },
+                {
+                    {0, 0}, 
+                    {0, 0}
+                }
+        };
+        applyMatrix2(m_qureg, qubit, m);
+    }
+}
+
+void CmdExecutor::getStateOfAllQubits(std::vector<double>& real, std::vector<double>& imag)
+{
+    long long int maxindex = getMaxAmpIndex();
+    for (long long int index = 0; index < maxindex; ++index)
+    {
+        Complex amp = getAmp(m_qureg, index);
+        real.push_back(amp.real);
+        imag.push_back(amp.imag);
+    }
+}
+
+void CmdExecutor::getProbabilities(std::vector<double>& probabilities)
+{
+    long long int maxindex = getMaxAmpIndex();
+    for (long long int index = 0; index < maxindex; ++index)
+    {
+        double prob = getProbAmp(m_qureg, index);;
+        probabilities.push_back(prob);
+    }
+}
+
+long long int CmdExecutor::getMaxAmpIndex()
+{
+    return (1LL << SINGLETON(CQuESTIniter)->m_qubits);
 }
 
 void CmdExecutor::H(const Cmd& cmd) {
@@ -1363,4 +1492,84 @@ void CmdExecutor::iSwap(const Cmd& cmd)
 void CmdExecutor::id(const Cmd& cmd)
 {
     // do nothing
+}
+
+void CmdExecutor::MatrixN(const Cmd& cmd) {
+    auto matrix = m_gateMatrix[toLowerCase(cmd.gate)];
+    auto targetsize = (int)cmd.targets.size();
+    if (targetsize != matrix.qubits)
+    {
+        LOG(ERROR) << "MatrixN is invaild target num(targetsize:" << targetsize << ").";
+        return;
+    }
+
+    if (cmd.inverse) {
+        //暂时不支持
+        LOG(ERROR) << "MatrixN is not support inverse";
+        return;
+    }
+    
+    int index = 0;
+    int numrows = 1 << matrix.qubits;
+    ComplexMatrixN m = createComplexMatrixN(matrix.qubits);
+    for (int row = 0; row < numrows; row++) { 
+        for (int col = 0; col < numrows; col++) { 
+            m.real[row][col] = matrix.matrix[index++];
+            m.imag[row][col] = matrix.matrix[index++];
+        }
+    } 
+
+    int targsnum = matrix.qubits;
+    std::unique_ptr<int []> targs(new int[targsnum]());
+    for (int i = 0; i < targsnum; ++i)
+    {
+        targs[i] = cmd.targets[i];
+    }
+
+    applyMatrixN(m_qureg, targs.get(), targsnum, m);
+
+    destroyComplexMatrixN(m);
+}
+
+void CmdExecutor::Ph(const Cmd& cmd)
+{
+    int targsnum = cmd.targets.size();
+    if (targsnum == 0 || cmd.rotation.size() != 1)
+    {
+        return;
+    }
+
+    if (cmd.inverse) {
+        //暂时不支持
+        LOG(ERROR) << "MatrixN is not support inverse";
+        return;
+    }
+
+    double rotation = cmd.rotation[0];
+    int numrows = 1 << targsnum;
+    ComplexMatrixN m = createComplexMatrixN(targsnum);
+    for (int row = 0; row < numrows; row++) { 
+        for (int col = 0; col < numrows; col++) { 
+            if (row == col)
+            {
+                m.real[row][col] = cos(rotation);
+                m.imag[row][col] = sin(rotation);
+            }
+            else
+            {
+                m.real[row][col] = 0;
+                m.imag[row][col] = 0;
+            }
+        }
+    } 
+
+    std::unique_ptr<int []> targs(new int[targsnum]());
+    for (int i = 0; i < targsnum; ++i)
+    {
+        targs[i] = cmd.targets[i];
+    }
+
+    applyMatrixN(m_qureg, targs.get(), targsnum, m);
+
+    destroyComplexMatrixN(m);
 }

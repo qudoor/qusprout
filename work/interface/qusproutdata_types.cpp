@@ -3856,3 +3856,1895 @@ void GetExpecPauliSumResp::printTo(std::ostream& out) const {
 }
 
 
+MeasureQubitsReq::~MeasureQubitsReq() noexcept {
+}
+
+
+void MeasureQubitsReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+
+void MeasureQubitsReq::__set_qubits(const std::vector<int32_t> & val) {
+  this->qubits = val;
+}
+std::ostream& operator<<(std::ostream& out, const MeasureQubitsReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t MeasureQubitsReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+  bool isset_qubits = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->qubits.clear();
+            uint32_t _size147;
+            ::apache::thrift::protocol::TType _etype150;
+            xfer += iprot->readListBegin(_etype150, _size147);
+            this->qubits.resize(_size147);
+            uint32_t _i151;
+            for (_i151 = 0; _i151 < _size147; ++_i151)
+            {
+              xfer += iprot->readI32(this->qubits[_i151]);
+            }
+            xfer += iprot->readListEnd();
+          }
+          isset_qubits = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_qubits)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t MeasureQubitsReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("MeasureQubitsReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("qubits", ::apache::thrift::protocol::T_LIST, 2);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->qubits.size()));
+    std::vector<int32_t> ::const_iterator _iter152;
+    for (_iter152 = this->qubits.begin(); _iter152 != this->qubits.end(); ++_iter152)
+    {
+      xfer += oprot->writeI32((*_iter152));
+    }
+    xfer += oprot->writeListEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(MeasureQubitsReq &a, MeasureQubitsReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+  swap(a.qubits, b.qubits);
+}
+
+MeasureQubitsReq::MeasureQubitsReq(const MeasureQubitsReq& other153) {
+  id = other153.id;
+  qubits = other153.qubits;
+}
+MeasureQubitsReq& MeasureQubitsReq::operator=(const MeasureQubitsReq& other154) {
+  id = other154.id;
+  qubits = other154.qubits;
+  return *this;
+}
+void MeasureQubitsReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "MeasureQubitsReq(";
+  out << "id=" << to_string(id);
+  out << ", " << "qubits=" << to_string(qubits);
+  out << ")";
+}
+
+
+MeasureQubitsResp::~MeasureQubitsResp() noexcept {
+}
+
+
+void MeasureQubitsResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+
+void MeasureQubitsResp::__set_results(const std::vector<MeasureResult> & val) {
+  this->results = val;
+__isset.results = true;
+}
+
+void MeasureQubitsResp::__set_outcomes(const std::vector<Outcome> & val) {
+  this->outcomes = val;
+}
+std::ostream& operator<<(std::ostream& out, const MeasureQubitsResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t MeasureQubitsResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+  bool isset_outcomes = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->results.clear();
+            uint32_t _size155;
+            ::apache::thrift::protocol::TType _etype158;
+            xfer += iprot->readListBegin(_etype158, _size155);
+            this->results.resize(_size155);
+            uint32_t _i159;
+            for (_i159 = 0; _i159 < _size155; ++_i159)
+            {
+              xfer += this->results[_i159].read(iprot);
+            }
+            xfer += iprot->readListEnd();
+          }
+          this->__isset.results = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->outcomes.clear();
+            uint32_t _size160;
+            ::apache::thrift::protocol::TType _etype163;
+            xfer += iprot->readListBegin(_etype163, _size160);
+            this->outcomes.resize(_size160);
+            uint32_t _i164;
+            for (_i164 = 0; _i164 < _size160; ++_i164)
+            {
+              xfer += this->outcomes[_i164].read(iprot);
+            }
+            xfer += iprot->readListEnd();
+          }
+          isset_outcomes = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_outcomes)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t MeasureQubitsResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("MeasureQubitsResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  if (this->__isset.results) {
+    xfer += oprot->writeFieldBegin("results", ::apache::thrift::protocol::T_LIST, 2);
+    {
+      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->results.size()));
+      std::vector<MeasureResult> ::const_iterator _iter165;
+      for (_iter165 = this->results.begin(); _iter165 != this->results.end(); ++_iter165)
+      {
+        xfer += (*_iter165).write(oprot);
+      }
+      xfer += oprot->writeListEnd();
+    }
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldBegin("outcomes", ::apache::thrift::protocol::T_LIST, 3);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->outcomes.size()));
+    std::vector<Outcome> ::const_iterator _iter166;
+    for (_iter166 = this->outcomes.begin(); _iter166 != this->outcomes.end(); ++_iter166)
+    {
+      xfer += (*_iter166).write(oprot);
+    }
+    xfer += oprot->writeListEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(MeasureQubitsResp &a, MeasureQubitsResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+  swap(a.results, b.results);
+  swap(a.outcomes, b.outcomes);
+  swap(a.__isset, b.__isset);
+}
+
+MeasureQubitsResp::MeasureQubitsResp(const MeasureQubitsResp& other167) {
+  base = other167.base;
+  results = other167.results;
+  outcomes = other167.outcomes;
+  __isset = other167.__isset;
+}
+MeasureQubitsResp& MeasureQubitsResp::operator=(const MeasureQubitsResp& other168) {
+  base = other168.base;
+  results = other168.results;
+  outcomes = other168.outcomes;
+  __isset = other168.__isset;
+  return *this;
+}
+void MeasureQubitsResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "MeasureQubitsResp(";
+  out << "base=" << to_string(base);
+  out << ", " << "results="; (__isset.results ? (out << to_string(results)) : (out << "<null>"));
+  out << ", " << "outcomes=" << to_string(outcomes);
+  out << ")";
+}
+
+
+GateMatrix::~GateMatrix() noexcept {
+}
+
+
+void GateMatrix::__set_name(const std::string& val) {
+  this->name = val;
+}
+
+void GateMatrix::__set_qubits(const int32_t val) {
+  this->qubits = val;
+}
+
+void GateMatrix::__set_matrix(const std::vector<double> & val) {
+  this->matrix = val;
+}
+std::ostream& operator<<(std::ostream& out, const GateMatrix& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t GateMatrix::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_name = false;
+  bool isset_qubits = false;
+  bool isset_matrix = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->name);
+          isset_name = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->qubits);
+          isset_qubits = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->matrix.clear();
+            uint32_t _size169;
+            ::apache::thrift::protocol::TType _etype172;
+            xfer += iprot->readListBegin(_etype172, _size169);
+            this->matrix.resize(_size169);
+            uint32_t _i173;
+            for (_i173 = 0; _i173 < _size169; ++_i173)
+            {
+              xfer += iprot->readDouble(this->matrix[_i173]);
+            }
+            xfer += iprot->readListEnd();
+          }
+          isset_matrix = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_name)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_qubits)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_matrix)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t GateMatrix::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("GateMatrix");
+
+  xfer += oprot->writeFieldBegin("name", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->name);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("qubits", ::apache::thrift::protocol::T_I32, 2);
+  xfer += oprot->writeI32(this->qubits);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("matrix", ::apache::thrift::protocol::T_LIST, 3);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_DOUBLE, static_cast<uint32_t>(this->matrix.size()));
+    std::vector<double> ::const_iterator _iter174;
+    for (_iter174 = this->matrix.begin(); _iter174 != this->matrix.end(); ++_iter174)
+    {
+      xfer += oprot->writeDouble((*_iter174));
+    }
+    xfer += oprot->writeListEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(GateMatrix &a, GateMatrix &b) {
+  using ::std::swap;
+  swap(a.name, b.name);
+  swap(a.qubits, b.qubits);
+  swap(a.matrix, b.matrix);
+}
+
+GateMatrix::GateMatrix(const GateMatrix& other175) {
+  name = other175.name;
+  qubits = other175.qubits;
+  matrix = other175.matrix;
+}
+GateMatrix& GateMatrix::operator=(const GateMatrix& other176) {
+  name = other176.name;
+  qubits = other176.qubits;
+  matrix = other176.matrix;
+  return *this;
+}
+void GateMatrix::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "GateMatrix(";
+  out << "name=" << to_string(name);
+  out << ", " << "qubits=" << to_string(qubits);
+  out << ", " << "matrix=" << to_string(matrix);
+  out << ")";
+}
+
+
+AddCustomGateByMatrixReq::~AddCustomGateByMatrixReq() noexcept {
+}
+
+
+void AddCustomGateByMatrixReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+
+void AddCustomGateByMatrixReq::__set_gate(const GateMatrix& val) {
+  this->gate = val;
+}
+std::ostream& operator<<(std::ostream& out, const AddCustomGateByMatrixReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t AddCustomGateByMatrixReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+  bool isset_gate = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->gate.read(iprot);
+          isset_gate = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_gate)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t AddCustomGateByMatrixReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("AddCustomGateByMatrixReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("gate", ::apache::thrift::protocol::T_STRUCT, 2);
+  xfer += this->gate.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(AddCustomGateByMatrixReq &a, AddCustomGateByMatrixReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+  swap(a.gate, b.gate);
+}
+
+AddCustomGateByMatrixReq::AddCustomGateByMatrixReq(const AddCustomGateByMatrixReq& other177) {
+  id = other177.id;
+  gate = other177.gate;
+}
+AddCustomGateByMatrixReq& AddCustomGateByMatrixReq::operator=(const AddCustomGateByMatrixReq& other178) {
+  id = other178.id;
+  gate = other178.gate;
+  return *this;
+}
+void AddCustomGateByMatrixReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "AddCustomGateByMatrixReq(";
+  out << "id=" << to_string(id);
+  out << ", " << "gate=" << to_string(gate);
+  out << ")";
+}
+
+
+AddCustomGateByMatrixResp::~AddCustomGateByMatrixResp() noexcept {
+}
+
+
+void AddCustomGateByMatrixResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+std::ostream& operator<<(std::ostream& out, const AddCustomGateByMatrixResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t AddCustomGateByMatrixResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t AddCustomGateByMatrixResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("AddCustomGateByMatrixResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(AddCustomGateByMatrixResp &a, AddCustomGateByMatrixResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+}
+
+AddCustomGateByMatrixResp::AddCustomGateByMatrixResp(const AddCustomGateByMatrixResp& other179) {
+  base = other179.base;
+}
+AddCustomGateByMatrixResp& AddCustomGateByMatrixResp::operator=(const AddCustomGateByMatrixResp& other180) {
+  base = other180.base;
+  return *this;
+}
+void AddCustomGateByMatrixResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "AddCustomGateByMatrixResp(";
+  out << "base=" << to_string(base);
+  out << ")";
+}
+
+
+SubCircuit::~SubCircuit() noexcept {
+}
+
+
+void SubCircuit::__set_name(const std::string& val) {
+  this->name = val;
+}
+
+void SubCircuit::__set_circuit(const Circuit& val) {
+  this->circuit = val;
+}
+std::ostream& operator<<(std::ostream& out, const SubCircuit& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t SubCircuit::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_name = false;
+  bool isset_circuit = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->name);
+          isset_name = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->circuit.read(iprot);
+          isset_circuit = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_name)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_circuit)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t SubCircuit::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("SubCircuit");
+
+  xfer += oprot->writeFieldBegin("name", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->name);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("circuit", ::apache::thrift::protocol::T_STRUCT, 2);
+  xfer += this->circuit.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(SubCircuit &a, SubCircuit &b) {
+  using ::std::swap;
+  swap(a.name, b.name);
+  swap(a.circuit, b.circuit);
+}
+
+SubCircuit::SubCircuit(const SubCircuit& other181) {
+  name = other181.name;
+  circuit = other181.circuit;
+}
+SubCircuit& SubCircuit::operator=(const SubCircuit& other182) {
+  name = other182.name;
+  circuit = other182.circuit;
+  return *this;
+}
+void SubCircuit::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "SubCircuit(";
+  out << "name=" << to_string(name);
+  out << ", " << "circuit=" << to_string(circuit);
+  out << ")";
+}
+
+
+AddSubCircuitReq::~AddSubCircuitReq() noexcept {
+}
+
+
+void AddSubCircuitReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+
+void AddSubCircuitReq::__set_sub_circuit(const SubCircuit& val) {
+  this->sub_circuit = val;
+}
+std::ostream& operator<<(std::ostream& out, const AddSubCircuitReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t AddSubCircuitReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+  bool isset_sub_circuit = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->sub_circuit.read(iprot);
+          isset_sub_circuit = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_sub_circuit)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t AddSubCircuitReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("AddSubCircuitReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("sub_circuit", ::apache::thrift::protocol::T_STRUCT, 2);
+  xfer += this->sub_circuit.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(AddSubCircuitReq &a, AddSubCircuitReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+  swap(a.sub_circuit, b.sub_circuit);
+}
+
+AddSubCircuitReq::AddSubCircuitReq(const AddSubCircuitReq& other183) {
+  id = other183.id;
+  sub_circuit = other183.sub_circuit;
+}
+AddSubCircuitReq& AddSubCircuitReq::operator=(const AddSubCircuitReq& other184) {
+  id = other184.id;
+  sub_circuit = other184.sub_circuit;
+  return *this;
+}
+void AddSubCircuitReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "AddSubCircuitReq(";
+  out << "id=" << to_string(id);
+  out << ", " << "sub_circuit=" << to_string(sub_circuit);
+  out << ")";
+}
+
+
+AddSubCircuitResp::~AddSubCircuitResp() noexcept {
+}
+
+
+void AddSubCircuitResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+std::ostream& operator<<(std::ostream& out, const AddSubCircuitResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t AddSubCircuitResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t AddSubCircuitResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("AddSubCircuitResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(AddSubCircuitResp &a, AddSubCircuitResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+}
+
+AddSubCircuitResp::AddSubCircuitResp(const AddSubCircuitResp& other185) {
+  base = other185.base;
+}
+AddSubCircuitResp& AddSubCircuitResp::operator=(const AddSubCircuitResp& other186) {
+  base = other186.base;
+  return *this;
+}
+void AddSubCircuitResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "AddSubCircuitResp(";
+  out << "base=" << to_string(base);
+  out << ")";
+}
+
+
+AppendQubitsReq::~AppendQubitsReq() noexcept {
+}
+
+
+void AppendQubitsReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+
+void AppendQubitsReq::__set_qubits(const int32_t val) {
+  this->qubits = val;
+}
+std::ostream& operator<<(std::ostream& out, const AppendQubitsReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t AppendQubitsReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+  bool isset_qubits = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->qubits);
+          isset_qubits = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_qubits)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t AppendQubitsReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("AppendQubitsReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("qubits", ::apache::thrift::protocol::T_I32, 2);
+  xfer += oprot->writeI32(this->qubits);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(AppendQubitsReq &a, AppendQubitsReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+  swap(a.qubits, b.qubits);
+}
+
+AppendQubitsReq::AppendQubitsReq(const AppendQubitsReq& other187) {
+  id = other187.id;
+  qubits = other187.qubits;
+}
+AppendQubitsReq& AppendQubitsReq::operator=(const AppendQubitsReq& other188) {
+  id = other188.id;
+  qubits = other188.qubits;
+  return *this;
+}
+void AppendQubitsReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "AppendQubitsReq(";
+  out << "id=" << to_string(id);
+  out << ", " << "qubits=" << to_string(qubits);
+  out << ")";
+}
+
+
+AppendQubitsResp::~AppendQubitsResp() noexcept {
+}
+
+
+void AppendQubitsResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+std::ostream& operator<<(std::ostream& out, const AppendQubitsResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t AppendQubitsResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t AppendQubitsResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("AppendQubitsResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(AppendQubitsResp &a, AppendQubitsResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+}
+
+AppendQubitsResp::AppendQubitsResp(const AppendQubitsResp& other189) {
+  base = other189.base;
+}
+AppendQubitsResp& AppendQubitsResp::operator=(const AppendQubitsResp& other190) {
+  base = other190.base;
+  return *this;
+}
+void AppendQubitsResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "AppendQubitsResp(";
+  out << "base=" << to_string(base);
+  out << ")";
+}
+
+
+ResetQubitsReq::~ResetQubitsReq() noexcept {
+}
+
+
+void ResetQubitsReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+
+void ResetQubitsReq::__set_qubits(const std::vector<int32_t> & val) {
+  this->qubits = val;
+}
+std::ostream& operator<<(std::ostream& out, const ResetQubitsReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t ResetQubitsReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+  bool isset_qubits = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->qubits.clear();
+            uint32_t _size191;
+            ::apache::thrift::protocol::TType _etype194;
+            xfer += iprot->readListBegin(_etype194, _size191);
+            this->qubits.resize(_size191);
+            uint32_t _i195;
+            for (_i195 = 0; _i195 < _size191; ++_i195)
+            {
+              xfer += iprot->readI32(this->qubits[_i195]);
+            }
+            xfer += iprot->readListEnd();
+          }
+          isset_qubits = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_qubits)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t ResetQubitsReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("ResetQubitsReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("qubits", ::apache::thrift::protocol::T_LIST, 2);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, static_cast<uint32_t>(this->qubits.size()));
+    std::vector<int32_t> ::const_iterator _iter196;
+    for (_iter196 = this->qubits.begin(); _iter196 != this->qubits.end(); ++_iter196)
+    {
+      xfer += oprot->writeI32((*_iter196));
+    }
+    xfer += oprot->writeListEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(ResetQubitsReq &a, ResetQubitsReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+  swap(a.qubits, b.qubits);
+}
+
+ResetQubitsReq::ResetQubitsReq(const ResetQubitsReq& other197) {
+  id = other197.id;
+  qubits = other197.qubits;
+}
+ResetQubitsReq& ResetQubitsReq::operator=(const ResetQubitsReq& other198) {
+  id = other198.id;
+  qubits = other198.qubits;
+  return *this;
+}
+void ResetQubitsReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "ResetQubitsReq(";
+  out << "id=" << to_string(id);
+  out << ", " << "qubits=" << to_string(qubits);
+  out << ")";
+}
+
+
+ResetQubitsResp::~ResetQubitsResp() noexcept {
+}
+
+
+void ResetQubitsResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+std::ostream& operator<<(std::ostream& out, const ResetQubitsResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t ResetQubitsResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t ResetQubitsResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("ResetQubitsResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(ResetQubitsResp &a, ResetQubitsResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+}
+
+ResetQubitsResp::ResetQubitsResp(const ResetQubitsResp& other199) {
+  base = other199.base;
+}
+ResetQubitsResp& ResetQubitsResp::operator=(const ResetQubitsResp& other200) {
+  base = other200.base;
+  return *this;
+}
+void ResetQubitsResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "ResetQubitsResp(";
+  out << "base=" << to_string(base);
+  out << ")";
+}
+
+
+GetStateOfAllQubitsReq::~GetStateOfAllQubitsReq() noexcept {
+}
+
+
+void GetStateOfAllQubitsReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+std::ostream& operator<<(std::ostream& out, const GetStateOfAllQubitsReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t GetStateOfAllQubitsReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t GetStateOfAllQubitsReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("GetStateOfAllQubitsReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(GetStateOfAllQubitsReq &a, GetStateOfAllQubitsReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+}
+
+GetStateOfAllQubitsReq::GetStateOfAllQubitsReq(const GetStateOfAllQubitsReq& other201) {
+  id = other201.id;
+}
+GetStateOfAllQubitsReq& GetStateOfAllQubitsReq::operator=(const GetStateOfAllQubitsReq& other202) {
+  id = other202.id;
+  return *this;
+}
+void GetStateOfAllQubitsReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "GetStateOfAllQubitsReq(";
+  out << "id=" << to_string(id);
+  out << ")";
+}
+
+
+GetStateOfAllQubitsResp::~GetStateOfAllQubitsResp() noexcept {
+}
+
+
+void GetStateOfAllQubitsResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+
+void GetStateOfAllQubitsResp::__set_state_vector(const std::vector<double> & val) {
+  this->state_vector = val;
+}
+std::ostream& operator<<(std::ostream& out, const GetStateOfAllQubitsResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t GetStateOfAllQubitsResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->state_vector.clear();
+            uint32_t _size203;
+            ::apache::thrift::protocol::TType _etype206;
+            xfer += iprot->readListBegin(_etype206, _size203);
+            this->state_vector.resize(_size203);
+            uint32_t _i207;
+            for (_i207 = 0; _i207 < _size203; ++_i207)
+            {
+              xfer += iprot->readDouble(this->state_vector[_i207]);
+            }
+            xfer += iprot->readListEnd();
+          }
+          this->__isset.state_vector = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t GetStateOfAllQubitsResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("GetStateOfAllQubitsResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("state_vector", ::apache::thrift::protocol::T_LIST, 2);
+  {
+    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_DOUBLE, static_cast<uint32_t>(this->state_vector.size()));
+    std::vector<double> ::const_iterator _iter208;
+    for (_iter208 = this->state_vector.begin(); _iter208 != this->state_vector.end(); ++_iter208)
+    {
+      xfer += oprot->writeDouble((*_iter208));
+    }
+    xfer += oprot->writeListEnd();
+  }
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(GetStateOfAllQubitsResp &a, GetStateOfAllQubitsResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+  swap(a.state_vector, b.state_vector);
+  swap(a.__isset, b.__isset);
+}
+
+GetStateOfAllQubitsResp::GetStateOfAllQubitsResp(const GetStateOfAllQubitsResp& other209) {
+  base = other209.base;
+  state_vector = other209.state_vector;
+  __isset = other209.__isset;
+}
+GetStateOfAllQubitsResp& GetStateOfAllQubitsResp::operator=(const GetStateOfAllQubitsResp& other210) {
+  base = other210.base;
+  state_vector = other210.state_vector;
+  __isset = other210.__isset;
+  return *this;
+}
+void GetStateOfAllQubitsResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "GetStateOfAllQubitsResp(";
+  out << "base=" << to_string(base);
+  out << ", " << "state_vector=" << to_string(state_vector);
+  out << ")";
+}
+
+
+GetProbabilitiesReq::~GetProbabilitiesReq() noexcept {
+}
+
+
+void GetProbabilitiesReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+std::ostream& operator<<(std::ostream& out, const GetProbabilitiesReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t GetProbabilitiesReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t GetProbabilitiesReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("GetProbabilitiesReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(GetProbabilitiesReq &a, GetProbabilitiesReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+}
+
+GetProbabilitiesReq::GetProbabilitiesReq(const GetProbabilitiesReq& other211) {
+  id = other211.id;
+}
+GetProbabilitiesReq& GetProbabilitiesReq::operator=(const GetProbabilitiesReq& other212) {
+  id = other212.id;
+  return *this;
+}
+void GetProbabilitiesReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "GetProbabilitiesReq(";
+  out << "id=" << to_string(id);
+  out << ")";
+}
+
+
+GetProbabilitiesResp::~GetProbabilitiesResp() noexcept {
+}
+
+
+void GetProbabilitiesResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+
+void GetProbabilitiesResp::__set_probabilities(const std::vector<double> & val) {
+  this->probabilities = val;
+__isset.probabilities = true;
+}
+std::ostream& operator<<(std::ostream& out, const GetProbabilitiesResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t GetProbabilitiesResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->probabilities.clear();
+            uint32_t _size213;
+            ::apache::thrift::protocol::TType _etype216;
+            xfer += iprot->readListBegin(_etype216, _size213);
+            this->probabilities.resize(_size213);
+            uint32_t _i217;
+            for (_i217 = 0; _i217 < _size213; ++_i217)
+            {
+              xfer += iprot->readDouble(this->probabilities[_i217]);
+            }
+            xfer += iprot->readListEnd();
+          }
+          this->__isset.probabilities = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t GetProbabilitiesResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("GetProbabilitiesResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  if (this->__isset.probabilities) {
+    xfer += oprot->writeFieldBegin("probabilities", ::apache::thrift::protocol::T_LIST, 2);
+    {
+      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_DOUBLE, static_cast<uint32_t>(this->probabilities.size()));
+      std::vector<double> ::const_iterator _iter218;
+      for (_iter218 = this->probabilities.begin(); _iter218 != this->probabilities.end(); ++_iter218)
+      {
+        xfer += oprot->writeDouble((*_iter218));
+      }
+      xfer += oprot->writeListEnd();
+    }
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(GetProbabilitiesResp &a, GetProbabilitiesResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+  swap(a.probabilities, b.probabilities);
+  swap(a.__isset, b.__isset);
+}
+
+GetProbabilitiesResp::GetProbabilitiesResp(const GetProbabilitiesResp& other219) {
+  base = other219.base;
+  probabilities = other219.probabilities;
+  __isset = other219.__isset;
+}
+GetProbabilitiesResp& GetProbabilitiesResp::operator=(const GetProbabilitiesResp& other220) {
+  base = other220.base;
+  probabilities = other220.probabilities;
+  __isset = other220.__isset;
+  return *this;
+}
+void GetProbabilitiesResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "GetProbabilitiesResp(";
+  out << "base=" << to_string(base);
+  out << ", " << "probabilities="; (__isset.probabilities ? (out << to_string(probabilities)) : (out << "<null>"));
+  out << ")";
+}
+
+

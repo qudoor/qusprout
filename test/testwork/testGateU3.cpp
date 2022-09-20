@@ -36,7 +36,7 @@ bool CTestGateU3::TestInv(const InitState::type state)
 
     int qubits = 1;
     bool density = false;
-    SINGLETON(CQuESTIniter)->Init(qubits, (int)state, 0, density);
+    SINGLETON(CQuESTIniter)->Init(qubits, density);
 
     CmdExecutor handle;
 
@@ -126,7 +126,7 @@ bool CTestGateU3::VerifyXAndU3(const InitState::type state)
 
     int qubits = 1;
     bool density = false;
-    SINGLETON(CQuESTIniter)->Init(qubits, (int)state, 0, density);
+    SINGLETON(CQuESTIniter)->Init(qubits, density);
 
     CmdExecutor handle;
 
@@ -166,7 +166,7 @@ bool CTestGateU3::VerifyXAndU3(const InitState::type state)
 
     SINGLETON(CQuESTIniter)->finalize();
 
-    SINGLETON(CQuESTIniter)->Init(qubits, (int)state, 0, density);
+    SINGLETON(CQuESTIniter)->Init(qubits, density);
 
     CmdExecutor handle1;
 
@@ -228,7 +228,7 @@ bool CTestGateU3::VerifyRXAndU3(const InitState::type state)
 
     int qubits = 1;
     bool density = false;
-    SINGLETON(CQuESTIniter)->Init(qubits, (int)state, 0, density);
+    SINGLETON(CQuESTIniter)->Init(qubits, density);
 
     CmdExecutor handle;
 
@@ -266,7 +266,7 @@ bool CTestGateU3::VerifyRXAndU3(const InitState::type state)
 
     SINGLETON(CQuESTIniter)->finalize();
 
-    SINGLETON(CQuESTIniter)->Init(qubits, (int)state, 0, density);
+    SINGLETON(CQuESTIniter)->Init(qubits, density);
 
     CmdExecutor handle1;
 

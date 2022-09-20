@@ -34,7 +34,7 @@ void CSlaveServer::startServer()
     {
         //任务接口初始化
         ::std::shared_ptr<CSlaveServerHandler> taskhandler(new CSlaveServerHandler());
-        ::std::shared_ptr<TProcessor> taskprocessor(new SlaveServerProcessor(taskhandler));
+        ::std::shared_ptr<TProcessor> taskprocessor(new QuSproutServerProcessor(taskhandler));
         
         //网络、协议等初始化
         ::std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(SINGLETON(CConfig)->m_listenPort, SINGLETON(CConfig)->m_sendTimeout, SINGLETON(CConfig)->m_recvTimeout));
@@ -43,7 +43,7 @@ void CSlaveServer::startServer()
 
         //注册接口
         ::std::shared_ptr<TMultiplexedProcessor> multiProcessor(new TMultiplexedProcessor());
-        multiProcessor->registerProcessor("SlaveServer", taskprocessor);
+        multiProcessor->registerProcessor("QuSproutServer", taskprocessor);
 
         ::std::shared_ptr<TThreadedServer> server(new TThreadedServer(multiProcessor, serverTransport, transportFactory, protocolFactory));
         m_server = server;

@@ -2,6 +2,26 @@
 #include "Config.h"
 #include "yaml-cpp/yaml.h"
 
+int split(std::vector<std::string>& datalist, const std::string& str, const std::string& delimitstr)
+{
+	unsigned long begin = 0, end = 0, len = 0;
+	do
+	{
+		end	= str.find(delimitstr, begin);
+		if (end == std::string::npos)
+		    len = str.length() - begin;
+		else
+			len = end - begin;
+		datalist.push_back(str.substr(begin, len));
+
+		if (end == std::string::npos)
+			break;
+		begin = end + delimitstr.length();
+	} while (1);
+
+	return datalist.size();
+}
+
 CConfig::CConfig()
 {
 
@@ -37,6 +57,9 @@ int CConfig::praseConfig(const std::string& configFile)
     
     if (handle["rpc"].IsDefined())
     {
+        if (handle["rpc"]["listenAddr"].IsDefined())
+            m_listenAddr = handle["rpc"]["listenAddr"].as<int>();
+
         if (handle["rpc"]["listenPort"].IsDefined())
             m_listenPort = handle["rpc"]["listenPort"].as<int>();
 
@@ -83,6 +106,45 @@ int CConfig::praseConfig(const std::string& configFile)
             m_clientRecvTimeout = handle["client"]["clientRecvTimeout"].as<int>();
     }
 
+    if (handle["quroot"].IsDefined())
+    {
+        if (handle["quroot"]["enable"].IsDefined())
+            m_qurootEnable = handle["quroot"]["enable"].as<int>();
+
+        if (handle["quroot"]["port"].IsDefined())
+            m_qurootPort = handle["quroot"]["port"].as<int>();
+
+        if (handle["quroot"]["addr"].IsDefined())
+            m_qurootAddr = handle["quroot"]["addr"].as<std::string>();
+
+        if (handle["quroot"]["qurootHeartInterval"].IsDefined())
+            m_qurootHeartInterval = handle["quroot"]["qurootHeartInterval"].as<int>();
+    }
+    
+    if (handle["cap"].IsDefined())
+    {
+        auto temp = handle["cap"];
+        for (size_t i = 0; i < temp.size(); i++) 
+        {
+            std::string devicetype = "";
+            std::string supgate = "";
+            if (temp[i]["deviceType"].IsDefined())
+            {
+                devicetype = temp[i]["deviceType"].as<std::string>();
+            }
+            if (temp[i]["supGate"].IsDefined())
+            {
+                supgate = temp[i]["supGate"].as<std::string>();
+            }
+            std::vector<std::string> gates;
+            split(gates, supgate, ",");
+            for (auto gate : gates)
+            {
+                m_supportGate[devicetype].insert(gate);
+            }
+        }
+    }
+
     return 0;
 }
 
@@ -100,6 +162,7 @@ std::string CConfig::getPrintStr()
         << "];"
 
         << "rpc[listenPort:" << m_listenPort
+        << ",listenAddr:" << m_listenAddr
         << ",sendTimeout:" << m_sendTimeout
         << ",recvTimeout:" << m_recvTimeout
         << ",listenSysPort:" << m_listenSysPort
@@ -118,6 +181,23 @@ std::string CConfig::getPrintStr()
         << ",clientSendTimeout:" << m_clientSendTimeout
         << ",clientRecvTimeout:" << m_clientRecvTimeout
         << "];"
+
+        << "quroot[port:" << m_qurootPort
+        << ",enable:" << m_qurootEnable
+        << ",addr:" << m_qurootAddr
+        << "];"
+
+        << "cap[";
+    for (auto iter = m_supportGate.begin(); iter != m_supportGate.end(); ++iter)
+    {
+        os << ";deviceType:" << iter->first
+            << "gates:";
+        for (auto gate : iter->second)
+        {
+            os << gate << "|";
+        }
+    }
+    os << "];"
 
         << "}.";
 

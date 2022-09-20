@@ -77,6 +77,27 @@ public:
     //获取泡利算子乘积之和的期望值
     void getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req);
 
+    //获取测量结果
+    void measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req);
+
+    //注册一些自定义量子门，单次任务有效
+    void addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req);
+
+    //添加量子门操作
+    void addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req);
+
+    //追加量子比特到当前的量子电路
+    void appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req);
+
+    //重置指定的qubits
+    void resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req);
+
+    //获取当前量子状态向量
+    void getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req);
+
+    //获取当前所有可能状态组合的概率
+    void getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req);
+    
     //定时清理资源
     void timerCleanTask();
 
@@ -87,7 +108,7 @@ private:
     void cleanTask(const int timeOutDuration = 0);
 
     //查找任务
-    std::shared_ptr<CTask> getTask(const std::string& id);
+    std::shared_ptr<CTask> getTask(const std::string& id, const bool isupdatetime = true);
 
     //task创建和初始化
     void initTask(InitQubitsResp& resp, const InitQubitsReq& req, const std::string& addr, const std::string& rpcAddr, const int& rpcPort, const std::vector<std::string>& hosts);
@@ -98,12 +119,16 @@ private:
     //Gpu模拟器初始化
     void initGpuSimulator(InitQubitsResp& resp, const InitQubitsReq& req);
 
+    //用户自定义资源初始化
+    void initFixedSimulator(InitQubitsResp& resp, const InitQubitsReq& req);
+
+    //添加任务
+    int addTask(const std::string& id, std::shared_ptr<CTask> task);
+
 private:
     std::mutex m_mutex;
     //任务列表，key:taskid,value:CTask
     std::map<std::string, std::shared_ptr<CTask>> m_taskList;
-    //机器和任务对应关系，key:addr, taskid
-    std::map<std::string, std::set<std::string>> m_addrList;
 };
 
 #endif

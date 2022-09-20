@@ -10,7 +10,7 @@
 #include <thrift/concurrency/ThreadFactory.h>
 #include <thrift/concurrency/ThreadManager.h>
 
-#include "../interface/WorkServer.h"
+#include "../interface/QuSproutServer.h"
 #include "../command/executor.h"
 #include "../node/WorkNodeHandler.h"
 
@@ -20,7 +20,7 @@ using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
 using namespace ::apache::thrift::concurrency;
 
-class CWorkServerHandler : virtual public WorkServerIf 
+class CWorkServerHandler : virtual public QuSproutServerIf 
 {
 public:
     CWorkServerHandler();
@@ -64,6 +64,27 @@ public:
 
     //获取泡利算子乘积之和的期望值
     void getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req);
+
+    //获取测量结果
+    void measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req);
+
+    //注册一些自定义量子门，单次任务有效
+    void addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req);
+
+    //添加量子门操作
+    void addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req);
+
+    //追加量子比特到当前的量子电路
+    void appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req);
+
+    //重置指定的qubits
+    void resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req);
+
+    //获取当前量子状态向量
+    void getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req);
+
+    //获取当前所有可能状态组合的概率
+    void getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req);
 
 private:
     QS::CmdExecutor m_executor;

@@ -75,3 +75,9 @@ void CQuESTIniter::destroyWorkQureg(Qureg& workqureg)
 {
     destroyQureg(workqureg, m_env);
 }
+
+void CQuESTIniter::reInit(const int qubits)
+{
+    finalize();
+    Init(qubits, m_density);
+}

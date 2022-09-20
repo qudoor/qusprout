@@ -4,7 +4,7 @@
 #include <string>
 #include <iostream>
 #include <gtest/gtest.h>
-#include "interface/work_types.h"
+#include "interface/qusproutdata_types.h"
 
 class CTestGateRY: public testing::Test
 {

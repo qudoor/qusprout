@@ -19,7 +19,7 @@ OBJS_CLIENT = client.o
 
 #定义库文件路径变量	    
 STATCI_LIBS = -L. -L/usr/local/lib64 -L/usr/local/lib -L/usr/lib -L/usr/lib64 -Wl,-Bstatic -lthrift
-SHARED_LIBS = -L. -L/usr/local/lib64 -L/usr/local/lib -L/usr/lib -L/usr/lib64 -Wl,-Bdynamic -lm -lpthread -lz -lrt
+SHARED_LIBS = -L. -L/usr/local/lib64 -L/usr/local/lib -L/usr/lib -L/usr/lib64 -Wl,-Bdynamic -lm -lpthread -lrt
 
 #定义头文件路径变量
 INCLUDES = -I. -I.thrift  -I/usr/include -I/usr/local/include -I/usr/local/include/thrift

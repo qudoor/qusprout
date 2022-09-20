@@ -325,6 +325,35 @@ ErrCode::type CResourceManager::checkGpuResource(const InitQubitsReq& req, std::
     return ErrCode::type::COM_SUCCESS;
 }
 
+//检查用户自定义资源
+ErrCode::type CResourceManager::checkFixedResource(const InitQubitsReq& req, const std::vector<std::string>& hosts, std::string& addr, std::string& rpcAddr, int& rpcPort)
+{
+    long long needmemory = calcQubitBytes(req, 1);
+
+    std::lock_guard<std::mutex> guard(m_mutex);
+    size_t ressize = m_resourceList.size();
+    if (ressize == 0)
+    {
+        //无可用资源
+        LOG(ERROR) << "no resource is available(taskId:" << req.id << ").";
+        return ErrCode::type::QUROOT_NOT_RESOURCE;
+    }
+
+    auto iter = m_resourceList.find(hosts[0]);
+    if (iter == m_resourceList.end())
+    {
+        LOG(ERROR) << "resource is not exist(addr:" << hosts[0] << ").";
+        return ErrCode::type::COM_INVALID_PARAM;
+    }
+
+    addr = iter->second->machine.addr;
+    rpcAddr = iter->second->rpc.addr;
+    rpcPort = iter->second->rpc.port;
+    LOG(INFO) << "applyResource(needmemory:" << needmemory << ",free_memory:" << iter->second->resource.free_memory << ",addr:" << addr << ")";
+
+    return ErrCode::type::COM_SUCCESS;
+}
+
 //定时清理资源
 void CResourceManager::timerCleanResource()
 {
@@ -409,4 +438,32 @@ int CResourceManager::getNumRanks(const int numQubits, const int hostSize)
     }
 
     return (int)numranks;
+}
+
+//获取所有的资源
+void CResourceManager::getResource(std::map<std::string, DeviceDetail>& devlist)
+{
+    std::lock_guard<std::mutex> guard(m_mutex);
+    auto iter = m_resourceList.begin();
+    for (; iter != m_resourceList.end(); ++iter)
+    {
+        auto temp = iter->second;
+
+        MachineDetail machine;
+        machine.__set_addr(temp->machine.addr);
+        machine.__set_sys_name(temp->machine.sys_name);
+        machine.__set_sys_release(temp->machine.sys_release);
+        machine.__set_sys_version(temp->machine.sys_version);
+        machine.__set_sys_machine(temp->machine.sys_machine);
+
+        ResourceDetail resource;
+        resource.__set_cpu_total_memory(temp->resource.total_memory);
+        resource.__set_cpu_free_memory(temp->resource.free_memory);
+
+        DeviceDetail device;
+        device.__set_machine(machine);
+        device.__set_resource(resource);
+
+        devlist.insert(std::pair<std::string, DeviceDetail>(temp->machine.addr, device));
+    }
 }

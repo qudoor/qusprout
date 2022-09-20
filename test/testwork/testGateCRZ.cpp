@@ -36,7 +36,7 @@ bool CTestGateCRZ::TestInv(const InitState::type state)
 
     int qubits = 2;
     bool density = false;
-    SINGLETON(CQuESTIniter)->Init(qubits, (int)state, 0, density);
+    SINGLETON(CQuESTIniter)->Init(qubits, density);
 
     CmdExecutor handle;
 

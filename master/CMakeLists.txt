@@ -9,16 +9,16 @@ execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cp
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusproutdata.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusprout.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/resource.thrift)
-execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/slave.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/statistics.thrift)
+execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qurootresource.thrift)
 if(EXISTS ${PROJECT_SOURCE_DIR}/interface/MasterServer_server.skeleton.cpp)
     execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/MasterServer_server.skeleton.cpp)
 endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/interface/QuSproutServer_server.skeleton.cpp)
     execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/QuSproutServer_server.skeleton.cpp)
 endif()
-if(EXISTS ${PROJECT_SOURCE_DIR}/interface/SlaveServer_server.skeleton.cpp)
-    execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/SlaveServer_server.skeleton.cpp)
+if(EXISTS ${PROJECT_SOURCE_DIR}/interface/QuRootServer_server.skeleton.cpp)
+    execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/QuRootServer_server.skeleton.cpp)
 endif()
 
 #set设置普通变量，缓存变量或环境变量
@@ -49,6 +49,7 @@ file(GLOB SRC_LIST
 	"comm/*.cpp"
 	"config/*.cpp"
 	"interface/*.cpp"
+	"register/*.cpp"
 	"resourcemanager/*.cpp"
 	"rpcclient/*.cpp"
 	"rpcserver/*.cpp"

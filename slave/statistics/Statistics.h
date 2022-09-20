@@ -19,6 +19,13 @@ const std::string Tag_Iinterface_applyQFT = "applyQFT";
 const std::string Tag_Iinterface_applyFullQFT = "applyFullQFT";
 const std::string Tag_Iinterface_getExpecPauliProd = "getExpecPauliProd";
 const std::string Tag_Iinterface_getExpecPauliSum = "getExpecPauliSum";
+const std::string Tag_Iinterface_measureQubits = "measureQubits";
+const std::string Tag_Iinterface_addCustomGateByMatrix = "addCustomGateByMatrix";
+const std::string Tag_Iinterface_addSubCircuit = "addSubCircuit";
+const std::string Tag_Iinterface_appendQubits = "appendQubits";
+const std::string Tag_Iinterface_resetQubits = "resetQubits";
+const std::string Tag_Iinterface_getStateOfAllQubits = "getStateOfAllQubits";
+const std::string Tag_Iinterface_getProbabilities = "getProbabilities";
 
 class CElapsedTime
 {

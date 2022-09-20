@@ -7,9 +7,9 @@ project(qusprout-work)
 #生成rpc接口
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/ecode.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusproutdata.thrift)
-execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/work.thrift)
-if(EXISTS ${PROJECT_SOURCE_DIR}/interface/WorkServer_server.skeleton.cpp)
-    execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/WorkServer_server.skeleton.cpp)
+execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusprout.thrift)
+if(EXISTS ${PROJECT_SOURCE_DIR}/interface/QuSproutServer_server.skeleton.cpp)
+    execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/QuSproutServer_server.skeleton.cpp)
 endif()
 
 #set设置普通变量，缓存变量或环境变量

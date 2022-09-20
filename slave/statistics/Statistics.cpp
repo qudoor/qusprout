@@ -119,7 +119,7 @@ void CStatistics::getStatisticsInfo(StatisticsInfo& sis)
     //1.机器固定资源信息
     sis.fixed_info.cpu_num = cpunum;
     sis.fixed_info.cpu_memory = mem.totalRam;
-    sis.fixed_info.gpu_type = GpuType::GpuType_Default;
+    sis.fixed_info.gpu_type = SisGpuType::SisGpuType_Default;
     sis.fixed_info.gpu_memory = 0;
 
     //2.机器变化资源信息

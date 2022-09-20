@@ -13,19 +13,19 @@
 
 
 
-int _kGpuTypeValues[] = {
-  GpuType::GpuType_Default,
-  GpuType::GpuType_Nvidia
+int _kSisGpuTypeValues[] = {
+  SisGpuType::SisGpuType_Default,
+  SisGpuType::SisGpuType_Nvidia
 };
-const char* _kGpuTypeNames[] = {
-  "GpuType_Default",
-  "GpuType_Nvidia"
+const char* _kSisGpuTypeNames[] = {
+  "SisGpuType_Default",
+  "SisGpuType_Nvidia"
 };
-const std::map<int, const char*> _GpuType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(2, _kGpuTypeValues, _kGpuTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
+const std::map<int, const char*> _SisGpuType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(2, _kSisGpuTypeValues, _kSisGpuTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
 
-std::ostream& operator<<(std::ostream& out, const GpuType::type& val) {
-  std::map<int, const char*>::const_iterator it = _GpuType_VALUES_TO_NAMES.find(val);
-  if (it != _GpuType_VALUES_TO_NAMES.end()) {
+std::ostream& operator<<(std::ostream& out, const SisGpuType::type& val) {
+  std::map<int, const char*>::const_iterator it = _SisGpuType_VALUES_TO_NAMES.find(val);
+  if (it != _SisGpuType_VALUES_TO_NAMES.end()) {
     out << it->second;
   } else {
     out << static_cast<int>(val);
@@ -33,9 +33,9 @@ std::ostream& operator<<(std::ostream& out, const GpuType::type& val) {
   return out;
 }
 
-std::string to_string(const GpuType::type& val) {
-  std::map<int, const char*>::const_iterator it = _GpuType_VALUES_TO_NAMES.find(val);
-  if (it != _GpuType_VALUES_TO_NAMES.end()) {
+std::string to_string(const SisGpuType::type& val) {
+  std::map<int, const char*>::const_iterator it = _SisGpuType_VALUES_TO_NAMES.find(val);
+  if (it != _SisGpuType_VALUES_TO_NAMES.end()) {
     return std::string(it->second);
   } else {
     return std::to_string(static_cast<int>(val));
@@ -1069,7 +1069,7 @@ void MachineFixedInfo::__set_cpu_memory(const int64_t val) {
   this->cpu_memory = val;
 }
 
-void MachineFixedInfo::__set_gpu_type(const GpuType::type val) {
+void MachineFixedInfo::__set_gpu_type(const SisGpuType::type val) {
   this->gpu_type = val;
 __isset.gpu_type = true;
 }
@@ -1128,7 +1128,7 @@ uint32_t MachineFixedInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_I32) {
           int32_t ecast17;
           xfer += iprot->readI32(ecast17);
-          this->gpu_type = static_cast<GpuType::type>(ecast17);
+          this->gpu_type = static_cast<SisGpuType::type>(ecast17);
           this->__isset.gpu_type = true;
         } else {
           xfer += iprot->skip(ftype);

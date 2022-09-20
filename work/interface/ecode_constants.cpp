@@ -20,6 +20,7 @@ ecodeConstants::ecodeConstants() {
   ErrMsg.insert(std::make_pair((ErrCode::type)101, "未初始化"));
   ErrMsg.insert(std::make_pair((ErrCode::type)102, "机器未注册"));
   ErrMsg.insert(std::make_pair((ErrCode::type)103, "无可用的资源"));
+  ErrMsg.insert(std::make_pair((ErrCode::type)104, "数据解析异常"));
 
 }
 

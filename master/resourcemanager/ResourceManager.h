@@ -11,6 +11,7 @@
 #include "interface/resource_types.h"
 #include "interface/qusproutdata_types.h"
 #include "interface/statistics_types.h"
+#include "interface/qurootresource_types.h"
 
 //机器资源
 struct CResource
@@ -58,19 +59,24 @@ public:
     //获取统计信息
     void GetStatisticsInfo(GetStatisticsInfoResp& resp, const GetStatisticsInfoReq& req);
 
-private:
-    bool checkRegisterParam(const RegisterReq& req, RegisterResp& resp);
-
-public:
     //检查cpu资源是否足够
     ErrCode::type checkCpuResource(const InitQubitsReq& req, std::string& addr, std::string& rpcAddr, int& rpcPort, std::vector<std::string>& hosts);
 
     //检查gpu资源是否足够
     ErrCode::type checkGpuResource(const InitQubitsReq& req, std::string& addr, std::string& rpcAddr, int& rpcPort, std::vector<std::string>& hosts);
 
+    //检查用户自定义资源
+    ErrCode::type checkFixedResource(const InitQubitsReq& req, const std::vector<std::string>& hosts, std::string& addr, std::string& rpcAddr, int& rpcPort);
+
     //定时清理资源
     void timerCleanResource();
+
+    //获取所有的资源
+    void getResource(std::map<std::string, DeviceDetail>& devlist);
+
 private:
+    bool checkRegisterParam(const RegisterReq& req, RegisterResp& resp);
+
     //设置rpc返回值
     void setBase(BaseCode& base, const ErrCode::type& code);
 

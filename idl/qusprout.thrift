@@ -38,4 +38,25 @@ service QuSproutServer {
 
     //获取泡利算子乘积之和的期望值
     qusproutdata.GetExpecPauliSumResp getExpecPauliSum(1:qusproutdata.GetExpecPauliSumReq req)
+    
+    //获取测量结果
+    qusproutdata.MeasureQubitsResp measureQubits(1:qusproutdata.MeasureQubitsReq req)
+
+    //注册一些自定义量子门，单次任务有效
+    qusproutdata.AddCustomGateByMatrixResp addCustomGateByMatrix(1:qusproutdata.AddCustomGateByMatrixReq req)
+
+    //添加量子门操作
+    qusproutdata.AddSubCircuitResp addSubCircuit(1:qusproutdata.AddSubCircuitReq req)
+
+    //追加量子比特到当前的量子电路
+    qusproutdata.AppendQubitsResp appendQubits(1:qusproutdata.AppendQubitsReq req)
+
+    //重置指定的qubits
+    qusproutdata.ResetQubitsResp resetQubits(1:qusproutdata.ResetQubitsReq req)
+
+    //获取当前量子状态向量
+    qusproutdata.GetStateOfAllQubitsResp getStateOfAllQubits(1:qusproutdata.GetStateOfAllQubitsReq req)
+
+    //获取当前所有可能状态组合的概率
+    qusproutdata.GetProbabilitiesResp getProbabilities(1:qusproutdata.GetProbabilitiesReq req)
 }

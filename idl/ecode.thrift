@@ -29,6 +29,9 @@ enum ErrCode {
 
     //无可用的资源
     QUROOT_NOT_RESOURCE = 103,
+
+    //数据解析异常
+    QUROOT_PRASE_ERROR = 104,       
 }
 
 const map<ErrCode, string> ErrMsg = {
@@ -41,6 +44,7 @@ const map<ErrCode, string> ErrMsg = {
     ErrCode.QUROOT_NOT_INIT: "未初始化",
     ErrCode.QUROOT_NOT_REGISTER: "机器未注册",
     ErrCode.QUROOT_NOT_RESOURCE: "无可用的资源",
+    ErrCode.QUROOT_PRASE_ERROR: "数据解析异常",
 }
 
 //返回信息
