@@ -53,6 +53,7 @@ if [ ! -f "/usr/bin/cmake" ] && [ ! -f "/usr/local/bin/cmake" ]; then
         echo "make install failed!!! please Check error"
         exit
     fi
+    cd $CURRDIR
     echo "install cmake success"
 fi
 
@@ -73,6 +74,7 @@ if [ ! -f "/usr/share/info/m4.info" ] && [ ! -f "/usr/local/share/info/m4.info" 
         echo "make install failed!!! please Check error"
         exit
     fi
+    cd $CURRDIR
     echo "install m4 success"
 fi
  
@@ -93,6 +95,7 @@ if [ ! -f "/usr/bin/autoconf" ] && [ ! -f "/usr/local/bin/autoconf" ]; then
         echo "make install failed!!! please Check error"
         exit
     fi
+    cd $CURRDIR
     echo "install autoconf success"
 fi
 
@@ -113,6 +116,7 @@ if [ ! -f "/usr/bin/automake" ] && [ ! -f "/usr/local/bin/automake" ]; then
         echo "make install failed!!! please Check error"
         exit
     fi
+    cd $CURRDIR
     echo "install automake success"
 fi 
 
@@ -122,7 +126,6 @@ if [ ! -f "/usr/bin/libtoolize" ] && [ ! -f "/usr/local/bin/libtoolize" ]; then
 	rm -rf libtool-2.4.7
     tar -zxvf libtool-2.4.7.tar.gz 
     cd libtool-2.4.7
-    ./bootstrap 
     ./configure
     make
     if [ $? -ne "0" ]; then
@@ -134,6 +137,7 @@ if [ ! -f "/usr/bin/libtoolize" ] && [ ! -f "/usr/local/bin/libtoolize" ]; then
         echo "make install failed!!! please Check error"
         exit
     fi
+    cd $CURRDIR
     echo "install libtool success"
 fi 
 
@@ -145,7 +149,7 @@ if [ ! -f "/usr/local/lib/libboost_system.a" ]; then
     cd ./boost_1_79_0
     ./bootstrap.sh
     ./b2
-    sudo ./b2 install
+    ./b2 install
     cd $CURRDIR
     echo "install libboost success"
 fi
@@ -172,7 +176,6 @@ if [ ! -f "/usr/local/lib/libevent_core.a" ]; then
     echo "install libevent success"
 fi
 
-#yum install flex
 #bison安装
 if [ ! -f "/usr/local/lib/liby.a" ]; then
     echo "begin install libbison"
@@ -194,12 +197,42 @@ if [ ! -f "/usr/local/lib/liby.a" ]; then
     echo "install libbison success"
 fi
 
+#flex安装
+if [ ! -f "/usr/local/lib/libfl.a" ]; then
+    echo "begin install flex"
+    rm -rf flex-2.6.4
+    tar -zxvf flex-2.6.4.tar.gz 
+    cd flex-2.6.4/
+    ./configure
+    make
+    if [ $? -ne "0" ]; then
+        echo "make failed!!! please Check error"
+        exit
+    fi
+    make install
+    if [ $? -ne "0" ]; then
+        echo "make install failed!!! please Check error"
+        exit
+    fi
+    cd $CURRDIR
+    echo "install flex success"
+fi
+
 #thrift安装
 if [ ! -f "/usr/local/lib/libthrift.a" ]; then
     echo "begin install libthrift"
     rm -rf thrift-0.16.0
     tar -zxvf thrift-0.16.0.tar.gz
     cd ./thrift-0.16.0
+    if [ ${OS} == "Darwin" ]; then
+        sed -i '.bak' 's/if(BUILD_JAVA)/if(false)/g' CMakeLists.txt
+        sed -i '.bak' 's/if(BUILD_JAVASCRIPT)/if(false)/g' CMakeLists.txt
+        sed -i '.bak' 's/if(BUILD_NODEJS)/if(false)/g' CMakeLists.txt
+    else
+        sed -i 's/if(BUILD_JAVA)/if(false)/g' CMakeLists.txt
+        sed -i 's/if(BUILD_JAVASCRIPT)/if(false)/g' CMakeLists.txt
+        sed -i 's/if(BUILD_NODEJS)/if(false)/g' CMakeLists.txt
+    fi
     mkdir builddir
     cd builddir
     cmake ..
@@ -280,6 +313,11 @@ if [ ! -f "/usr/local/lib/libyaml-cpp.a" ] && [ ! -f "/usr/local/lib64/libyaml-c
     rm -rf yaml-cpp-yaml-cpp-0.7.0
     tar -zxvf yaml-cpp-yaml-cpp-0.7.0.tar.gz
     cd yaml-cpp-yaml-cpp-0.7.0
+    if [ ${OS} == "Darwin" ]; then
+        sed -i '.bak' 's/include(CTest)/#include(CTest)/g' CMakeLists.txt
+    else
+        sed -i 's/include(CTest)/#include(CTest)/g' CMakeLists.txt
+    fi
     mkdir build
     cd build
     cmake ..
@@ -298,10 +336,13 @@ if [ ! -f "/usr/local/lib/libyaml-cpp.a" ] && [ ! -f "/usr/local/lib64/libyaml-c
 fi
 
 #mpich安装
-#yum remove libibverbs-devel libibverbs-utils librdmacm librdmacm-devel librdmacm-utils libibverbs
-#apt-get remove libibverbs-dev libibverbs-utils librdmacm librdmacm-dev librdmacm-utils libibverbs
-if [ ! -f "/usr/local/lib/libmpi.a" ]; then
-    echo "begin install libmpi"
+#if [ -f "/usr/bin/yum" ]; then
+#    yum remove -y libibverbs-devel libibverbs-utils librdmacm librdmacm-devel librdmacm-utils libibverbs
+#elif [ -f "/usr/bin/apt-get" ]; then
+#    apt-get remove -y libibverbs-dev libibverbs-utils librdmacm librdmacm-dev librdmacm-utils libibverbs
+#fi
+if [ ! -f "/usr/local/lib/libhwloc.a" ]; then
+    echo "begin install libhwloc"
     rm -rf mpich-4.0
     tar -zxvf mpich-4.0.tar.gz
     cd ./mpich-4.0 
@@ -318,7 +359,16 @@ if [ ! -f "/usr/local/lib/libmpi.a" ]; then
         echo "make install failed!!! please Check error"
         exit
     fi
-    cd ../../
+    cd $CURRDIR
+    echo "install libhwloc success"
+fi
+
+if [ ! -f "/usr/local/lib/libmpi.a" ]; then
+    echo "begin install libmpi"
+    if [ ! -d "mpich-4.0" ]; then
+        tar -zxvf mpich-4.0.tar.gz
+    fi
+    cd ./mpich-4.0 
     ./autogen.sh 
     ./configure --libdir=/usr/local/lib --includedir=/usr/local/include --disable-fortran --enable-shared=yes --enable-static=yes --with-hwloc-include=/usr/local/include --with-hwloc-lib=/usr/local/lib --with-hwloc=/usr/local
     make -j4
@@ -334,7 +384,12 @@ if [ ! -f "/usr/local/lib/libmpi.a" ]; then
     cd $CURRDIR
     echo "install libmpi success"
 fi
-#yum install buildah cockpit-podman firewalld iproute-tc iptables-nft nmap-ncat podman tcpdump libibverbs-devel libibverbs-utils librdmacm librdmacm-devel librdmacm-utils libibverbs
+#if [ -f "/usr/bin/yum" ]; then
+#    yum install -y buildah cockpit-podman firewalld iproute-tc iptables-nft nmap-ncat podman tcpdump libibverbs-devel libibverbs-utils librdmacm librdmacm-devel librdmacm-utils libibverbs
+#elif [ -f "/usr/bin/apt-get" ]; then
+#    apt-get install -y libibverbs-dev libibverbs-utils librdmacm librdmacm-dev librdmacm-utils libibverbs
+#fi
+#
 
 #QuEST安装
 echo "begin install QuEST"
@@ -376,6 +431,11 @@ if [ ! -f "/usr/local/lib/libgtest.a" ] && [ ! -f "/usr/local/lib64/libgtest.a" 
     rm -rf googletest-release-1.10.0
     tar -zxvf googletest-release-1.10.0.tar.gz
     cd ./googletest-release-1.10.0
+    if [ ${OS} == "Darwin" ]; then
+        sed -i '.bak' 's/int dummy;/int dummy = 0;/g' googletest/src/gtest-death-test.cc
+    else
+        sed -i 's/int dummy;/int dummy = 0;/g' googletest/src/gtest-death-test.cc
+    fi
     mkdir build
     cd build
     cmake ..
