@@ -160,6 +160,29 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     initCpuSimulator(resp, req);
 }
 
+void CTaskManager::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req)
+{
+    if (req.id.empty())
+    {
+        LOG(ERROR) << "setAmplitudes is invaild param.";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    }
+
+    //1.判断任务是否已经初始化
+    auto taskhandle = getTask(req.id);
+    if (taskhandle != nullptr)
+    {
+        //任务不存在
+        LOG(ERROR) << "setAmplitudes task is not exist(taskid:" << req.id << ").";
+        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.setAmplitudes(resp, req);
+}
+
 void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {
     if (req.id.empty() || (req.final == false && req.circuit.cmds.size() <= 0))

@@ -71,6 +71,27 @@ void NodeData::unpackcircuit(char* packbuf, int& packsize)
     }
 }
 
+void NodeData::packamplitudes(const std::vector<double>& reals, const std::vector<double>& imags, char* packbuf, int& packsize)
+{
+    //pack command type
+    packcmdtype(CMDTYPE_SETAMPLITUDES, packbuf, packsize);
+
+    //pack reals
+    packvectordouble(reals, packbuf, packsize);
+
+    //pack imags
+    packvectordouble(imags, packbuf, packsize);
+}
+
+void NodeData::unpackamplitudes(char* packbuf, int& packsize)
+{
+    //unpack reals
+    unpackvectordouble(m_reals, packbuf, packsize);
+
+    //unpack imags
+    unpackvectordouble(m_imags, packbuf, packsize);
+}
+
 void NodeData::packprobamp(const int& ampindex, char* packbuf, int& packsize)
 {
     //pack command type

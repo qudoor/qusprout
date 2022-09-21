@@ -86,6 +86,16 @@ CmdExecutor::~CmdExecutor()
 {
 }
 
+// void CmdExecutor::setAmplitudes(const std::vector<double>& reals, const std::vector<double>& imags)
+// {
+//     long long int startInd = SINGLETON(CQuESTIniter)->m_env.rank * m_qureg.numAmpsPerChunk;
+//     long long int numAmps = m_qureg.numAmpsPerChunk;
+//     if (startInd + m_qureg.numAmpsPerChunk > reals.size())
+//         numAmps = reals.size() - startInd;
+
+//     setAmps(m_qureg, startInd, (double*)reals.data(), (double*)imags.data(), numAmps);
+// }
+
 void CmdExecutor::receiveCircuit(const ::Circuit& circuit, const bool final) {
     // cache circuit
     m_circuitCache.push_back(circuit);

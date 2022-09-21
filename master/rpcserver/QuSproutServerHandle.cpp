@@ -27,6 +27,12 @@ void CQuSproutServerHandler::initQubits(InitQubitsResp& resp, const InitQubitsRe
     LOG(INFO) << "response initQubits(id:" << req.id << ",resp:" << getPrint<InitQubitsResp>(resp) << ").";
 }
 
+//设置振幅
+void CQuSproutServerHandler::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req)
+{
+    SINGLETON(CTaskManager)->setAmplitudes(resp, req);
+}
+
 //发送任务
 void CQuSproutServerHandler::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {

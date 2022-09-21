@@ -41,6 +41,9 @@ public:
     void getProbabilities(std::vector<double>& probabilities);
 
     long long int getMaxAmpIndex();
+
+    //void setAmplitudes(const std::vector<double>& reals, const std::vector<double>& imags);
+
 private:
     void writeStateToFile(const std::string& id);
 

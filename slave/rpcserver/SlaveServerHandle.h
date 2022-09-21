@@ -67,6 +67,9 @@ public:
 
     //获取当前所有可能状态组合的概率
     void getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req);
+
+    //设置振幅
+    void setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req);
 };
 
 #endif

@@ -8,6 +8,7 @@
 #include "interface/statistics_types.h"
 
 const std::string Tag_Iinterface_initQubits = "initQubits";
+const std::string Tag_Iinterface_setAmplitudes = "setAmplitudes";
 const std::string Tag_Iinterface_sendCircuitCmd = "sendCircuitCmd";
 const std::string Tag_Iinterface_cancelCmd = "cancelCmd";
 const std::string Tag_Iinterface_getProbAmp = "getProbAmp";

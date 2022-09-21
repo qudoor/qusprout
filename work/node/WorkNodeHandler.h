@@ -30,6 +30,8 @@ public:
     void getStateOfAllQubits();
     void getProbabilities();
 
+    void setAmplitudes(const std::vector<double>& reals, const std::vector<double>& imags);
+
 private:
     QS::CmdExecutor m_executor;
 
@@ -46,6 +48,9 @@ private:
     GateMatrix m_matrix;
     std::vector<int32_t> m_reset_qubits;
     
+    std::vector<double> m_reals;
+    std::vector<double> m_imags;
+
     void packdata(int cmdtype, char* packbuf, int& packsize);
     void unpackdata(NodeData& nodedata, char* packbuf, int& packsize);
     void execute(NodeData& nodedata);
