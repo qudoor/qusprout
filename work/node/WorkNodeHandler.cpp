@@ -332,7 +332,7 @@ void CWorkNodeHandler::execute(NodeData& nodedata)
         m_executor.getProbabilities(probabilities);
         break;
     case CMDTYPE_SETAMPLITUDES:
-        //m_executor.setAmplitudes(nodedata.m_reals, nodedata.m_imags);
+        m_executor.setAmplitudes(nodedata.m_reals, nodedata.m_imags);
         break;
     default:
         assert(false);

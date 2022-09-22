@@ -26,27 +26,27 @@ void CWorkServerHandler::initQubits(InitQubitsResp& resp, const InitQubitsReq& r
 //设置振幅
 void CWorkServerHandler::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req)
 {
-    // try
-    // {
-    //     if (req.id.empty())
-    //     {
-    //         LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::setAmplitudes()";
-    //         setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-    //         return;
-    //     }
+    try
+    {
+        if (req.id.empty())
+        {
+            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::setAmplitudes()";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
 
-    //     //Broadcast setAmplitudes to all node
-    //     if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
-    //         workNodeHandler.setAmplitudes(req.reals, req.imags);
+        //Broadcast setAmplitudes to all node
+        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
+            workNodeHandler.setAmplitudes(req.reals, req.imags);
 
-    //     m_executor.setAmplitudes(req.reals, req.imags);
-    //     setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    // }
-    // catch(const std::exception& e)
-    // {
-    //     LOG(ERROR) << "CWorkServerHandler::setAmplitudes exception: " << e.what();
-    //     setBase(resp.base, ErrCode::type::COM_OTHRE);
-    // }
+        m_executor.setAmplitudes(req.reals, req.imags);
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    catch(const std::exception& e)
+    {
+        LOG(ERROR) << "CWorkServerHandler::setAmplitudes exception: " << e.what();
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+    }
 }
 
 //执行任务
