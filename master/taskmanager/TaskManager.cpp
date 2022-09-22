@@ -171,7 +171,7 @@ void CTaskManager::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq
 
     //1.判断任务是否已经初始化
     auto taskhandle = getTask(req.id);
-    if (taskhandle != nullptr)
+    if (taskhandle == nullptr)
     {
         //任务不存在
         LOG(ERROR) << "setAmplitudes task is not exist(taskid:" << req.id << ").";
