@@ -1,0 +1,12 @@
+This txt introduce how to pull image from private cloud server:
+1.  install docker
+2.  modify /etc/docker/daemon.json like below:
+	{
+		"insecure-registries":["192.168.170.195:8084"]
+	}
+3.  logon private cloud server:
+    docker login 192.168.170.195:8084 (xxx/xxx)
+4.  pull image:
+    docker pull 192.168.170.195:8084/repository/qudoor/qusprout-server:0.1.10
+5.  create container:
+    docker run --name qusprout-service -dit -p 9091:9091 -v path:path "image id" /bin/bash
