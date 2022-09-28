@@ -874,6 +874,181 @@ void testget()
     }
 }
 
+void testreset()
+{
+    std::ostringstream os("");
+    os << time(NULL);
+    auto id = os.str();
+
+    int qubitnum = 2;
+    try
+    {
+        std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("192.168.158.146", 9091); 
+        socket->setConnTimeout(60000);
+        socket->setRecvTimeout(60000);
+        socket->setSendTimeout(60000);
+        std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+        std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+        std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+        transport->open();
+
+        std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+        //初始化
+        InitQubitsReq initreq;
+        initreq.__set_id(id);
+        initreq.__set_qubits(qubitnum);
+        initreq.__set_density(false);
+        initreq.__set_exec_type(ExecCmdType::ExecTypeCpuSingle);
+        InitQubitsResp initresp;
+        client->initQubits(initresp, initreq);
+        std::ostream& osstream = std::cout;
+        initreq.printTo(osstream);
+        std::cout << "end init---------------" << std::endl;
+
+        //发送指令
+        SendCircuitCmdReq cmdreq;
+        cmdreq.__set_id(id);
+        Circuit circuit;
+        for (auto i = 0; i < qubitnum; ++i)
+        {
+            Cmd cmd;
+            cmd.__set_gate("H");
+            cmd.targets.push_back(i);
+            std::ostringstream ostemp("");
+            ostemp << "h q[" << i << "]";
+            cmd.desc = ostemp.str();
+            circuit.cmds.push_back(cmd);
+        }
+        Cmd cmd1;
+        cmd1.__set_gate("Reset");
+        cmd1.targets.push_back(1);
+        std::ostringstream ostemp("");
+        ostemp << "Reset q[" << 1 << "]";
+        cmd1.desc = ostemp.str();
+        circuit.cmds.push_back(cmd1);
+
+        cmdreq.__set_circuit(circuit);
+        cmdreq.__set_final(true);
+        SendCircuitCmdResp cmdresp;
+        client->sendCircuitCmd(cmdresp, cmdreq);
+        std::cout << "end sendCircuitCmd---------------" << std::endl;
+
+        //获取所有的计算状态
+        GetAllStateReq statereq;
+        statereq.__set_id(id);
+        GetAllStateResp stateresp;
+        client->getAllState(stateresp, statereq);
+        stateresp.printTo(osstream);
+        std::cout << "end getAllState---------------" << std::endl;
+
+        //获取振幅
+        for (auto i = 0; i < pow(2,qubitnum); ++i)
+        {
+            GetProbAmpReq ampreq;
+            ampreq.__set_id(id);
+            ampreq.__set_index(i);
+            GetProbAmpResp ampresp;
+            client->getProbAmp(ampresp, ampreq);
+            ampresp.printTo(osstream);
+            std::cout << "end getProbAmp---------------" << std::endl;
+        }
+
+        //获取当前qubit的概率
+        for (auto i = 0; i < qubitnum; ++i)
+        {
+            GetProbOfOutcomeReq alloutcomreq;
+            alloutcomreq.__set_id(id);
+            alloutcomreq.__set_qubit(i);
+            alloutcomreq.__set_outcom(0);
+            GetProbOfOutcomeResp alloutcomresp;
+            client->getProbOfOutcome(alloutcomresp, alloutcomreq);
+            alloutcomresp.printTo(osstream);
+            std::cout << "end getProbOfOutcome---------------" << std::endl;
+        }
+
+        GetProbOfAllOutcomReq alloutcomreq;
+        alloutcomreq.__set_id(id);
+        std::vector<int32_t> outcomre;
+        outcomre.push_back(0);
+        outcomre.push_back(1);
+        alloutcomreq.__set_targets(outcomre);
+        GetProbOfAllOutcomResp alloutcomresp;
+        client->getProbOfAllOutcome(alloutcomresp, alloutcomreq);
+        alloutcomresp.printTo(osstream);
+        std::cout << "end getProbOfAllOutcome---------------" << std::endl;
+
+        /*
+        //重置指定的qubits
+        ResetQubitsReq resetreq;
+        resetreq.__set_id(id);
+        std::vector<int32_t> resetqubits;
+        resetqubits.push_back(1);
+        resetreq.__set_qubits(resetqubits);
+        ResetQubitsResp resetresp;
+        client->resetQubits(resetresp, resetreq);
+        resetresp.printTo(osstream);
+        std::cout << "end resetQubits---------------" << std::endl;
+        
+
+        //获取所有的计算状态
+        GetAllStateReq statereq1;
+        statereq1.__set_id(id);
+        GetAllStateResp stateresp1;
+        client->getAllState(stateresp1, statereq1);
+        stateresp1.printTo(osstream);
+        std::cout << "end getAllState---------------" << std::endl;
+
+        //获取振幅
+        for (auto i = 0; i < pow(2,qubitnum); ++i)
+        {
+            GetProbAmpReq ampreq;
+            ampreq.__set_id(id);
+            ampreq.__set_index(i);
+            GetProbAmpResp ampresp;
+            client->getProbAmp(ampresp, ampreq);
+            ampresp.printTo(osstream);
+            std::cout << "end getProbAmp---------------" << std::endl;
+        }
+
+        //获取当前qubit的概率
+        for (auto i = 0; i < qubitnum; ++i)
+        {
+            GetProbOfOutcomeReq alloutcomreq;
+            alloutcomreq.__set_id(id);
+            alloutcomreq.__set_qubit(i);
+            alloutcomreq.__set_outcom(0);
+            GetProbOfOutcomeResp alloutcomresp;
+            client->getProbOfOutcome(alloutcomresp, alloutcomreq);
+            alloutcomresp.printTo(osstream);
+            std::cout << "end getProbOfOutcome---------------" << std::endl;
+        }
+
+        GetProbOfAllOutcomReq alloutcomreq1;
+        alloutcomreq1.__set_id(id);
+        std::vector<int32_t> outcomre1;
+        outcomre1.push_back(0);
+        outcomre1.push_back(1);
+        alloutcomreq1.__set_targets(outcomre1);
+        GetProbOfAllOutcomResp alloutcomresp1;
+        client->getProbOfAllOutcome(alloutcomresp1, alloutcomreq1);
+        alloutcomresp1.printTo(osstream);
+        std::cout << "end getProbOfAllOutcome---------------" << std::endl;
+        */
+
+        transport->close();
+        sleep(1);
+    }
+    catch(const TTransportException& e)
+    {
+        std::cout << "init exception(err:" << e.what() << ",getType:" << e.getType() << ").";
+    }
+    catch(...)
+    {
+        std::cout << "init other exception.";
+    }
+}
+
 int main(int argc, char **argv) {
     //testSimMultiCmd();
     //testSimThreadCmd();
@@ -882,7 +1057,8 @@ int main(int argc, char **argv) {
     //testGetStatisticsInfo();
     //testpauil();
     //testpauil1();
-    testget();
+    //testget();
+    testreset();
     
     return 0;
 }

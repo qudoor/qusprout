@@ -93,6 +93,7 @@ public:
     void CSwap(const Cmd& cmd);
     void MatrixN(const Cmd& cmd);
     void Ph(const Cmd& cmd);
+    void Reset(const Cmd& cmd);
 
 private:
     Qureg m_qureg;
