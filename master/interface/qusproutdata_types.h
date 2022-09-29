@@ -52,6 +52,10 @@ std::ostream& operator<<(std::ostream& out, const PauliOperType::type& val);
 
 std::string to_string(const PauliOperType::type& val);
 
+class Amplitude;
+
+class Cmdex;
+
 class Cmd;
 
 class Circuit;
@@ -65,10 +69,6 @@ class Result;
 class InitQubitsReq;
 
 class InitQubitsResp;
-
-class SetAmplitudesReq;
-
-class SetAmplitudesResp;
 
 class SendCircuitCmdReq;
 
@@ -149,6 +149,107 @@ class GetProbabilitiesReq;
 class GetProbabilitiesResp;
 
 
+class Amplitude : public virtual ::apache::thrift::TBase {
+ public:
+
+  Amplitude(const Amplitude&);
+  Amplitude& operator=(const Amplitude&);
+  Amplitude() noexcept
+            : startind(0),
+              numamps(0) {
+  }
+
+  virtual ~Amplitude() noexcept;
+  std::vector<double>  reals;
+  std::vector<double>  imags;
+  int32_t startind;
+  int32_t numamps;
+
+  void __set_reals(const std::vector<double> & val);
+
+  void __set_imags(const std::vector<double> & val);
+
+  void __set_startind(const int32_t val);
+
+  void __set_numamps(const int32_t val);
+
+  bool operator == (const Amplitude & rhs) const
+  {
+    if (!(reals == rhs.reals))
+      return false;
+    if (!(imags == rhs.imags))
+      return false;
+    if (!(startind == rhs.startind))
+      return false;
+    if (!(numamps == rhs.numamps))
+      return false;
+    return true;
+  }
+  bool operator != (const Amplitude &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Amplitude & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(Amplitude &a, Amplitude &b);
+
+std::ostream& operator<<(std::ostream& out, const Amplitude& obj);
+
+typedef struct _Cmdex__isset {
+  _Cmdex__isset() : amp(false) {}
+  bool amp :1;
+} _Cmdex__isset;
+
+class Cmdex : public virtual ::apache::thrift::TBase {
+ public:
+
+  Cmdex(const Cmdex&);
+  Cmdex& operator=(const Cmdex&);
+  Cmdex() noexcept {
+  }
+
+  virtual ~Cmdex() noexcept;
+  Amplitude amp;
+
+  _Cmdex__isset __isset;
+
+  void __set_amp(const Amplitude& val);
+
+  bool operator == (const Cmdex & rhs) const
+  {
+    if (__isset.amp != rhs.__isset.amp)
+      return false;
+    else if (__isset.amp && !(amp == rhs.amp))
+      return false;
+    return true;
+  }
+  bool operator != (const Cmdex &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Cmdex & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(Cmdex &a, Cmdex &b);
+
+std::ostream& operator<<(std::ostream& out, const Cmdex& obj);
+
+typedef struct _Cmd__isset {
+  _Cmd__isset() : cmdex(false) {}
+  bool cmdex :1;
+} _Cmd__isset;
+
 class Cmd : public virtual ::apache::thrift::TBase {
  public:
 
@@ -167,6 +268,9 @@ class Cmd : public virtual ::apache::thrift::TBase {
   std::vector<double>  rotation;
   std::string desc;
   bool inverse;
+  Cmdex cmdex;
+
+  _Cmd__isset __isset;
 
   void __set_gate(const std::string& val);
 
@@ -179,6 +283,8 @@ class Cmd : public virtual ::apache::thrift::TBase {
   void __set_desc(const std::string& val);
 
   void __set_inverse(const bool val);
+
+  void __set_cmdex(const Cmdex& val);
 
   bool operator == (const Cmd & rhs) const
   {
@@ -193,6 +299,10 @@ class Cmd : public virtual ::apache::thrift::TBase {
     if (!(desc == rhs.desc))
       return false;
     if (!(inverse == rhs.inverse))
+      return false;
+    if (__isset.cmdex != rhs.__isset.cmdex)
+      return false;
+    else if (__isset.cmdex && !(cmdex == rhs.cmdex))
       return false;
     return true;
   }
@@ -488,89 +598,6 @@ class InitQubitsResp : public virtual ::apache::thrift::TBase {
 void swap(InitQubitsResp &a, InitQubitsResp &b);
 
 std::ostream& operator<<(std::ostream& out, const InitQubitsResp& obj);
-
-
-class SetAmplitudesReq : public virtual ::apache::thrift::TBase {
- public:
-
-  SetAmplitudesReq(const SetAmplitudesReq&);
-  SetAmplitudesReq& operator=(const SetAmplitudesReq&);
-  SetAmplitudesReq() noexcept
-                   : id() {
-  }
-
-  virtual ~SetAmplitudesReq() noexcept;
-  std::string id;
-  std::vector<double>  reals;
-  std::vector<double>  imags;
-
-  void __set_id(const std::string& val);
-
-  void __set_reals(const std::vector<double> & val);
-
-  void __set_imags(const std::vector<double> & val);
-
-  bool operator == (const SetAmplitudesReq & rhs) const
-  {
-    if (!(id == rhs.id))
-      return false;
-    if (!(reals == rhs.reals))
-      return false;
-    if (!(imags == rhs.imags))
-      return false;
-    return true;
-  }
-  bool operator != (const SetAmplitudesReq &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const SetAmplitudesReq & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(SetAmplitudesReq &a, SetAmplitudesReq &b);
-
-std::ostream& operator<<(std::ostream& out, const SetAmplitudesReq& obj);
-
-
-class SetAmplitudesResp : public virtual ::apache::thrift::TBase {
- public:
-
-  SetAmplitudesResp(const SetAmplitudesResp&);
-  SetAmplitudesResp& operator=(const SetAmplitudesResp&);
-  SetAmplitudesResp() noexcept {
-  }
-
-  virtual ~SetAmplitudesResp() noexcept;
-   ::BaseCode base;
-
-  void __set_base(const  ::BaseCode& val);
-
-  bool operator == (const SetAmplitudesResp & rhs) const
-  {
-    if (!(base == rhs.base))
-      return false;
-    return true;
-  }
-  bool operator != (const SetAmplitudesResp &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const SetAmplitudesResp & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(SetAmplitudesResp &a, SetAmplitudesResp &b);
-
-std::ostream& operator<<(std::ostream& out, const SetAmplitudesResp& obj);
 
 typedef struct _SendCircuitCmdReq__isset {
   _SendCircuitCmdReq__isset() : circuit(false), final(false) {}

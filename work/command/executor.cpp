@@ -64,7 +64,8 @@ map<string, GateFunc> g_gateMap = {
     make_pair<string, GateFunc>("sqrtxdg", &CmdExecutor::SqrtXdg),
     make_pair<string, GateFunc>("csqrtx", &CmdExecutor::CSqrtX),
     make_pair<string, GateFunc>("cswap", &CmdExecutor::CSwap),
-    make_pair<string, GateFunc>("ph", &CmdExecutor::Ph)
+    make_pair<string, GateFunc>("ph", &CmdExecutor::Ph),
+    make_pair<string, GateFunc>("amp", &CmdExecutor::Amp)
 };
 
 inline string toLowerCase(string str) 
@@ -84,16 +85,6 @@ CmdExecutor::CmdExecutor()
 
 CmdExecutor::~CmdExecutor() 
 {
-}
-
-void CmdExecutor::setAmplitudes(const std::vector<double>& reals, const std::vector<double>& imags)
-{
-    long long int startInd = SINGLETON(CQuESTIniter)->m_env.rank * m_qureg.numAmpsPerChunk;
-    long long int numAmps = m_qureg.numAmpsPerChunk;
-    if (startInd + m_qureg.numAmpsPerChunk > (long long)reals.size())
-        numAmps = reals.size() - startInd;
-
-    setAmps(m_qureg, startInd, (double*)reals.data(), (double*)imags.data(), numAmps);
 }
 
 void CmdExecutor::receiveCircuit(const ::Circuit& circuit, const bool final) {
@@ -1582,4 +1573,9 @@ void CmdExecutor::Ph(const Cmd& cmd)
     applyMatrixN(m_qureg, targs.get(), targsnum, m);
 
     destroyComplexMatrixN(m);
+}
+
+void CmdExecutor::Amp(const Cmd& cmd)
+{
+    setAmps(m_qureg, cmd.cmdex.amp.startind, (double*)cmd.cmdex.amp.reals.data(), (double*)cmd.cmdex.amp.imags.data(), cmd.cmdex.amp.numamps);
 }

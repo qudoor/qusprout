@@ -27,20 +27,6 @@ void CSlaveServerHandler::initQubits(InitQubitsResp& resp, const InitQubitsReq& 
     CStatisticsCodeCount codesis(req.exec_type, Tag_Iinterface_initQubits, req.qubits, resp.base.code);
 }
 
-//设置振幅
-void CSlaveServerHandler::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req)
-{
-    InitQubitsReq initinfo;
-    initinfo.__set_exec_type(ExecCmdType::ExecTypeDefault);
-    CStatisticsTimeAndCount countsis(initinfo.exec_type, Tag_Iinterface_setAmplitudes);
-
-    SINGLETON(CTaskManager)->setAmplitudes(resp, req, initinfo);
-    countsis.setExecType(initinfo.exec_type);
-    countsis.setQubitNum(initinfo.qubits);
-
-    CStatisticsCodeCount codesis(initinfo.exec_type, Tag_Iinterface_setAmplitudes, initinfo.qubits, resp.base.code);
-}
-
 //发送任务
 void CSlaveServerHandler::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {

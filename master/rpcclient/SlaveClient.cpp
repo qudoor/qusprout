@@ -94,18 +94,6 @@ void CSlaveClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     LOG(INFO) << "response initQubits(id:" << req.id << ",resp:" << getPrint(resp) << ").";
 }
 
-//设置振幅
-void CSlaveClient::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req)
-{
-    if (!isInit())
-    {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
-        return;
-    }
-
-    CALL_WITH_SERVICE(m_client->setAmplitudes(resp, req), req);
-}
-
 //发送任务
 void CSlaveClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {

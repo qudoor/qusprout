@@ -22,7 +22,6 @@ const int PACKSIZE = 1024 * 1024;
 #define CMDTYPE_RESETQUBITS     (1 << 12)
 #define CMDTYPE_STATEOFALL      (1 << 13)
 #define CMDTYPE_PROBAMPALL      (1 << 14)
-#define CMDTYPE_SETAMPLITUDES   (1 << 15)
 
 class NodeData
 {
@@ -78,9 +77,6 @@ public:
     void packprobampall(char* packbuf, int& packsize);
     void unpackprobampall(char* packbuf, int& packsize);
 
-    void packamplitudes(const std::vector<double>& reals, const std::vector<double>& imags, char* packbuf, int& packsize);
-    void unpackamplitudes(char* packbuf, int& packsize);
-    
     std::vector<Cmd> m_Cmds;
     std::vector<int> m_targets;
     int m_cmdtype;
@@ -94,9 +90,6 @@ public:
     GetExpecPauliSumReq m_pauli_sum;
     GateMatrix m_matrix;
     std::vector<int32_t> m_reset_qubits;
-
-    std::vector<double> m_reals;
-    std::vector<double> m_imags;
     
 private:
     int m_position;

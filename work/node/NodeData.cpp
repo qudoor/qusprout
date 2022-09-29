@@ -47,6 +47,10 @@ void NodeData::packcircuit(const std::vector<Cmd>& cmds, const int& final, char*
         packvectorint(cmd.targets, packbuf, packsize);
         packvectordouble(cmd.rotation, packbuf, packsize);
         packstring(cmd.desc, packbuf, packsize);
+        packvectordouble(cmd.cmdex.amp.reals, packbuf, packsize);
+        packvectordouble(cmd.cmdex.amp.imags, packbuf, packsize);
+        packint(cmd.cmdex.amp.startind, packbuf, packsize);
+        packint(cmd.cmdex.amp.numamps, packbuf, packsize);
     }
 }
 
@@ -66,30 +70,13 @@ void NodeData::unpackcircuit(char* packbuf, int& packsize)
         unpackvectorint(cmd.targets, packbuf, packsize);
         unpackvectordouble(cmd.rotation, packbuf, packsize);
         unpackstring(cmd.desc, packbuf, packsize);
+        unpackvectordouble(cmd.cmdex.amp.reals, packbuf, packsize);
+        unpackvectordouble(cmd.cmdex.amp.imags, packbuf, packsize);
+        unpackint(cmd.cmdex.amp.startind, packbuf, packsize);
+        unpackint(cmd.cmdex.amp.numamps, packbuf, packsize);
 
         m_Cmds.push_back(cmd);
     }
-}
-
-void NodeData::packamplitudes(const std::vector<double>& reals, const std::vector<double>& imags, char* packbuf, int& packsize)
-{
-    //pack command type
-    packcmdtype(CMDTYPE_SETAMPLITUDES, packbuf, packsize);
-
-    //pack reals
-    packvectordouble(reals, packbuf, packsize);
-
-    //pack imags
-    packvectordouble(imags, packbuf, packsize);
-}
-
-void NodeData::unpackamplitudes(char* packbuf, int& packsize)
-{
-    //unpack reals
-    unpackvectordouble(m_reals, packbuf, packsize);
-
-    //unpack imags
-    unpackvectordouble(m_imags, packbuf, packsize);
 }
 
 void NodeData::packprobamp(const int& ampindex, char* packbuf, int& packsize)

@@ -74,12 +74,6 @@ void CWorkClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     LOG(INFO) << "response initQubits(id:" << req.id << ",resp:" << getPrint(resp) << ").";
 }
 
-//设置振幅
-void CWorkClient::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req)
-{
-    CALL_WITH_SERVICE(m_client->setAmplitudes(resp, req), req);
-}
-
 //发送任务
 void CWorkClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {

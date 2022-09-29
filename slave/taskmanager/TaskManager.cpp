@@ -60,30 +60,6 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
 }
 
-void CTaskManager::setAmplitudes(SetAmplitudesResp& resp, const SetAmplitudesReq& req, InitQubitsReq& initInfo)
-{
-    if (req.id.empty())
-    {
-        LOG(ERROR) << "setAmplitudes param is invalild(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-        return;
-    } 
-
-    //1.判断任务是否已经初始化
-    auto taskhandle = getTask(req.id);
-    if (taskhandle == nullptr)
-    {
-        //任务不存在
-        LOG(ERROR) << "setAmplitudes task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
-        return;
-    }
-    initInfo = taskhandle->taskinfo;
-
-    std::lock_guard<std::mutex> guard(taskhandle->mutex);
-    taskhandle->client.setAmplitudes(resp, req);
-}
-
 void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req, InitQubitsReq& initInfo)
 {
     if (req.id.empty() || (req.final == false && req.circuit.cmds.size() <= 0))

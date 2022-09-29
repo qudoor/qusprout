@@ -30,8 +30,6 @@ public:
     void getStateOfAllQubits();
     void getProbabilities();
 
-    void setAmplitudes(const std::vector<double>& reals, const std::vector<double>& imags);
-
 private:
     QS::CmdExecutor m_executor;
 

@@ -23,7 +23,6 @@ class QuSproutServerIf {
  public:
   virtual ~QuSproutServerIf() {}
   virtual void initQubits( ::InitQubitsResp& _return, const  ::InitQubitsReq& req) = 0;
-  virtual void setAmplitudes( ::SetAmplitudesResp& _return, const  ::SetAmplitudesReq& req) = 0;
   virtual void sendCircuitCmd( ::SendCircuitCmdResp& _return, const  ::SendCircuitCmdReq& req) = 0;
   virtual void cancelCmd( ::CancelCmdResp& _return, const  ::CancelCmdReq& req) = 0;
   virtual void getProbAmp( ::GetProbAmpResp& _return, const  ::GetProbAmpReq& req) = 0;
@@ -72,9 +71,6 @@ class QuSproutServerNull : virtual public QuSproutServerIf {
  public:
   virtual ~QuSproutServerNull() {}
   void initQubits( ::InitQubitsResp& /* _return */, const  ::InitQubitsReq& /* req */) override {
-    return;
-  }
-  void setAmplitudes( ::SetAmplitudesResp& /* _return */, const  ::SetAmplitudesReq& /* req */) override {
     return;
   }
   void sendCircuitCmd( ::SendCircuitCmdResp& /* _return */, const  ::SendCircuitCmdReq& /* req */) override {
@@ -232,110 +228,6 @@ class QuSproutServer_initQubits_presult {
    ::InitQubitsResp* success;
 
   _QuSproutServer_initQubits_presult__isset __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
-typedef struct _QuSproutServer_setAmplitudes_args__isset {
-  _QuSproutServer_setAmplitudes_args__isset() : req(false) {}
-  bool req :1;
-} _QuSproutServer_setAmplitudes_args__isset;
-
-class QuSproutServer_setAmplitudes_args {
- public:
-
-  QuSproutServer_setAmplitudes_args(const QuSproutServer_setAmplitudes_args&);
-  QuSproutServer_setAmplitudes_args& operator=(const QuSproutServer_setAmplitudes_args&);
-  QuSproutServer_setAmplitudes_args() noexcept {
-  }
-
-  virtual ~QuSproutServer_setAmplitudes_args() noexcept;
-   ::SetAmplitudesReq req;
-
-  _QuSproutServer_setAmplitudes_args__isset __isset;
-
-  void __set_req(const  ::SetAmplitudesReq& val);
-
-  bool operator == (const QuSproutServer_setAmplitudes_args & rhs) const
-  {
-    if (!(req == rhs.req))
-      return false;
-    return true;
-  }
-  bool operator != (const QuSproutServer_setAmplitudes_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const QuSproutServer_setAmplitudes_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-
-class QuSproutServer_setAmplitudes_pargs {
- public:
-
-
-  virtual ~QuSproutServer_setAmplitudes_pargs() noexcept;
-  const  ::SetAmplitudesReq* req;
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _QuSproutServer_setAmplitudes_result__isset {
-  _QuSproutServer_setAmplitudes_result__isset() : success(false) {}
-  bool success :1;
-} _QuSproutServer_setAmplitudes_result__isset;
-
-class QuSproutServer_setAmplitudes_result {
- public:
-
-  QuSproutServer_setAmplitudes_result(const QuSproutServer_setAmplitudes_result&);
-  QuSproutServer_setAmplitudes_result& operator=(const QuSproutServer_setAmplitudes_result&);
-  QuSproutServer_setAmplitudes_result() noexcept {
-  }
-
-  virtual ~QuSproutServer_setAmplitudes_result() noexcept;
-   ::SetAmplitudesResp success;
-
-  _QuSproutServer_setAmplitudes_result__isset __isset;
-
-  void __set_success(const  ::SetAmplitudesResp& val);
-
-  bool operator == (const QuSproutServer_setAmplitudes_result & rhs) const
-  {
-    if (!(success == rhs.success))
-      return false;
-    return true;
-  }
-  bool operator != (const QuSproutServer_setAmplitudes_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const QuSproutServer_setAmplitudes_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _QuSproutServer_setAmplitudes_presult__isset {
-  _QuSproutServer_setAmplitudes_presult__isset() : success(false) {}
-  bool success :1;
-} _QuSproutServer_setAmplitudes_presult__isset;
-
-class QuSproutServer_setAmplitudes_presult {
- public:
-
-
-  virtual ~QuSproutServer_setAmplitudes_presult() noexcept;
-   ::SetAmplitudesResp* success;
-
-  _QuSproutServer_setAmplitudes_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -2241,9 +2133,6 @@ class QuSproutServerClient : virtual public QuSproutServerIf {
   void initQubits( ::InitQubitsResp& _return, const  ::InitQubitsReq& req) override;
   void send_initQubits(const  ::InitQubitsReq& req);
   void recv_initQubits( ::InitQubitsResp& _return);
-  void setAmplitudes( ::SetAmplitudesResp& _return, const  ::SetAmplitudesReq& req) override;
-  void send_setAmplitudes(const  ::SetAmplitudesReq& req);
-  void recv_setAmplitudes( ::SetAmplitudesResp& _return);
   void sendCircuitCmd( ::SendCircuitCmdResp& _return, const  ::SendCircuitCmdReq& req) override;
   void send_sendCircuitCmd(const  ::SendCircuitCmdReq& req);
   void recv_sendCircuitCmd( ::SendCircuitCmdResp& _return);
@@ -2314,7 +2203,6 @@ class QuSproutServerProcessor : public ::apache::thrift::TDispatchProcessor {
   typedef std::map<std::string, ProcessFunction> ProcessMap;
   ProcessMap processMap_;
   void process_initQubits(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
-  void process_setAmplitudes(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_sendCircuitCmd(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_cancelCmd(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_getProbAmp(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
@@ -2337,7 +2225,6 @@ class QuSproutServerProcessor : public ::apache::thrift::TDispatchProcessor {
   QuSproutServerProcessor(::std::shared_ptr<QuSproutServerIf> iface) :
     iface_(iface) {
     processMap_["initQubits"] = &QuSproutServerProcessor::process_initQubits;
-    processMap_["setAmplitudes"] = &QuSproutServerProcessor::process_setAmplitudes;
     processMap_["sendCircuitCmd"] = &QuSproutServerProcessor::process_sendCircuitCmd;
     processMap_["cancelCmd"] = &QuSproutServerProcessor::process_cancelCmd;
     processMap_["getProbAmp"] = &QuSproutServerProcessor::process_getProbAmp;
@@ -2391,16 +2278,6 @@ class QuSproutServerMultiface : virtual public QuSproutServerIf {
       ifaces_[i]->initQubits(_return, req);
     }
     ifaces_[i]->initQubits(_return, req);
-    return;
-  }
-
-  void setAmplitudes( ::SetAmplitudesResp& _return, const  ::SetAmplitudesReq& req) override {
-    size_t sz = ifaces_.size();
-    size_t i = 0;
-    for (; i < (sz - 1); ++i) {
-      ifaces_[i]->setAmplitudes(_return, req);
-    }
-    ifaces_[i]->setAmplitudes(_return, req);
     return;
   }
 
@@ -2619,9 +2496,6 @@ class QuSproutServerConcurrentClient : virtual public QuSproutServerIf {
   void initQubits( ::InitQubitsResp& _return, const  ::InitQubitsReq& req) override;
   int32_t send_initQubits(const  ::InitQubitsReq& req);
   void recv_initQubits( ::InitQubitsResp& _return, const int32_t seqid);
-  void setAmplitudes( ::SetAmplitudesResp& _return, const  ::SetAmplitudesReq& req) override;
-  int32_t send_setAmplitudes(const  ::SetAmplitudesReq& req);
-  void recv_setAmplitudes( ::SetAmplitudesResp& _return, const int32_t seqid);
   void sendCircuitCmd( ::SendCircuitCmdResp& _return, const  ::SendCircuitCmdReq& req) override;
   int32_t send_sendCircuitCmd(const  ::SendCircuitCmdReq& req);
   void recv_sendCircuitCmd( ::SendCircuitCmdResp& _return, const int32_t seqid);

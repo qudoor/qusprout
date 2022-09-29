@@ -16,14 +16,6 @@ CWorkNodeHandler::~CWorkNodeHandler()
 {
 }
 
-void CWorkNodeHandler::setAmplitudes(const std::vector<double>& reals, const std::vector<double>& imags)
-{
-    m_reals = reals;
-    m_imags = imags;
-
-    mpiexecute(CMDTYPE_SETAMPLITUDES);
-}
-
 void CWorkNodeHandler::sendCircuitCmd(const std::vector<Cmd>& cmds, const int& final)
 {
     m_Cmds = cmds;
@@ -208,9 +200,6 @@ void CWorkNodeHandler::packdata(int cmdtype, char* packbuf, int& packsize)
         case CMDTYPE_PROBAMPALL:
             data.packprobampall(packbuf, packsize);
             break;
-        case CMDTYPE_SETAMPLITUDES:
-            data.packamplitudes(m_reals, m_imags, packbuf, packsize);
-            break;
         default:
             assert(false);
             break;
@@ -266,9 +255,6 @@ void CWorkNodeHandler::unpackdata(NodeData& nodedata, char* packbuf, int& packsi
             break;
         case CMDTYPE_PROBAMPALL:
             nodedata.unpackprobampall(packbuf, packsize);
-            break;
-        case CMDTYPE_SETAMPLITUDES:
-            nodedata.unpackamplitudes(packbuf, packsize);
             break;
         default:
             assert(false);
@@ -330,9 +316,6 @@ void CWorkNodeHandler::execute(NodeData& nodedata)
         break;
     case CMDTYPE_PROBAMPALL:
         m_executor.getProbabilities(probabilities);
-        break;
-    case CMDTYPE_SETAMPLITUDES:
-        m_executor.setAmplitudes(nodedata.m_reals, nodedata.m_imags);
         break;
     default:
         assert(false);

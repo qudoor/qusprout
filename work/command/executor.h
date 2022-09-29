@@ -42,8 +42,6 @@ public:
 
     long long int getMaxAmpIndex();
 
-    void setAmplitudes(const std::vector<double>& reals, const std::vector<double>& imags);
-    
 private:
     void writeStateToFile(const std::string& id);
 
@@ -96,6 +94,7 @@ public:
     void CSwap(const Cmd& cmd);
     void MatrixN(const Cmd& cmd);
     void Ph(const Cmd& cmd);
+    void Amp(const Cmd& cmd);
 
 private:
     Qureg m_qureg;
