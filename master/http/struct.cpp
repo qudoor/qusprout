@@ -3,8 +3,8 @@
 #include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
 #include "struct.h"
-#include "log/qulog.h"
-#include "common/errorcode.h"
+#include "common/qulog.h"
+#include "comm/errorcode.h"
 
 using namespace rapidjson;
 
@@ -70,10 +70,7 @@ std::string ReqHead::getStr()
 bool ReqHead::decodehead(const std::string& buf)
 {
     PraseReqJson();
-
-    DecodeString("flowid", dom, flowid, true);
-    DecodeString("taskid", dom, taskid, true);
-    DecodeString("cmd", dom, cmd, true);
+    decode(dom);
 
     return true;
 }
@@ -110,6 +107,20 @@ void RespHead::setcode(const std::string& flowid, const int code)
     this->flowid = flowid;
     this->code = code;
     this->msg = g_errormsg[code];
+}
+
+void RespHead::encodehead(std::string& buf)
+{
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        encode(writer);
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
 }
 
 void MeasureInfo::encode(Writer<StringBuffer>& writer)
@@ -189,7 +200,7 @@ std::string InitParam::getStr()
 
 void InitEnvReq::encode(std::string& buf)
 {
-    cmd = "initenv";
+    cmd = CMD_STR_INITENV;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -198,10 +209,10 @@ void InitEnvReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
-            data.encode(writer);
+            params.encode(writer);
         }
         writer.EndObject();
     }
@@ -214,16 +225,16 @@ bool InitEnvReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (!dom.HasMember("data") || !dom["data"].IsObject())
+    if (!dom.HasMember("params") || !dom["params"].IsObject())
     {
-        LOG(ERROR) << "decode not find required key(key:data).";
+        LOG(ERROR) << "decode not find required key(key:params).";
         return false;
     }
 
-    const rapidjson::Value& datadom = dom["data"];
-    if (!data.decode(datadom))
+    const rapidjson::Value& paramsdom = dom["params"];
+    if (!params.decode(paramsdom))
     {
-        LOG(ERROR) << "decode data failed.";
+        LOG(ERROR) << "decode params failed.";
         return false;
     }
 
@@ -234,7 +245,7 @@ std::string InitEnvReq::getStr()
 {
     std::ostringstream ss;
     ss << "InitEnvReq:" << ReqHead::getStr()
-        << data.getStr();
+        << params.getStr();
 
     return ss.str();
 }
@@ -364,7 +375,7 @@ std::string GateCmdParam::getStr()
         << ";circuits:[";
     for (auto temp : circuits) 
     {
-        ss << temp.getStr();
+        ss << temp.getStr() << ";";
     }
     ss << "];";
 
@@ -373,7 +384,7 @@ std::string GateCmdParam::getStr()
 
 void AddGateCmdReq::encode(std::string& buf)
 {
-    cmd = "addcmd";
+    cmd = CMD_STR_ADDCMD;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -382,10 +393,10 @@ void AddGateCmdReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
-            data.encode(writer);
+            params.encode(writer);
         }
         writer.EndObject();
     }
@@ -398,16 +409,16 @@ bool AddGateCmdReq::decode(const std::string& buf)
 {
     PraseReqJson();
 
-    if (!dom.HasMember("data") || !dom["data"].IsObject())
+    if (!dom.HasMember("params") || !dom["params"].IsObject())
     {
-        LOG(ERROR) << "decode not find required key(key:data).";
+        LOG(ERROR) << "decode not find required key(key:params).";
         return false;
     }
 
-    const rapidjson::Value& datadom = dom["data"];
-    if (!data.decode(datadom))
+    const rapidjson::Value& paramsdom = dom["params"];
+    if (!params.decode(paramsdom))
     {
-        LOG(ERROR) << "decode data failed.";
+        LOG(ERROR) << "decode params failed.";
         return false;
     }
 
@@ -418,7 +429,7 @@ std::string AddGateCmdReq::getStr()
 {
     std::ostringstream ss;
     ss << "AddGateCmdReq:" << ReqHead::getStr()
-        << data.getStr();
+        << params.getStr();
 
     return ss.str();
 }
@@ -454,7 +465,7 @@ std::string AddGateCmdResp::getStr()
 
 void RunGateCmdReq::encode(std::string& buf)
 {
-    cmd = "runcmd";
+    cmd = CMD_STR_RUNCMD;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -463,7 +474,7 @@ void RunGateCmdReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
             EncodeInt("shots", shots);
@@ -479,10 +490,10 @@ bool RunGateCmdReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (dom.HasMember("data") && dom["data"].IsObject())
+    if (dom.HasMember("params") && dom["params"].IsObject())
     {
-        const rapidjson::Value& datadom = dom["data"];
-        DecodeInt("shots", datadom, shots, false);
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeInt("shots", paramsdom, shots, false);
     }
 
     return true;
@@ -587,12 +598,12 @@ std::string RunGateCmdResp::getStr()
         << ";measures:[";
     for (auto temp : measures)
     {
-        ss << temp.getStr();
+        ss << temp.getStr() << ";";
     }
     ss << "];outcomes:[";
     for (auto temp : outcomes)
     {
-        ss << temp.getStr();
+        ss << temp.getStr() << ";";
     }
     ss << "];";
 
@@ -601,7 +612,7 @@ std::string RunGateCmdResp::getStr()
 
 void GetAmpReq::encode(std::string& buf)
 {
-    cmd = "getamp";
+    cmd = CMD_STR_GETAMP;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -610,7 +621,7 @@ void GetAmpReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
             EncodeArraryInt("indexs", indexs);
@@ -626,10 +637,10 @@ bool GetAmpReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (dom.HasMember("data") && dom["data"].IsObject())
+    if (dom.HasMember("params") && dom["params"].IsObject())
     {
-        const rapidjson::Value& datadom = dom["data"];
-        DecodeArraryInt("indexs", datadom, indexs, false);
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeArraryInt("indexs", paramsdom, indexs, false);
     }
 
     return true;
@@ -699,7 +710,7 @@ std::string GetAmpResp::getStr()
 
 void GetProbReq::encode(std::string& buf)
 {
-    cmd = "getprob";
+    cmd = CMD_STR_GETPROB;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -708,7 +719,7 @@ void GetProbReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
             EncodeArraryInt("targets", targets);
@@ -724,10 +735,10 @@ bool GetProbReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (dom.HasMember("data") && dom["data"].IsObject())
+    if (dom.HasMember("params") && dom["params"].IsObject())
     {
-        const rapidjson::Value& datadom = dom["data"];
-        DecodeArraryInt("targets", datadom, targets, false);
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeArraryInt("targets", paramsdom, targets, false);
     }
 
     return true;
@@ -797,7 +808,7 @@ std::string GetProbResp::getStr()
 
 void GetStateReq::encode(std::string& buf)
 {
-    cmd = "getstate";
+    cmd = CMD_STR_GETSTATE;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -876,7 +887,7 @@ std::string GetStateResp::getStr()
 
 void ReleaseEnvReq::encode(std::string& buf)
 {
-    cmd = "releaseenv";
+    cmd = CMD_STR_RELEASEENV;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -936,7 +947,7 @@ std::string ReleaseEnvResp::getStr()
 
 void GetMeasureReq::encode(std::string& buf)
 {
-    cmd = "getmeasure";
+    cmd = CMD_STR_GETMEASURE;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -945,7 +956,7 @@ void GetMeasureReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
             EncodeArraryInt("targets", targets);
@@ -961,10 +972,10 @@ bool GetMeasureReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (dom.HasMember("data") && dom["data"].IsObject())
+    if (dom.HasMember("params") && dom["params"].IsObject())
     {
-        const rapidjson::Value& datadom = dom["data"];
-        DecodeArraryInt("targets", datadom, targets, false);
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeArraryInt("targets", paramsdom, targets, false);
     }
 
     return true;
@@ -1073,12 +1084,12 @@ std::string GetMeasureResp::getStr()
         << ";measures:[";
     for (auto temp : measures)
     {
-        ss << temp.getStr();
+        ss << temp.getStr() << ";";
     }
     ss << "];outcomes:[";
     for (auto temp : outcomes)
     {
-        ss << temp.getStr();
+        ss << temp.getStr() << ";";
     }
     ss << "];";
 
@@ -1087,7 +1098,7 @@ std::string GetMeasureResp::getStr()
 
 void ApplyQftReq::encode(std::string& buf)
 {
-    cmd = "applyqft";
+    cmd = CMD_STR_APPLYQFT;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -1096,7 +1107,7 @@ void ApplyQftReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
             EncodeArraryInt("targets", targets);
@@ -1112,10 +1123,10 @@ bool ApplyQftReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (dom.HasMember("data") && dom["data"].IsObject())
+    if (dom.HasMember("params") && dom["params"].IsObject())
     {
-        const rapidjson::Value& datadom = dom["data"];
-        DecodeArraryInt("targets", datadom, targets, false);
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeArraryInt("targets", paramsdom, targets, false);
     }
 
     return true;
@@ -1164,9 +1175,33 @@ std::string ApplyQftResp::getStr()
     return ss.str();
 }
 
+void PauliInfo::encode(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    EncodeInt("opertype", opertype);
+    EncodeInt("target", target);
+}
+
+bool PauliInfo::decode(const rapidjson::Value& dom)
+{
+    DecodeInt("opertype", dom, opertype, true);
+    DecodeInt("target", dom, target, true);
+
+    return true;
+}
+
+std::string PauliInfo::getStr()
+{
+    std::ostringstream ss;
+    ss << "opertype:" << opertype
+        << ";target:" << target
+        << ";";
+
+    return ss.str();
+}
+
 void GetEPauliReq::encode(std::string& buf)
 {
-    cmd = "getpauli";
+    cmd = CMD_STR_GETPAULI;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -1175,10 +1210,22 @@ void GetEPauliReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
-            EncodeArraryInt("paulis", paulis);
+            writer.Key("paulis");
+            writer.StartArray();
+            {
+                for (auto temp : paulis)
+                {
+                    writer.StartObject();
+                    {
+                        temp.encode(writer);
+                    }
+                    writer.EndObject();
+                }
+            }
+            writer.EndArray();
         }
         writer.EndObject();
     }
@@ -1191,10 +1238,26 @@ bool GetEPauliReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (dom.HasMember("data") && dom["data"].IsObject())
+    if (dom.HasMember("params") && dom["params"].IsObject())
     {
-        const rapidjson::Value& datadom = dom["data"];
-        DecodeArraryInt("paulis", datadom, paulis, false);
+        const rapidjson::Value& paramsdom = dom["params"];
+
+        if (!paramsdom.HasMember("paulis") || !paramsdom["paulis"].IsArray())
+        {
+            return false;
+        }
+
+        const rapidjson::Value& paulilist = paramsdom["paulis"];
+        for (unsigned int i = 0; i < paulilist.Size(); ++i) 
+        {
+            PauliInfo temp;
+            const rapidjson::Value& result = paulilist[i];
+            if (!temp.decode(result))
+            {
+                return false;
+            }
+            paulis.push_back(temp);
+        }
     }
 
     return true;
@@ -1207,7 +1270,7 @@ std::string GetEPauliReq::getStr()
         << ";paulis:[";
     for (auto temp : paulis)
     {
-        ss << temp << ";";
+        ss << temp.getStr() << ";";
     }
     ss << "];";
 
@@ -1252,35 +1315,7 @@ std::string GetEPauliResp::getStr()
 {
     std::ostringstream ss;
     ss << "GetEPauliResp:" << RespHead::getStr()
-        << ";expect:[";
-    for (auto temp : amps)
-    {
-        ss << temp << ";";
-    }
-    ss << "];";
-
-    return ss.str();
-}
-
-void PauliInfo::encode(rapidjson::Writer<rapidjson::StringBuffer>& writer)
-{
-    EncodeInt("opertype", opertype);
-    EncodeInt("target", target);
-}
-
-bool PauliInfo::decode(const rapidjson::Value& dom)
-{
-    DecodeInt("opertype", dom, opertype, true);
-    DecodeInt("target", dom, target, true);
-
-    return true;
-}
-
-std::string PauliInfo::getStr()
-{
-    std::ostringstream ss;
-    ss << "opertype:" << opertype
-        << ";target:" << target
+        << ";expect:" << expect
         << ";";
 
     return ss.str();
@@ -1288,7 +1323,7 @@ std::string PauliInfo::getStr()
 
 void GetEPauliSumReq::encode(std::string& buf)
 {
-    cmd = "getpaulisum";
+    cmd = CMD_STR_GETPAULISUM;
 
     StringBuffer bufstream;
 	Writer<StringBuffer> writer(bufstream);
@@ -1297,23 +1332,10 @@ void GetEPauliSumReq::encode(std::string& buf)
     {
         ReqHead::encode(writer);
 
-        writer.Key("data");
+        writer.Key("params");
         writer.StartObject();
         {
-            writer.Key("opertypes");
-            writer.StartArray();
-            {
-                for (auto temp : opertypes)
-                {
-                    writer.StartObject();
-                    {
-                        temp.encode(writer);
-                    }
-                    writer.EndObject();
-                }
-            }
-            writer.EndArray();
-
+            EncodeArraryInt("opertypes", opertypes);
             EncodeArraryDouble("terms", terms);
         }
         writer.EndObject();
@@ -1327,28 +1349,11 @@ bool GetEPauliSumReq::decode(const std::string& buf)
 {
     PraseReqJson();
         
-    if (dom.HasMember("data") && dom["data"].IsObject())
+    if (dom.HasMember("params") && dom["params"].IsObject())
     {
-        const rapidjson::Value& datadom = dom["data"];
-
-        if (!datadom.HasMember("opertypes") || !datadom["opertypes"].IsArray())
-        {
-            return false;
-        }
-
-        const rapidjson::Value& opertypelist = datadom["opertypes"];
-        for (unsigned int i = 0; i < opertypelist.Size(); ++i) 
-        {
-            PauliInfo temp;
-            const rapidjson::Value& result = opertypelist[i];
-            if (!temp.decode(result))
-            {
-                return false;
-            }
-            opertypes.push_back(temp);
-        }
-
-        DecodeArraryDouble("terms", datadom, terms, true);
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeArraryInt("opertypes", paramsdom, opertypes, true);
+        DecodeArraryDouble("terms", paramsdom, terms, true);
     }
 
     return true;
@@ -1358,10 +1363,10 @@ std::string GetEPauliSumReq::getStr()
 {
     std::ostringstream ss;
     ss << ReqHead::getStr()
-    ss << ";opertypes:[";
+        << ";opertypes:[";
     for (auto temp : opertypes)
     {
-        ss << temp.getStr();
+        ss << temp << ";";
     }
     ss << "];terms:[";
     for (auto temp : terms)
@@ -1411,12 +1416,8 @@ std::string GetEPauliSumResp::getStr()
 {
     std::ostringstream ss;
     ss << "GetEPauliSumResp:" << RespHead::getStr()
-        << ";expect:[";
-    for (auto temp : amps)
-    {
-        ss << temp << ";";
-    }
-    ss << "];";
+        << ";expect:" << expect
+        << ";";
 
     return ss.str();
 }

@@ -55,6 +55,7 @@ file(GLOB SRC_LIST
 	"rpcserver/*.cpp"
 	"taskmanager/*.cpp"
 	"timertask/*.cpp"
+	"http/*.cpp"
 )
 
 #头文件搜索路径，路径之间用空格分隔，相当于指定-I参数
@@ -71,7 +72,7 @@ ENDIF ()
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 #添加链接库,相同于指定-l参数
-target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;pthread)
+target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libhv_static.a;pthread)
 
 #安装
 INSTALL(TARGETS ${PROJECT_NAME}

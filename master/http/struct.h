@@ -6,6 +6,18 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/document.h>
 
+const std::string CMD_STR_INITENV = "initenv";
+const std::string CMD_STR_ADDCMD = "addcmd";
+const std::string CMD_STR_RUNCMD = "runcmd";
+const std::string CMD_STR_GETAMP = "getamp";
+const std::string CMD_STR_GETPROB = "getprob";
+const std::string CMD_STR_GETSTATE = "getstate";
+const std::string CMD_STR_RELEASEENV = "releaseenv";
+const std::string CMD_STR_GETMEASURE = "getmeasure";
+const std::string CMD_STR_APPLYQFT = "applyqft";
+const std::string CMD_STR_GETPAULI = "getpauli";
+const std::string CMD_STR_GETPAULISUM = "getpaulisum";
+
 //请求包头
 struct ReqHead 
 {
@@ -42,6 +54,7 @@ struct RespHead
     std::string getStr();
 
     void setcode(const std::string& flowid, const int code);
+    void encodehead(std::string& buf);
 };
 
 //测量结果
@@ -91,7 +104,7 @@ struct InitParam
 //初始化量子环境
 struct InitEnvReq : public ReqHead 
 {
-    InitParam data;
+    InitParam params;
 
     void encode(std::string& buf);
     bool decode(const std::string& buf);
@@ -146,7 +159,7 @@ struct GateCmdParam
 //添加量子指令
 struct AddGateCmdReq : public ReqHead 
 {
-    GateCmdParam data;
+    GateCmdParam params;
     
     void encode(std::string& buf);
     bool decode(const std::string& buf);
@@ -208,7 +221,7 @@ struct GetAmpResp : public RespHead
 //获取目标比特为0的概率
 struct GetProbReq : public ReqHead 
 {
-    //选填| 目标比特位,取值范围：[0, qubitnum),单个比特是获取0的概率，多个比特是获取组合概率，空的时候获取所有的组合概率
+    //选填| 目标比特位,取值范围：[0, qubitnum),单个比特是获取0的概率，多个比特是获取组合概率
     std::vector<int> targets;
     
     void encode(std::string& buf);
@@ -302,10 +315,23 @@ struct ApplyQftResp : public RespHead
 };
 
 //获取泡利算子乘积的期望值
+struct PauliInfo 
+{
+    //必填| 泡利算子操作类型，0：POT_PAULI_I，1：POT_PAULI_X，2：POT_PAULI_Y，3：POT_PAULI_Z
+    int opertype{0};
+
+    //必填| 目标比特位
+    int target{0};
+
+    void encode(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    bool decode(const rapidjson::Value& dom);
+    std::string getStr();
+};
+
 struct GetEPauliReq : public ReqHead 
 {
-    //选填| 期望值信息，0：POT_PAULI_I，1：POT_PAULI_X，2：POT_PAULI_Y，3：POT_PAULI_Z
-    std::vector<int> paulis;
+    //选填| 期望值信息
+    std::vector<PauliInfo> paulis;
 
     void encode(std::string& buf);
     bool decode(const std::string& buf);
@@ -323,19 +349,10 @@ struct GetEPauliResp : public RespHead
 };
 
 //获取泡利算子乘积之和的期望值
-struct PauliInfo 
-{
-    //必填| 泡利算子操作类型，0：POT_PAULI_I，1：POT_PAULI_X，2：POT_PAULI_Y，3：POT_PAULI_Z
-    int opertype{0};
-
-    //必填| 目标比特位
-    int target{0};
-};
-
 struct GetEPauliSumReq : public ReqHead 
 {
-    //必填| 泡利算子操作类型
-    std::vector<PauliInfo> opertypes;
+    //必填| 泡利算子操作类型，0：POT_PAULI_I，1：POT_PAULI_X，2：POT_PAULI_Y，3：POT_PAULI_Z
+    std::vector<int> opertypes;
 
     //必填| 回归系数
     std::vector<double> terms;

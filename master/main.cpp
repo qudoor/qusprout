@@ -9,6 +9,7 @@
 #include "rpcserver/RpcServer.h"
 #include "resourcemanager/ResourceManager.h"
 #include "taskmanager/TaskManager.h"
+#include "http/httpserver.h"
 
 void stop()
 {
