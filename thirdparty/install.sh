@@ -452,3 +452,47 @@ if [ ! -f "/usr/local/lib/libgtest.a" ] && [ ! -f "/usr/local/lib64/libgtest.a" 
     cd $CURRDIR
     echo "install libgtest success"
 fi
+
+#libhv安装
+if [ ! -f "/usr/local/lib/libhv_static.a" ]; then
+    echo "begin install libhv"
+    unzip libhv-master.zip
+    cd libhv-master
+    mkdir build
+    cd build
+    cmake ..
+    make
+    if [ $? -ne "0" ]; then
+        echo "make failed!!! please Check error"
+        exit
+    fi
+    make install
+    if [ $? -ne "0" ]; then
+        echo "make install failed!!! please Check error"
+        exit
+    fi
+    cd $CURRDIR
+    echo "install libgtest libhv"
+fi
+
+#rapidjson安装
+if [ ! -f "/usr/local/lib/pkgconfig/RapidJSON.pc" ]; then
+    echo "begin install rapidjson"
+    unzip rapidjson-master.zip
+    cd rapidjson-master
+    mkdir build
+    cd build
+    cmake ..
+    make
+    if [ $? -ne "0" ]; then
+        echo "make failed!!! please Check error"
+        exit
+    fi
+    make install
+    if [ $? -ne "0" ]; then
+        echo "make install failed!!! please Check error"
+        exit
+    fi
+    cd $CURRDIR
+    echo "install libgtest rapidjson"
+fi
