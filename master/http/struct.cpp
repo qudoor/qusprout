@@ -28,9 +28,9 @@ using namespace rapidjson;
 #define DecodeString(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsString()) { value = tempdom[key].GetString(); } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
 #define DecodeInt(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsInt()) { value = tempdom[key].GetInt(); } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
 #define DecodeInt64(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsInt64()) { value = tempdom[key].GetInt64(); } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
-#define DecodeArraryString(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsArray()) { for (unsigned int i = 0; i < tempdom[key].Size(); ++i) { value.push_back(tempdom[key][i].GetString()); } } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
-#define DecodeArraryInt(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsArray()) { for (unsigned int i = 0; i < tempdom[key].Size(); ++i) { value.push_back(tempdom[key][i].GetInt()); } } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
-#define DecodeArraryDouble(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsArray()) { for (unsigned int i = 0; i < tempdom[key].Size(); ++i) { value.push_back(tempdom[key][i].GetDouble()); } } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
+#define DecodeArraryString(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsArray()) { for (unsigned int i = 0; i < tempdom[key].Size(); ++i) { if (!tempdom[key][i].IsString()) { LOG(ERROR) << "decode type is not string(key:" << key << ")."; return false; } value.push_back(tempdom[key][i].GetString()); } } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
+#define DecodeArraryInt(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsArray()) { for (unsigned int i = 0; i < tempdom[key].Size(); ++i) { if (!tempdom[key][i].IsInt()) { LOG(ERROR) << "decode type is not int(key:" << key << ")."; return false; } value.push_back(tempdom[key][i].GetInt()); } } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
+#define DecodeArraryDouble(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsArray()) { for (unsigned int i = 0; i < tempdom[key].Size(); ++i) { if (!tempdom[key][i].IsDouble()) { LOG(ERROR) << "decode type is not double(key:" << key << ")."; return false; } value.push_back(tempdom[key][i].GetDouble()); } } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
 #define DecodeDouble(key, tempdom, value, required) if (tempdom.HasMember(key) && tempdom[key].IsDouble()) { value = tempdom[key].GetDouble(); } else if (required) { LOG(ERROR) << "decode not find required key(key:" << key << ")."; return false; }
 
 #define PraseReqJson() Document dom; \
@@ -176,6 +176,7 @@ void InitParam::encode(rapidjson::Writer<rapidjson::StringBuffer>& writer)
     EncodeInt("qubits", qubits);
     EncodeInt("density", density);
     EncodeInt("exec_type", exec_type);
+    EncodeInt("async", async);
 }
 
 bool InitParam::decode(const rapidjson::Value& dom)
@@ -183,6 +184,7 @@ bool InitParam::decode(const rapidjson::Value& dom)
     DecodeInt("qubits", dom, qubits, false);
     DecodeInt("density", dom, density, false);
     DecodeInt("exec_type", dom, exec_type, false);
+    DecodeInt("async", dom, async, false);
 
     return true;
 }
@@ -193,6 +195,7 @@ std::string InitParam::getStr()
     ss << "qubits:" << qubits
         << ";density:" << density
         << ";exec_type:" << exec_type
+        << ";async:" << async
         << ";";
 
     return ss.str();
@@ -357,11 +360,11 @@ bool GateCmdParam::decode(const rapidjson::Value& dom)
         {
             GateCmd temp;
             const rapidjson::Value& result = circuitdom[i];
-            bool rnt = temp.decode(result);
-            if (rnt)
+            if (!temp.decode(result))
             {
-                circuits.push_back(temp);
+                return false;
             }
+            circuits.push_back(temp);
         }
     }
 
@@ -570,7 +573,10 @@ bool RunGateCmdResp::decode(const std::string& buf)
             {
                 MeasureInfo temp;
                 const rapidjson::Value& result = measureslist[i];
-                temp.decode(result);
+                if (!temp.decode(result))
+                {
+                    return false;
+                }
                 measures.push_back(temp);
 			}
         }
@@ -582,7 +588,10 @@ bool RunGateCmdResp::decode(const std::string& buf)
             {
                 OutcomeInfo temp;
                 const rapidjson::Value& result = outcomelist[i];
-                temp.decode(result);
+                if (!temp.decode(result))
+                {
+                    return false;
+                }
                 outcomes.push_back(temp);
 			}
         }
@@ -945,6 +954,81 @@ std::string ReleaseEnvResp::getStr()
     return ss.str();
 }
 
+void GetTaskReq::encode(std::string& buf)
+{
+    cmd = CMD_STR_GETTASK;
+
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        ReqHead::encode(writer);
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool GetTaskReq::decode(const std::string& buf)
+{
+    PraseReqJson();
+
+    return true;
+}
+
+std::string GetTaskReq::getStr()
+{
+    std::ostringstream ss;
+    ss << "GetTaskReq:" << ReqHead::getStr();
+
+    return ss.str();
+}
+
+void GetTaskResp::encode(std::string& buf)
+{
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        RespHead::encode(writer);
+
+        writer.Key("data");
+        writer.StartObject();
+        {
+            EncodeInt("state", state);
+        }
+        writer.EndObject();
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool GetTaskResp::decode(const std::string& buf)
+{
+    PraseRespJson();
+
+    if (dom.HasMember("data") && dom["data"].IsObject())
+    {
+        const rapidjson::Value& datadom = dom["data"];
+        DecodeInt("state", datadom, state, false);
+    }
+
+    return true;
+}
+
+std::string GetTaskResp::getStr()
+{
+    std::ostringstream ss;
+    ss << "GetTaskResp:" << RespHead::getStr()
+        << ";state" << state
+        << ";";
+
+    return ss.str();
+}
+
 void GetMeasureReq::encode(std::string& buf)
 {
     cmd = CMD_STR_GETMEASURE;
@@ -1056,7 +1140,10 @@ bool GetMeasureResp::decode(const std::string& buf)
             {
                 MeasureInfo temp;
                 const rapidjson::Value& result = measureslist[i];
-                temp.decode(result);
+                if (!temp.decode(result))
+                {
+                    return false;
+                }
                 measures.push_back(temp);
 			}
         }
@@ -1068,7 +1155,10 @@ bool GetMeasureResp::decode(const std::string& buf)
             {
                 OutcomeInfo temp;
                 const rapidjson::Value& result = outcomelist[i];
-                temp.decode(result);
+                if (!temp.decode(result))
+                {
+                    return false;
+                }
                 outcomes.push_back(temp);
 			}
         }

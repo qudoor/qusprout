@@ -13,6 +13,7 @@ const std::string CMD_STR_GETAMP = "getamp";
 const std::string CMD_STR_GETPROB = "getprob";
 const std::string CMD_STR_GETSTATE = "getstate";
 const std::string CMD_STR_RELEASEENV = "releaseenv";
+const std::string CMD_STR_GETTASK = "gettask";
 const std::string CMD_STR_GETMEASURE = "getmeasure";
 const std::string CMD_STR_APPLYQFT = "applyqft";
 const std::string CMD_STR_GETPAULI = "getpauli";
@@ -95,6 +96,9 @@ struct InitParam
 
     //执行指令的方式，0：默认, 1：单个cpu执行, 2：多个cpu执行, 3：单个gpu执行
     int exec_type{0};
+
+    //选填| 是否异步执行，0：否，1：是
+    int async{0};
 
     void encode(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     bool decode(const rapidjson::Value& dom);
@@ -267,6 +271,24 @@ struct ReleaseEnvReq : public ReqHead
 
 struct ReleaseEnvResp : public RespHead 
 {
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+};
+
+//获取任务的状态
+struct GetTaskReq : public ReqHead 
+{
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+};
+
+struct GetTaskResp : public RespHead 
+{
+    //必填| 任务状态，0：initial, 1：initialized, 2:queued, 3:running, 4:done, 5:error
+    int state{0};
+
     void encode(std::string& buf);
     bool decode(const std::string& buf);
     std::string getStr();
