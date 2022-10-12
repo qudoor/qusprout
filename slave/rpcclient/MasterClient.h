@@ -20,11 +20,8 @@ public:
     CMasterClient();
     virtual ~CMasterClient();
 
-    //初始化客户端
-    int init(const std::string& addr, const int port);
-
-    //关闭客户端
-    void close();
+    //连接客户端
+    int connect();
 
     //处理机器注册接口
     void registerResource(RegisterResp& resp, const RegisterReq& req);
@@ -35,22 +32,11 @@ public:
     //处理机器心跳接口
     void heartbeat(HeartbeatResp& resp, const HeartbeatReq& req);
 
-    //处理上报资源接口
-    void reportResource(ReportResourceResp& resp, const ReportResourceReq& req);
-
-    //上报统计信息
-    void ReportStatisticsInfo(ReportStatisticsInfoResp& resp, const ReportStatisticsInfoReq& req);
-
-    //获取统计信息
-    void GetStatisticsInfo(GetStatisticsInfoResp& resp, const GetStatisticsInfoReq& req);
+private:
+    //关闭客户端
+    void close();
 
 private:
-    //重新初始化客户端
-    int reInit(const bool isprint = true);
-
-private:
-    std::string m_addr{""};
-    int m_port{0};
     std::shared_ptr<MasterServerClient> m_client{nullptr};
     std::shared_ptr<TTransport> m_transport{nullptr};
 };

@@ -17,6 +17,15 @@ enum ErrCode {
     //异常
     COM_EXCEPTION = 4,
 
+    //不存在
+    COM_NOT_EXIST = 5,
+
+    //存在
+    COM_IS_EXIST = 6,
+
+    //缓存中
+    COM_IS_QUEUE = 7,  
+
     //------quroot错误码------
     //内存不足
     QUROOT_MEM_NOT_ENOUGH = 100,
@@ -31,7 +40,7 @@ enum ErrCode {
     QUROOT_NOT_RESOURCE = 103,
 
     //数据解析异常
-    QUROOT_PRASE_ERROR = 104,       
+    QUROOT_PRASE_ERROR = 104,  
 }
 
 const map<ErrCode, string> ErrMsg = {
@@ -40,6 +49,9 @@ const map<ErrCode, string> ErrMsg = {
     ErrCode.COM_INVALID_PARAM: "不合法参数", 
     ErrCode.COM_TIMEOUT: "超时", 
     ErrCode.COM_EXCEPTION: "异常", 
+    ErrCode.COM_NOT_EXIST: "不存在",
+    ErrCode.COM_IS_EXIST: "存在",
+    ErrCode.COM_IS_QUEUE: "缓存中",
     ErrCode.QUROOT_MEM_NOT_ENOUGH: "内存不足", 
     ErrCode.QUROOT_NOT_INIT: "未初始化",
     ErrCode.QUROOT_NOT_REGISTER: "机器未注册",

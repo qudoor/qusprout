@@ -46,7 +46,7 @@ int CRegister::resourceRegister()
     addr.__set_port(SINGLETON(CConfig)->m_listenPort);
     tpcresource.__set_addr_detail(addr);
     std::map<std::string, DeviceDetail> devlist;
-    SINGLETON(CResourceManager)->getResource(devlist);
+    SINGLETON(CResourceManager)->getAllResource(devlist);
     tpcresource.__set_dev_list(devlist);
     req.__set_tcp_resource(tpcresource);
 
@@ -117,12 +117,17 @@ int CRegister::unResourceRegister()
 //处理机器心跳接口
 int CRegister::heart()
 {
+    if (m_resourceid.empty())
+    {
+        return resourceRegister();
+    }
+
     HeartReq req;
     HeartResp resp;
     req.__set_resource_id(m_resourceid);
 
     std::map<std::string, DeviceDetail> devlist;
-    SINGLETON(CResourceManager)->getResource(devlist);
+    SINGLETON(CResourceManager)->getAllResource(devlist);
     req.__set_up_resource(true);
     req.__set_dev_list(devlist);
 

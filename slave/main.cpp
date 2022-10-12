@@ -17,15 +17,9 @@
 void stop()
 {
 	LOG(ERROR) << "begin stop.";
-	
-	//向master发起注销
-	SINGLETON(CRegister)->stop();
 
 	//停止定时器
 	SINGLETON(CTimerHandle)->stop();
-
-	//删除所有机器注册和任务
-	SINGLETON(CTaskManager)->stop();
 
 	//停止rpc
 	SINGLETON(CSlaveServer)->stopServer();
@@ -61,15 +55,6 @@ void releaseChldProcess(int sign)
     }
 
 	return;
-}
-
-//注册处理函数
-void registerToMaster()
-{
-	//1.向master注册
-	SINGLETON(CRegister)->registerToMaster();
-	//2.启动定时器
-	SINGLETON(CTimerHandle)->init();
 }
 
 //注册信号
@@ -126,16 +111,9 @@ int main(int argc, char **argv)
 		//6.清理旧的进程
 		SINGLETON(CTaskManager)->killAllTask();
 
-		//7.启动注册线程
-		ret = SINGLETON(CRegister)->init();
-		if (ret != 0)
-		{
-			LOG(ERROR) << "init failed(ret:" << ret << ").";
-			return -2;
-		}
-		std::thread thdreg(registerToMaster);
-		thdreg.detach();
-		
+		//7.启动定时器
+		SINGLETON(CTimerHandle)->init();
+
 		//8.启动服务
 		SINGLETON(CSlaveServer)->startServer();
     }

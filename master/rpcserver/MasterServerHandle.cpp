@@ -3,6 +3,7 @@
 #include "common/Singleton.h"
 #include "MasterServerHandle.h"
 #include "resourcemanager/ResourceManager.h"
+#include "metrics/metrics.h"
 
 using namespace apache::thrift::transport;
 
@@ -19,48 +20,40 @@ CMasterServerHandler::~CMasterServerHandler()
 //处理机器注册接口
 void CMasterServerHandler::registerResource(RegisterResp& resp, const RegisterReq& req)
 {
-    std::string reqbuf = getPrint<RegisterReq>(req);
-    LOG(INFO) << "request registerResource(req:" << reqbuf << ").";
+    LOG(INFO) << "request registerResource(req:" << getPrint(req) << ").";
 
     SINGLETON(CResourceManager)->registerResource(resp, req);
 
-    LOG(INFO) << "response registerResource(seq:" << req.seq << ",resp:" << getPrint<RegisterResp>(resp) << ").";
+    if (!req.resource_id.empty())
+    {
+        SINGLETON(CMetrics)->addResource(req.resource_id, req.device);
+    }
+
+    LOG(INFO) << "response registerResource(resp:" << getPrint(resp) << ").";
 }
 
 //处理机器注销接口
 void CMasterServerHandler::unRegister(UnRegisterResp& resp, const UnRegisterReq& req)
 {
-    std::string reqbuf = getPrint<UnRegisterReq>(req);
-    LOG(INFO) << "request unRegister(req:" << reqbuf << ").";
+    LOG(INFO) << "request unRegister(req:" << getPrint(req) << ").";
 
     SINGLETON(CResourceManager)->unRegister(resp, req);
 
-    LOG(INFO) << "response unRegister(seq:" << req.seq << ",resp:" << getPrint<UnRegisterResp>(resp) << ").";
+    if (!req.resource_id.empty())
+    {
+        SINGLETON(CMetrics)->clearResource(req.resource_id);
+    }
+
+    LOG(INFO) << "response unRegister(resp:" << getPrint(resp) << ").";
 }
 
 //处理机器心跳接口
 void CMasterServerHandler::heartbeat(HeartbeatResp& resp, const HeartbeatReq& req)
 {
     SINGLETON(CResourceManager)->heartbeat(resp, req);
-}
 
-//处理上报资源接口
-void CMasterServerHandler::reportResource(ReportResourceResp& resp, const ReportResourceReq& req)
-{
-    SINGLETON(CResourceManager)->reportResource(resp, req);
-}
-
-//上报统计信息
-void CMasterServerHandler::ReportStatisticsInfo(ReportStatisticsInfoResp& resp, const ReportStatisticsInfoReq& req)
-{
-    std::string reqbuf = getPrint<ReportStatisticsInfoReq>(req);
-    LOG(INFO) << "request ReportStatisticsInfo(req:" << reqbuf << ").";
-
-    SINGLETON(CResourceManager)->ReportStatisticsInfo(resp, req);
-}
-
-//获取统计信息
-void CMasterServerHandler::GetStatisticsInfo(GetStatisticsInfoResp& resp, const GetStatisticsInfoReq& req)
-{
-    SINGLETON(CResourceManager)->GetStatisticsInfo(resp, req);
+    if (!req.resource_id.empty() && req.up_resource == true)
+    {
+        SINGLETON(CMetrics)->addResource(req.resource_id, req.device);
+    }
 }

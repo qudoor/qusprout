@@ -475,6 +475,39 @@ if [ ! -f "/usr/local/lib/libhv_static.a" ]; then
     echo "install libgtest libhv"
 fi
 
+#prometheus-cpp安装
+if [ ! -f "/usr/local/lib/libprometheus-cpp-core.a" ] && [ ! -f "/usr/local/lib64/libprometheus-cpp-core.a" ]; then
+    echo "begin install prometheus-cpp"
+    tar -zxvf prometheus-cpp-1.0.1.tar.gz 
+    cd prometheus-cpp-1.0.1
+    if [ ${OS} == "Darwin" ]; then
+        sed -i '.bak' 's/option(ENABLE_PULL "Build prometheus-cpp pull library" ON)/option(ENABLE_PULL "Build prometheus-cpp pull library" OFF)/g' CMakeLists.txt
+        sed -i '.bak' 's/option(ENABLE_PUSH "Build prometheus-cpp push library" ON)/option(ENABLE_PUSH "Build prometheus-cpp push library" OFF)/g' CMakeLists.txt
+        sed -i '.bak' 's/option(ENABLE_COMPRESSION "Enable gzip compression" ON)/option(ENABLE_COMPRESSION "Enable gzip compression" OFF)/g' CMakeLists.txt
+        sed -i '.bak' 's/option(ENABLE_TESTING "Build tests" ON)/option(ENABLE_TESTING "Build tests" OFF)/g' CMakeLists.txt
+    else
+        sed -i 's/option(ENABLE_PULL "Build prometheus-cpp pull library" ON)/option(ENABLE_PULL "Build prometheus-cpp pull library" OFF)/g' CMakeLists.txt
+        sed -i 's/option(ENABLE_PUSH "Build prometheus-cpp push library" ON)/option(ENABLE_PUSH "Build prometheus-cpp push library" OFF)/g' CMakeLists.txt
+        sed -i 's/option(ENABLE_COMPRESSION "Enable gzip compression" ON)/option(ENABLE_COMPRESSION "Enable gzip compression" OFF)/g' CMakeLists.txt
+        sed -i 's/option(ENABLE_TESTING "Build tests" ON)/option(ENABLE_TESTING "Build tests" OFF)/g' CMakeLists.txt
+    fi
+    mkdir build
+    cd build
+    cmake ..
+    make
+    if [ $? -ne "0" ]; then
+        echo "make failed!!! please Check error"
+        exit
+    fi
+    make install
+    if [ $? -ne "0" ]; then
+        echo "make install failed!!! please Check error"
+        exit
+    fi
+    cd $CURRDIR
+    echo "install libgtest prometheus-cpp"
+fi
+
 #rapidjson安装
 if [ ! -f "/usr/local/lib/pkgconfig/RapidJSON.pc" ]; then
     echo "begin install rapidjson"

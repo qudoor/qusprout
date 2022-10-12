@@ -28,9 +28,6 @@ public:
     //进程名称
     std::string m_processName;
 
-    //统计时间间隔
-    int m_statisticsInterval;
-
     //rpc监听的端口
     int m_listenPort{9091};
 
@@ -46,14 +43,8 @@ public:
     //任务超时时长，单位：秒
     int m_taskTimeOutDuration{3600};
 
-    //定时清理机器资源的间隔，单位：秒
-    int m_cleanResourceInterval{30};
-
-    //机器资源超时时长，单位：秒
-    int m_resourceTimeOutDuration{60};
-
     //和master心跳间隔
-    int m_cleanHeartbeatInterval{10};
+    int m_masterHeartInterval{10};
 
     //master的rpc端口
     int m_masterPort{0};

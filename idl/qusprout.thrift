@@ -59,4 +59,7 @@ service QuSproutServer {
 
     //获取当前所有可能状态组合的概率
     qusproutdata.GetProbabilitiesResp getProbabilities(1:qusproutdata.GetProbabilitiesReq req)
+
+    //获取任务状态
+    qusproutdata.GetTaskInfoResp getTaskInfo(1:qusproutdata.GetTaskInfoReq req)
 }

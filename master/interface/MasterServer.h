@@ -25,9 +25,6 @@ class MasterServerIf {
   virtual void registerResource(RegisterResp& _return, const RegisterReq& req) = 0;
   virtual void unRegister(UnRegisterResp& _return, const UnRegisterReq& req) = 0;
   virtual void heartbeat(HeartbeatResp& _return, const HeartbeatReq& req) = 0;
-  virtual void reportResource(ReportResourceResp& _return, const ReportResourceReq& req) = 0;
-  virtual void ReportStatisticsInfo(ReportStatisticsInfoResp& _return, const ReportStatisticsInfoReq& req) = 0;
-  virtual void GetStatisticsInfo(GetStatisticsInfoResp& _return, const GetStatisticsInfoReq& req) = 0;
 };
 
 class MasterServerIfFactory {
@@ -64,15 +61,6 @@ class MasterServerNull : virtual public MasterServerIf {
     return;
   }
   void heartbeat(HeartbeatResp& /* _return */, const HeartbeatReq& /* req */) override {
-    return;
-  }
-  void reportResource(ReportResourceResp& /* _return */, const ReportResourceReq& /* req */) override {
-    return;
-  }
-  void ReportStatisticsInfo(ReportStatisticsInfoResp& /* _return */, const ReportStatisticsInfoReq& /* req */) override {
-    return;
-  }
-  void GetStatisticsInfo(GetStatisticsInfoResp& /* _return */, const GetStatisticsInfoReq& /* req */) override {
     return;
   }
 };
@@ -389,318 +377,6 @@ class MasterServer_heartbeat_presult {
 
 };
 
-typedef struct _MasterServer_reportResource_args__isset {
-  _MasterServer_reportResource_args__isset() : req(false) {}
-  bool req :1;
-} _MasterServer_reportResource_args__isset;
-
-class MasterServer_reportResource_args {
- public:
-
-  MasterServer_reportResource_args(const MasterServer_reportResource_args&);
-  MasterServer_reportResource_args& operator=(const MasterServer_reportResource_args&);
-  MasterServer_reportResource_args() noexcept {
-  }
-
-  virtual ~MasterServer_reportResource_args() noexcept;
-  ReportResourceReq req;
-
-  _MasterServer_reportResource_args__isset __isset;
-
-  void __set_req(const ReportResourceReq& val);
-
-  bool operator == (const MasterServer_reportResource_args & rhs) const
-  {
-    if (!(req == rhs.req))
-      return false;
-    return true;
-  }
-  bool operator != (const MasterServer_reportResource_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const MasterServer_reportResource_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-
-class MasterServer_reportResource_pargs {
- public:
-
-
-  virtual ~MasterServer_reportResource_pargs() noexcept;
-  const ReportResourceReq* req;
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _MasterServer_reportResource_result__isset {
-  _MasterServer_reportResource_result__isset() : success(false) {}
-  bool success :1;
-} _MasterServer_reportResource_result__isset;
-
-class MasterServer_reportResource_result {
- public:
-
-  MasterServer_reportResource_result(const MasterServer_reportResource_result&);
-  MasterServer_reportResource_result& operator=(const MasterServer_reportResource_result&);
-  MasterServer_reportResource_result() noexcept {
-  }
-
-  virtual ~MasterServer_reportResource_result() noexcept;
-  ReportResourceResp success;
-
-  _MasterServer_reportResource_result__isset __isset;
-
-  void __set_success(const ReportResourceResp& val);
-
-  bool operator == (const MasterServer_reportResource_result & rhs) const
-  {
-    if (!(success == rhs.success))
-      return false;
-    return true;
-  }
-  bool operator != (const MasterServer_reportResource_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const MasterServer_reportResource_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _MasterServer_reportResource_presult__isset {
-  _MasterServer_reportResource_presult__isset() : success(false) {}
-  bool success :1;
-} _MasterServer_reportResource_presult__isset;
-
-class MasterServer_reportResource_presult {
- public:
-
-
-  virtual ~MasterServer_reportResource_presult() noexcept;
-  ReportResourceResp* success;
-
-  _MasterServer_reportResource_presult__isset __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
-typedef struct _MasterServer_ReportStatisticsInfo_args__isset {
-  _MasterServer_ReportStatisticsInfo_args__isset() : req(false) {}
-  bool req :1;
-} _MasterServer_ReportStatisticsInfo_args__isset;
-
-class MasterServer_ReportStatisticsInfo_args {
- public:
-
-  MasterServer_ReportStatisticsInfo_args(const MasterServer_ReportStatisticsInfo_args&);
-  MasterServer_ReportStatisticsInfo_args& operator=(const MasterServer_ReportStatisticsInfo_args&);
-  MasterServer_ReportStatisticsInfo_args() noexcept {
-  }
-
-  virtual ~MasterServer_ReportStatisticsInfo_args() noexcept;
-  ReportStatisticsInfoReq req;
-
-  _MasterServer_ReportStatisticsInfo_args__isset __isset;
-
-  void __set_req(const ReportStatisticsInfoReq& val);
-
-  bool operator == (const MasterServer_ReportStatisticsInfo_args & rhs) const
-  {
-    if (!(req == rhs.req))
-      return false;
-    return true;
-  }
-  bool operator != (const MasterServer_ReportStatisticsInfo_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const MasterServer_ReportStatisticsInfo_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-
-class MasterServer_ReportStatisticsInfo_pargs {
- public:
-
-
-  virtual ~MasterServer_ReportStatisticsInfo_pargs() noexcept;
-  const ReportStatisticsInfoReq* req;
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _MasterServer_ReportStatisticsInfo_result__isset {
-  _MasterServer_ReportStatisticsInfo_result__isset() : success(false) {}
-  bool success :1;
-} _MasterServer_ReportStatisticsInfo_result__isset;
-
-class MasterServer_ReportStatisticsInfo_result {
- public:
-
-  MasterServer_ReportStatisticsInfo_result(const MasterServer_ReportStatisticsInfo_result&);
-  MasterServer_ReportStatisticsInfo_result& operator=(const MasterServer_ReportStatisticsInfo_result&);
-  MasterServer_ReportStatisticsInfo_result() noexcept {
-  }
-
-  virtual ~MasterServer_ReportStatisticsInfo_result() noexcept;
-  ReportStatisticsInfoResp success;
-
-  _MasterServer_ReportStatisticsInfo_result__isset __isset;
-
-  void __set_success(const ReportStatisticsInfoResp& val);
-
-  bool operator == (const MasterServer_ReportStatisticsInfo_result & rhs) const
-  {
-    if (!(success == rhs.success))
-      return false;
-    return true;
-  }
-  bool operator != (const MasterServer_ReportStatisticsInfo_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const MasterServer_ReportStatisticsInfo_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _MasterServer_ReportStatisticsInfo_presult__isset {
-  _MasterServer_ReportStatisticsInfo_presult__isset() : success(false) {}
-  bool success :1;
-} _MasterServer_ReportStatisticsInfo_presult__isset;
-
-class MasterServer_ReportStatisticsInfo_presult {
- public:
-
-
-  virtual ~MasterServer_ReportStatisticsInfo_presult() noexcept;
-  ReportStatisticsInfoResp* success;
-
-  _MasterServer_ReportStatisticsInfo_presult__isset __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
-typedef struct _MasterServer_GetStatisticsInfo_args__isset {
-  _MasterServer_GetStatisticsInfo_args__isset() : req(false) {}
-  bool req :1;
-} _MasterServer_GetStatisticsInfo_args__isset;
-
-class MasterServer_GetStatisticsInfo_args {
- public:
-
-  MasterServer_GetStatisticsInfo_args(const MasterServer_GetStatisticsInfo_args&);
-  MasterServer_GetStatisticsInfo_args& operator=(const MasterServer_GetStatisticsInfo_args&);
-  MasterServer_GetStatisticsInfo_args() noexcept {
-  }
-
-  virtual ~MasterServer_GetStatisticsInfo_args() noexcept;
-  GetStatisticsInfoReq req;
-
-  _MasterServer_GetStatisticsInfo_args__isset __isset;
-
-  void __set_req(const GetStatisticsInfoReq& val);
-
-  bool operator == (const MasterServer_GetStatisticsInfo_args & rhs) const
-  {
-    if (!(req == rhs.req))
-      return false;
-    return true;
-  }
-  bool operator != (const MasterServer_GetStatisticsInfo_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const MasterServer_GetStatisticsInfo_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-
-class MasterServer_GetStatisticsInfo_pargs {
- public:
-
-
-  virtual ~MasterServer_GetStatisticsInfo_pargs() noexcept;
-  const GetStatisticsInfoReq* req;
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _MasterServer_GetStatisticsInfo_result__isset {
-  _MasterServer_GetStatisticsInfo_result__isset() : success(false) {}
-  bool success :1;
-} _MasterServer_GetStatisticsInfo_result__isset;
-
-class MasterServer_GetStatisticsInfo_result {
- public:
-
-  MasterServer_GetStatisticsInfo_result(const MasterServer_GetStatisticsInfo_result&);
-  MasterServer_GetStatisticsInfo_result& operator=(const MasterServer_GetStatisticsInfo_result&);
-  MasterServer_GetStatisticsInfo_result() noexcept {
-  }
-
-  virtual ~MasterServer_GetStatisticsInfo_result() noexcept;
-  GetStatisticsInfoResp success;
-
-  _MasterServer_GetStatisticsInfo_result__isset __isset;
-
-  void __set_success(const GetStatisticsInfoResp& val);
-
-  bool operator == (const MasterServer_GetStatisticsInfo_result & rhs) const
-  {
-    if (!(success == rhs.success))
-      return false;
-    return true;
-  }
-  bool operator != (const MasterServer_GetStatisticsInfo_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const MasterServer_GetStatisticsInfo_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _MasterServer_GetStatisticsInfo_presult__isset {
-  _MasterServer_GetStatisticsInfo_presult__isset() : success(false) {}
-  bool success :1;
-} _MasterServer_GetStatisticsInfo_presult__isset;
-
-class MasterServer_GetStatisticsInfo_presult {
- public:
-
-
-  virtual ~MasterServer_GetStatisticsInfo_presult() noexcept;
-  GetStatisticsInfoResp* success;
-
-  _MasterServer_GetStatisticsInfo_presult__isset __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
 class MasterServerClient : virtual public MasterServerIf {
  public:
   MasterServerClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
@@ -735,15 +411,6 @@ class MasterServerClient : virtual public MasterServerIf {
   void heartbeat(HeartbeatResp& _return, const HeartbeatReq& req) override;
   void send_heartbeat(const HeartbeatReq& req);
   void recv_heartbeat(HeartbeatResp& _return);
-  void reportResource(ReportResourceResp& _return, const ReportResourceReq& req) override;
-  void send_reportResource(const ReportResourceReq& req);
-  void recv_reportResource(ReportResourceResp& _return);
-  void ReportStatisticsInfo(ReportStatisticsInfoResp& _return, const ReportStatisticsInfoReq& req) override;
-  void send_ReportStatisticsInfo(const ReportStatisticsInfoReq& req);
-  void recv_ReportStatisticsInfo(ReportStatisticsInfoResp& _return);
-  void GetStatisticsInfo(GetStatisticsInfoResp& _return, const GetStatisticsInfoReq& req) override;
-  void send_GetStatisticsInfo(const GetStatisticsInfoReq& req);
-  void recv_GetStatisticsInfo(GetStatisticsInfoResp& _return);
  protected:
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -762,18 +429,12 @@ class MasterServerProcessor : public ::apache::thrift::TDispatchProcessor {
   void process_registerResource(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_unRegister(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_heartbeat(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
-  void process_reportResource(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
-  void process_ReportStatisticsInfo(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
-  void process_GetStatisticsInfo(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   MasterServerProcessor(::std::shared_ptr<MasterServerIf> iface) :
     iface_(iface) {
     processMap_["registerResource"] = &MasterServerProcessor::process_registerResource;
     processMap_["unRegister"] = &MasterServerProcessor::process_unRegister;
     processMap_["heartbeat"] = &MasterServerProcessor::process_heartbeat;
-    processMap_["reportResource"] = &MasterServerProcessor::process_reportResource;
-    processMap_["ReportStatisticsInfo"] = &MasterServerProcessor::process_ReportStatisticsInfo;
-    processMap_["GetStatisticsInfo"] = &MasterServerProcessor::process_GetStatisticsInfo;
   }
 
   virtual ~MasterServerProcessor() {}
@@ -832,36 +493,6 @@ class MasterServerMultiface : virtual public MasterServerIf {
     return;
   }
 
-  void reportResource(ReportResourceResp& _return, const ReportResourceReq& req) override {
-    size_t sz = ifaces_.size();
-    size_t i = 0;
-    for (; i < (sz - 1); ++i) {
-      ifaces_[i]->reportResource(_return, req);
-    }
-    ifaces_[i]->reportResource(_return, req);
-    return;
-  }
-
-  void ReportStatisticsInfo(ReportStatisticsInfoResp& _return, const ReportStatisticsInfoReq& req) override {
-    size_t sz = ifaces_.size();
-    size_t i = 0;
-    for (; i < (sz - 1); ++i) {
-      ifaces_[i]->ReportStatisticsInfo(_return, req);
-    }
-    ifaces_[i]->ReportStatisticsInfo(_return, req);
-    return;
-  }
-
-  void GetStatisticsInfo(GetStatisticsInfoResp& _return, const GetStatisticsInfoReq& req) override {
-    size_t sz = ifaces_.size();
-    size_t i = 0;
-    for (; i < (sz - 1); ++i) {
-      ifaces_[i]->GetStatisticsInfo(_return, req);
-    }
-    ifaces_[i]->GetStatisticsInfo(_return, req);
-    return;
-  }
-
 };
 
 // The 'concurrent' client is a thread safe client that correctly handles
@@ -903,15 +534,6 @@ class MasterServerConcurrentClient : virtual public MasterServerIf {
   void heartbeat(HeartbeatResp& _return, const HeartbeatReq& req) override;
   int32_t send_heartbeat(const HeartbeatReq& req);
   void recv_heartbeat(HeartbeatResp& _return, const int32_t seqid);
-  void reportResource(ReportResourceResp& _return, const ReportResourceReq& req) override;
-  int32_t send_reportResource(const ReportResourceReq& req);
-  void recv_reportResource(ReportResourceResp& _return, const int32_t seqid);
-  void ReportStatisticsInfo(ReportStatisticsInfoResp& _return, const ReportStatisticsInfoReq& req) override;
-  int32_t send_ReportStatisticsInfo(const ReportStatisticsInfoReq& req);
-  void recv_ReportStatisticsInfo(ReportStatisticsInfoResp& _return, const int32_t seqid);
-  void GetStatisticsInfo(GetStatisticsInfoResp& _return, const GetStatisticsInfoReq& req) override;
-  int32_t send_GetStatisticsInfo(const GetStatisticsInfoReq& req);
-  void recv_GetStatisticsInfo(GetStatisticsInfoResp& _return, const int32_t seqid);
  protected:
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;

@@ -509,6 +509,12 @@ void CWorkServerHandler::getProbabilities(GetProbabilitiesResp& resp, const GetP
     }
 }
 
+//获取任务状态
+void CWorkServerHandler::getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req)
+{
+    setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+}
+
 //设置server 
 void CWorkServerHandler::SetThreadedServer(std::shared_ptr<TThreadedServer> server)
 {

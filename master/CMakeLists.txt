@@ -9,7 +9,6 @@ execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cp
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusproutdata.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusprout.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/resource.thrift)
-execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/statistics.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qurootresource.thrift)
 if(EXISTS ${PROJECT_SOURCE_DIR}/interface/MasterServer_server.skeleton.cpp)
     execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/MasterServer_server.skeleton.cpp)
@@ -56,6 +55,7 @@ file(GLOB SRC_LIST
 	"taskmanager/*.cpp"
 	"timertask/*.cpp"
 	"http/*.cpp"
+	"metrics/*.cpp"
 )
 
 #头文件搜索路径，路径之间用空格分隔，相当于指定-I参数
@@ -72,7 +72,7 @@ ENDIF ()
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 #添加链接库,相同于指定-l参数
-target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libhv_static.a;pthread)
+target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libhv_static.a;libprometheus-cpp-core.a;pthread)
 
 #安装
 INSTALL(TARGETS ${PROJECT_NAME}

@@ -80,18 +80,34 @@ int CConfig::praseConfig(const std::string& configFile)
 
         if (handle["task"]["taskTimeOutDuration"].IsDefined())
             m_taskTimeOutDuration = handle["task"]["taskTimeOutDuration"].as<int>();
+
+        if (handle["task"]["cleanTaskTimeout"].IsDefined())
+        {
+            auto temp = handle["task"]["cleanTaskTimeout"];
+            for (size_t i = 0; i < temp.size(); i++) 
+            {
+                int state = 0;
+                int timeout = 0;
+                if (temp[i]["taskState"].IsDefined())
+                {
+                    state = temp[i]["taskState"].as<int>();
+                }
+                if (temp[i]["timeout"].IsDefined())
+                {
+                    timeout = temp[i]["timeout"].as<int>();
+                }
+                m_cleanTaskTimeout[state] = timeout;
+            }
+        }
     }
 
     if (handle["resource"].IsDefined())
     {
-        if (handle["resource"]["cleanResourceInterval"].IsDefined())
-            m_cleanResourceInterval = handle["resource"]["cleanResourceInterval"].as<int>();
-
         if (handle["resource"]["resourceTimeOutDuration"].IsDefined())
             m_resourceTimeOutDuration = handle["resource"]["resourceTimeOutDuration"].as<int>();
 
-        if (handle["resource"]["resourceHeartInterval"].IsDefined())
-            m_resourceHeartInterval = handle["resource"]["resourceHeartInterval"].as<int>();
+        if (handle["resource"]["cleanResourceInterval"].IsDefined())
+            m_cleanResourceInterval = handle["resource"]["cleanResourceInterval"].as<int>();
     }
 
     if (handle["client"].IsDefined())
@@ -145,6 +161,27 @@ int CConfig::praseConfig(const std::string& configFile)
         }
     }
 
+    if (handle["http"].IsDefined())
+    {
+        if (handle["http"]["listenHttpPort"].IsDefined())
+            m_listenHttpPort = handle["http"]["listenHttpPort"].as<int>();
+
+        if (handle["http"]["httpThreadNum"].IsDefined())
+            m_httpThreadNum = handle["http"]["httpThreadNum"].as<int>();
+    }
+
+    if (handle["pool"].IsDefined())
+    {
+        if (handle["pool"]["minPoolThreads"].IsDefined())
+            m_minPoolThreads = handle["pool"]["minPoolThreads"].as<int>();
+
+        if (handle["pool"]["maxPoolThreads"].IsDefined())
+            m_maxPoolThreads = handle["pool"]["maxPoolThreads"].as<int>();
+
+        if (handle["pool"]["maxPoolIdleTime"].IsDefined())
+            m_maxPoolIdleTime = handle["pool"]["maxPoolIdleTime"].as<int>();
+    }
+
     return 0;
 }
 
@@ -169,12 +206,15 @@ std::string CConfig::getPrintStr()
         << "];"
 
         << "task[cleanTaskInterval:" << m_cleanTaskInterval
-        << ",taskTimeOutDuration:" << m_taskTimeOutDuration
-        << "];"
+        << ",taskTimeOutDuration:" << m_taskTimeOutDuration;
+    for (auto iter = m_cleanTaskTimeout.begin(); iter != m_cleanTaskTimeout.end(); ++iter)
+    {
+        os << ",taskState:" << iter->first << ",timeout:" << iter->second;
+    }
+    os << "];"
 
-        << "resource[cleanResourceInterval:" << m_cleanResourceInterval
-        << ",resourceTimeOutDuration:" << m_resourceTimeOutDuration
-        << ",resourceHeartInterval:" << m_resourceHeartInterval
+        << "resource[resourceTimeOutDuration:" << m_resourceTimeOutDuration
+        << ",cleanResourceInterval:" << m_cleanResourceInterval
         << "];"
 
         << "client[clientConnTimeout:" << m_clientConnTimeout
@@ -198,6 +238,15 @@ std::string CConfig::getPrintStr()
         }
     }
     os << "];"
+
+        << "http[listenHttpPort:" << m_listenHttpPort
+        << ",httpThreadNum:" << m_httpThreadNum
+        << "];"
+
+        << "pool[minPoolThreads:" << m_minPoolThreads
+        << ",maxPoolThreads:" << m_maxPoolThreads
+        << ",maxPoolIdleTime:" << m_maxPoolIdleTime
+        << "];"
 
         << "}.";
 

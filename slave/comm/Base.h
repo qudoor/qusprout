@@ -17,8 +17,7 @@ do { \
             break; \
         } \
     } catch (const TTransportException& e) { \
-        std::string reqbuf = getPrint(req); \
-        LOG(ERROR) << "call exception(reqbuf:" << reqbuf << ",err:" << e.what() << ")."; \
+        LOG(ERROR) << "call exception(req:" << getPrint(req) << ",err:" << e.what() << ")."; \
         setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
         if (isNeedReConnectCode(e)) { \
             std::this_thread::sleep_for(std::chrono::seconds(1)); \
@@ -27,12 +26,22 @@ do { \
         } \
         break; \
     } catch (...) { \
-        std::string reqbuf = getPrint(req); \
-        LOG(ERROR) << "call other exception(reqbuf:" << reqbuf << ")."; \
+        LOG(ERROR) << "call other exception(req:" << getPrint(req) << ")."; \
         setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
         break; \
     } \
 } while(retry-- > 0);
+
+#define CALL_WITH_TRY_SERVICE(CALL, req) \
+try { \
+    CALL; \
+} catch (const TTransportException& e) { \
+    LOG(ERROR) << "call exception(req:" << getPrint(req) << ",err:" << e.what() << ")."; \
+    setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+} catch (...) { \
+    LOG(ERROR) << "call other exception(req:" << getPrint(req) << ")."; \
+    setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+}
 
 class CBase
 {

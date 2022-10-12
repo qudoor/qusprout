@@ -82,8 +82,7 @@ int CSlaveClient::reInit()
 //qubit初始化
 void CSlaveClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request initQubits(req:" << reqbuf << ").";
+    LOG(INFO) << "request initQubits(req:" << getPrint(req) << ").";
 
     CALL_WITH_SERVICE(m_client->initQubits(resp, req), req);
     if (resp.base.code == ErrCode::COM_SUCCESS)
@@ -109,8 +108,7 @@ void CSlaveClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
 //取消任务
 void CSlaveClient::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request cancelCmd(req:" << reqbuf << ").";
+    LOG(INFO) << "request cancelCmd(req:" << getPrint(req) << ").";
 
     if (!isInit())
     {

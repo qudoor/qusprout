@@ -144,6 +144,10 @@ class GetProbabilitiesReq;
 
 class GetProbabilitiesResp;
 
+class GetTaskInfoReq;
+
+class GetTaskInfoResp;
+
 
 class Cmd : public virtual ::apache::thrift::TBase {
  public:
@@ -372,10 +376,11 @@ void swap(Result &a, Result &b);
 std::ostream& operator<<(std::ostream& out, const Result& obj);
 
 typedef struct _InitQubitsReq__isset {
-  _InitQubitsReq__isset() : density(false), exec_type(false), hosts(false) {}
+  _InitQubitsReq__isset() : density(false), exec_type(false), hosts(false), async_type(false) {}
   bool density :1;
   bool exec_type :1;
   bool hosts :1;
+  bool async_type :1;
 } _InitQubitsReq__isset;
 
 class InitQubitsReq : public virtual ::apache::thrift::TBase {
@@ -387,7 +392,8 @@ class InitQubitsReq : public virtual ::apache::thrift::TBase {
                 : id(),
                   qubits(0),
                   density(0),
-                  exec_type(static_cast<ExecCmdType::type>(0)) {
+                  exec_type(static_cast<ExecCmdType::type>(0)),
+                  async_type(0) {
   }
 
   virtual ~InitQubitsReq() noexcept;
@@ -400,6 +406,7 @@ class InitQubitsReq : public virtual ::apache::thrift::TBase {
    */
   ExecCmdType::type exec_type;
   std::vector<std::string>  hosts;
+  int32_t async_type;
 
   _InitQubitsReq__isset __isset;
 
@@ -412,6 +419,8 @@ class InitQubitsReq : public virtual ::apache::thrift::TBase {
   void __set_exec_type(const ExecCmdType::type val);
 
   void __set_hosts(const std::vector<std::string> & val);
+
+  void __set_async_type(const int32_t val);
 
   bool operator == (const InitQubitsReq & rhs) const
   {
@@ -430,6 +439,10 @@ class InitQubitsReq : public virtual ::apache::thrift::TBase {
     if (__isset.hosts != rhs.__isset.hosts)
       return false;
     else if (__isset.hosts && !(hosts == rhs.hosts))
+      return false;
+    if (__isset.async_type != rhs.__isset.async_type)
+      return false;
+    else if (__isset.async_type && !(async_type == rhs.async_type))
       return false;
     return true;
   }
@@ -2177,6 +2190,85 @@ class GetProbabilitiesResp : public virtual ::apache::thrift::TBase {
 void swap(GetProbabilitiesResp &a, GetProbabilitiesResp &b);
 
 std::ostream& operator<<(std::ostream& out, const GetProbabilitiesResp& obj);
+
+
+class GetTaskInfoReq : public virtual ::apache::thrift::TBase {
+ public:
+
+  GetTaskInfoReq(const GetTaskInfoReq&);
+  GetTaskInfoReq& operator=(const GetTaskInfoReq&);
+  GetTaskInfoReq() noexcept
+                 : id() {
+  }
+
+  virtual ~GetTaskInfoReq() noexcept;
+  std::string id;
+
+  void __set_id(const std::string& val);
+
+  bool operator == (const GetTaskInfoReq & rhs) const
+  {
+    if (!(id == rhs.id))
+      return false;
+    return true;
+  }
+  bool operator != (const GetTaskInfoReq &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const GetTaskInfoReq & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(GetTaskInfoReq &a, GetTaskInfoReq &b);
+
+std::ostream& operator<<(std::ostream& out, const GetTaskInfoReq& obj);
+
+
+class GetTaskInfoResp : public virtual ::apache::thrift::TBase {
+ public:
+
+  GetTaskInfoResp(const GetTaskInfoResp&);
+  GetTaskInfoResp& operator=(const GetTaskInfoResp&);
+  GetTaskInfoResp() noexcept
+                  : state(0) {
+  }
+
+  virtual ~GetTaskInfoResp() noexcept;
+   ::BaseCode base;
+  int32_t state;
+
+  void __set_base(const  ::BaseCode& val);
+
+  void __set_state(const int32_t val);
+
+  bool operator == (const GetTaskInfoResp & rhs) const
+  {
+    if (!(base == rhs.base))
+      return false;
+    if (!(state == rhs.state))
+      return false;
+    return true;
+  }
+  bool operator != (const GetTaskInfoResp &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const GetTaskInfoResp & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(GetTaskInfoResp &a, GetTaskInfoResp &b);
+
+std::ostream& operator<<(std::ostream& out, const GetTaskInfoResp& obj);
 
 
 

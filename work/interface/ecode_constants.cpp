@@ -13,6 +13,9 @@ const ecodeConstants g_ecode_constants;
 ecodeConstants::ecodeConstants() {
   ErrMsg.insert(std::make_pair((ErrCode::type)4, "异常"));
   ErrMsg.insert(std::make_pair((ErrCode::type)2, "不合法参数"));
+  ErrMsg.insert(std::make_pair((ErrCode::type)6, "存在"));
+  ErrMsg.insert(std::make_pair((ErrCode::type)7, "缓存中"));
+  ErrMsg.insert(std::make_pair((ErrCode::type)5, "不存在"));
   ErrMsg.insert(std::make_pair((ErrCode::type)1, "未知错误"));
   ErrMsg.insert(std::make_pair((ErrCode::type)0, "成功"));
   ErrMsg.insert(std::make_pair((ErrCode::type)3, "超时"));

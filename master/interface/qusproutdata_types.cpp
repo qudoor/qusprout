@@ -870,6 +870,11 @@ void InitQubitsReq::__set_hosts(const std::vector<std::string> & val) {
   this->hosts = val;
 __isset.hosts = true;
 }
+
+void InitQubitsReq::__set_async_type(const int32_t val) {
+  this->async_type = val;
+__isset.async_type = true;
+}
 std::ostream& operator<<(std::ostream& out, const InitQubitsReq& obj)
 {
   obj.printTo(out);
@@ -954,6 +959,14 @@ uint32_t InitQubitsReq::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 6:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->async_type);
+          this->__isset.async_type = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -1006,6 +1019,11 @@ uint32_t InitQubitsReq::write(::apache::thrift::protocol::TProtocol* oprot) cons
     }
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.async_type) {
+    xfer += oprot->writeFieldBegin("async_type", ::apache::thrift::protocol::T_I32, 6);
+    xfer += oprot->writeI32(this->async_type);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -1018,6 +1036,7 @@ void swap(InitQubitsReq &a, InitQubitsReq &b) {
   swap(a.density, b.density);
   swap(a.exec_type, b.exec_type);
   swap(a.hosts, b.hosts);
+  swap(a.async_type, b.async_type);
   swap(a.__isset, b.__isset);
 }
 
@@ -1027,6 +1046,7 @@ InitQubitsReq::InitQubitsReq(const InitQubitsReq& other53) {
   density = other53.density;
   exec_type = other53.exec_type;
   hosts = other53.hosts;
+  async_type = other53.async_type;
   __isset = other53.__isset;
 }
 InitQubitsReq& InitQubitsReq::operator=(const InitQubitsReq& other54) {
@@ -1035,6 +1055,7 @@ InitQubitsReq& InitQubitsReq::operator=(const InitQubitsReq& other54) {
   density = other54.density;
   exec_type = other54.exec_type;
   hosts = other54.hosts;
+  async_type = other54.async_type;
   __isset = other54.__isset;
   return *this;
 }
@@ -1046,6 +1067,7 @@ void InitQubitsReq::printTo(std::ostream& out) const {
   out << ", " << "density="; (__isset.density ? (out << to_string(density)) : (out << "<null>"));
   out << ", " << "exec_type="; (__isset.exec_type ? (out << to_string(exec_type)) : (out << "<null>"));
   out << ", " << "hosts="; (__isset.hosts ? (out << to_string(hosts)) : (out << "<null>"));
+  out << ", " << "async_type="; (__isset.async_type ? (out << to_string(async_type)) : (out << "<null>"));
   out << ")";
 }
 
@@ -5744,6 +5766,213 @@ void GetProbabilitiesResp::printTo(std::ostream& out) const {
   out << "GetProbabilitiesResp(";
   out << "base=" << to_string(base);
   out << ", " << "probabilities="; (__isset.probabilities ? (out << to_string(probabilities)) : (out << "<null>"));
+  out << ")";
+}
+
+
+GetTaskInfoReq::~GetTaskInfoReq() noexcept {
+}
+
+
+void GetTaskInfoReq::__set_id(const std::string& val) {
+  this->id = val;
+}
+std::ostream& operator<<(std::ostream& out, const GetTaskInfoReq& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t GetTaskInfoReq::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_id = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->id);
+          isset_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t GetTaskInfoReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("GetTaskInfoReq");
+
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(GetTaskInfoReq &a, GetTaskInfoReq &b) {
+  using ::std::swap;
+  swap(a.id, b.id);
+}
+
+GetTaskInfoReq::GetTaskInfoReq(const GetTaskInfoReq& other221) {
+  id = other221.id;
+}
+GetTaskInfoReq& GetTaskInfoReq::operator=(const GetTaskInfoReq& other222) {
+  id = other222.id;
+  return *this;
+}
+void GetTaskInfoReq::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "GetTaskInfoReq(";
+  out << "id=" << to_string(id);
+  out << ")";
+}
+
+
+GetTaskInfoResp::~GetTaskInfoResp() noexcept {
+}
+
+
+void GetTaskInfoResp::__set_base(const  ::BaseCode& val) {
+  this->base = val;
+}
+
+void GetTaskInfoResp::__set_state(const int32_t val) {
+  this->state = val;
+}
+std::ostream& operator<<(std::ostream& out, const GetTaskInfoResp& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t GetTaskInfoResp::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_base = false;
+  bool isset_state = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->base.read(iprot);
+          isset_base = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->state);
+          isset_state = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_base)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_state)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t GetTaskInfoResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("GetTaskInfoResp");
+
+  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->base.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("state", ::apache::thrift::protocol::T_I32, 2);
+  xfer += oprot->writeI32(this->state);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(GetTaskInfoResp &a, GetTaskInfoResp &b) {
+  using ::std::swap;
+  swap(a.base, b.base);
+  swap(a.state, b.state);
+}
+
+GetTaskInfoResp::GetTaskInfoResp(const GetTaskInfoResp& other223) {
+  base = other223.base;
+  state = other223.state;
+}
+GetTaskInfoResp& GetTaskInfoResp::operator=(const GetTaskInfoResp& other224) {
+  base = other224.base;
+  state = other224.state;
+  return *this;
+}
+void GetTaskInfoResp::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "GetTaskInfoResp(";
+  out << "base=" << to_string(base);
+  out << ", " << "state=" << to_string(state);
   out << ")";
 }
 

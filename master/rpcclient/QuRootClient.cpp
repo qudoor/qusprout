@@ -57,8 +57,7 @@ int CQurootClient::connect()
 //处理机器注册接口
 void CQurootClient::resourceRegister(ResourceRegisterResp& resp, const ResourceRegisterReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request resourceRegister(req:" << reqbuf << ").";
+    LOG(INFO) << "request resourceRegister(req:" << getPrint(req) << ").";
 
     CALL_WITH_TRY_SERVICE(m_client->resourceRegister(resp, req), req);
     LOG(INFO) << "response resourceRegister(resp:" << getPrint(resp) << ").";
@@ -67,8 +66,7 @@ void CQurootClient::resourceRegister(ResourceRegisterResp& resp, const ResourceR
 //处理机器注销接口
 void CQurootClient::unResourceRegister(UnResourceRegisterResp& resp, const UnResourceRegisterReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request unResourceRegister(req:" << reqbuf << ").";
+    LOG(INFO) << "request unResourceRegister(req:" << getPrint(req) << ").";
 
     CALL_WITH_TRY_SERVICE(m_client->unResourceRegister(resp, req), req);
     LOG(INFO) << "response unResourceRegister(resp:" << getPrint(resp) << ").";
