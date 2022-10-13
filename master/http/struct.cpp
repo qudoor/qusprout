@@ -176,7 +176,6 @@ void InitParam::encode(rapidjson::Writer<rapidjson::StringBuffer>& writer)
     EncodeInt("qubits", qubits);
     EncodeInt("density", density);
     EncodeInt("exec_type", exec_type);
-    EncodeInt("async", async);
 }
 
 bool InitParam::decode(const rapidjson::Value& dom)
@@ -184,7 +183,6 @@ bool InitParam::decode(const rapidjson::Value& dom)
     DecodeInt("qubits", dom, qubits, false);
     DecodeInt("density", dom, density, false);
     DecodeInt("exec_type", dom, exec_type, false);
-    DecodeInt("async", dom, async, false);
 
     return true;
 }
@@ -195,7 +193,6 @@ std::string InitParam::getStr()
     ss << "qubits:" << qubits
         << ";density:" << density
         << ";exec_type:" << exec_type
-        << ";async:" << async
         << ";";
 
     return ss.str();

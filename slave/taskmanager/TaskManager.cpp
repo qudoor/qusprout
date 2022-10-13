@@ -67,7 +67,7 @@ void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
     {
         //任务不存在
         LOG(ERROR) << "sendCircuitCmd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -90,7 +90,7 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     {
         //任务不存在
         LOG(ERROR) << "cancelCmd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -120,7 +120,7 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getProbAmp task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -143,7 +143,7 @@ void CTaskManager::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfO
     {
         //任务不存在
         LOG(ERROR) << "getProbOfOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -166,7 +166,7 @@ void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
     {
         //任务不存在
         LOG(ERROR) << "getProbOfAllOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -189,7 +189,7 @@ void CTaskManager::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getAllState task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -212,7 +212,7 @@ void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req)
     {
         //任务不存在
         LOG(ERROR) << "run task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -235,7 +235,7 @@ void CTaskManager::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
     {
         //任务不存在
         LOG(ERROR) << "applyQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -258,7 +258,7 @@ void CTaskManager::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& r
     {
         //任务不存在
         LOG(ERROR) << "applyFullQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -282,7 +282,7 @@ void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliProd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -306,7 +306,7 @@ void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliSum task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -330,7 +330,7 @@ void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
     {
         //任务不存在
         LOG(ERROR) << "measureQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -354,7 +354,7 @@ void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const 
     {
         //任务不存在
         LOG(ERROR) << "addCustomGateByMatrix task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -378,7 +378,7 @@ void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq
     {
         //任务不存在
         LOG(ERROR) << "addSubCircuit task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -402,7 +402,7 @@ void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& r
     {
         //任务不存在
         LOG(ERROR) << "appendQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -426,7 +426,7 @@ void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
     {
         //任务不存在
         LOG(ERROR) << "resetQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -450,7 +450,7 @@ void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetS
     {
         //任务不存在
         LOG(ERROR) << "getStateOfAllQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -474,7 +474,7 @@ void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabi
     {
         //任务不存在
         LOG(ERROR) << "getProbabilities task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 

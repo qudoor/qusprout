@@ -870,11 +870,6 @@ void InitQubitsReq::__set_hosts(const std::vector<std::string> & val) {
   this->hosts = val;
 __isset.hosts = true;
 }
-
-void InitQubitsReq::__set_async_type(const int32_t val) {
-  this->async_type = val;
-__isset.async_type = true;
-}
 std::ostream& operator<<(std::ostream& out, const InitQubitsReq& obj)
 {
   obj.printTo(out);
@@ -959,14 +954,6 @@ uint32_t InitQubitsReq::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
-      case 6:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->async_type);
-          this->__isset.async_type = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -1019,11 +1006,6 @@ uint32_t InitQubitsReq::write(::apache::thrift::protocol::TProtocol* oprot) cons
     }
     xfer += oprot->writeFieldEnd();
   }
-  if (this->__isset.async_type) {
-    xfer += oprot->writeFieldBegin("async_type", ::apache::thrift::protocol::T_I32, 6);
-    xfer += oprot->writeI32(this->async_type);
-    xfer += oprot->writeFieldEnd();
-  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -1036,7 +1018,6 @@ void swap(InitQubitsReq &a, InitQubitsReq &b) {
   swap(a.density, b.density);
   swap(a.exec_type, b.exec_type);
   swap(a.hosts, b.hosts);
-  swap(a.async_type, b.async_type);
   swap(a.__isset, b.__isset);
 }
 
@@ -1046,7 +1027,6 @@ InitQubitsReq::InitQubitsReq(const InitQubitsReq& other53) {
   density = other53.density;
   exec_type = other53.exec_type;
   hosts = other53.hosts;
-  async_type = other53.async_type;
   __isset = other53.__isset;
 }
 InitQubitsReq& InitQubitsReq::operator=(const InitQubitsReq& other54) {
@@ -1055,7 +1035,6 @@ InitQubitsReq& InitQubitsReq::operator=(const InitQubitsReq& other54) {
   density = other54.density;
   exec_type = other54.exec_type;
   hosts = other54.hosts;
-  async_type = other54.async_type;
   __isset = other54.__isset;
   return *this;
 }
@@ -1067,7 +1046,6 @@ void InitQubitsReq::printTo(std::ostream& out) const {
   out << ", " << "density="; (__isset.density ? (out << to_string(density)) : (out << "<null>"));
   out << ", " << "exec_type="; (__isset.exec_type ? (out << to_string(exec_type)) : (out << "<null>"));
   out << ", " << "hosts="; (__isset.hosts ? (out << to_string(hosts)) : (out << "<null>"));
-  out << ", " << "async_type="; (__isset.async_type ? (out << to_string(async_type)) : (out << "<null>"));
   out << ")";
 }
 

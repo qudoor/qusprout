@@ -45,14 +45,8 @@ public:
     //初始化对象
     int init(const InitQubitsReq& req, const RpcConnectInfo& addr, const std::string& resourceid, const ResourceData& resourcebytes);
 
-    //qubit是否为0
-    bool isZeroOfQubit();
-
     //qubit初始化
     void initQubits(InitQubitsResp& resp);
-
-    //是否异步
-    inline bool isAsync() { return m_taskinfo.async_type == 1; }
 
     //获取任务状态
     inline TaskState getTaskState() { return m_state; }
@@ -66,20 +60,14 @@ public:
     //获取qubits
     inline int getQubits() { return m_taskinfo.qubits; }
 
-    //异步任务处理
-    void asyncSendCircuitCmd(const SendCircuitCmdReq& req);
-
-    //同步任务处理
-    void syncSendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req);
+    //任务处理
+    void sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req);
 
     //取消任务
     void cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req);
 
-    //异步执行任务
-    void asyncRun(RunCircuitResp& resp, const RunCircuitReq& req);
-
-    //同步执行任务
-    void syncRun(RunCircuitResp& resp, const RunCircuitReq& req);
+    //执行任务
+    void run(RunCircuitResp& resp, const RunCircuitReq& req);
 
     //获取测量结果
     void measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req);
@@ -203,12 +191,6 @@ public:
     //获取任务状态
     void getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req);
     
-    //异步执行sendCircuitCmd接口
-    int runAddCmdTask(const std::string& id);
-
-    //异步执行run接口
-    int runRunCmdTask(const std::string& id, const int shots);
-
     //清理任务
     void cleanTask();
 

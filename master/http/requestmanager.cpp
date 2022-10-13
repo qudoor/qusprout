@@ -36,7 +36,6 @@ void CReqManager::initEnv(const std::shared_ptr<InitEnvReq> req, std::shared_ptr
     initreq.__set_qubits(req->params.qubits);
     initreq.__set_density(req->params.density?true:false);
     initreq.__set_exec_type(exectype);
-    initreq.__set_async_type(req->params.async);
 
     InitQubitsResp initresp;
     SINGLETON(CQuSproutServerHandler)->initQubits(initresp, initreq);
@@ -334,15 +333,15 @@ int CReqManager::switchCode(const ErrCode::type code)
         return COMMON_IS_EXIST;
     case ErrCode::type::COM_IS_QUEUE:
         return COMMON_IS_QUEUE;
-    case ErrCode::type::QUROOT_MEM_NOT_ENOUGH:
+    case ErrCode::type::COM_MEM_NOT_ENOUGH:
         return COMMON_MEM_NOT_ENOUGH;
-    case ErrCode::type::QUROOT_NOT_INIT:
+    case ErrCode::type::COM_NOT_INIT:
         return COMMON_NOT_INIT;
-    case ErrCode::type::QUROOT_NOT_REGISTER:
+    case ErrCode::type::COM_NOT_REGISTER:
         return COMMON_OHER;
-    case ErrCode::type::QUROOT_NOT_RESOURCE:
+    case ErrCode::type::COM_NOT_RESOURCE:
         return COMMON_NOT_RESOURCE;
-    case ErrCode::type::QUROOT_PRASE_ERROR:
+    case ErrCode::type::COM_PRASE_ERROR:
         return COMMON_PRASE_ERROR;
     }
 

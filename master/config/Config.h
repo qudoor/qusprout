@@ -84,15 +84,6 @@ public:
     //http线程数
     int m_httpThreadNum{0};
 
-    //异步线程池最小线程数
-    int m_minPoolThreads{1};
-
-    //异步线程池最大线程数
-    int m_maxPoolThreads{1};
-
-    //异步线程池任务超时时间
-    int m_maxPoolIdleTime{0};
-
     //任务清理超时时间，单位：秒
     std::map<int, int> m_cleanTaskTimeout;
 };

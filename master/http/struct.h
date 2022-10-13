@@ -97,9 +97,6 @@ struct InitParam
     //执行指令的方式，0：默认, 1：单个cpu执行, 2：多个cpu执行, 3：单个gpu执行
     int exec_type{0};
 
-    //选填| 是否异步执行，0：否，1：是
-    int async{0};
-
     void encode(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     bool decode(const rapidjson::Value& dom);
     std::string getStr();  

@@ -9,7 +9,6 @@
 #include "rpcserver/RpcServer.h"
 #include "resourcemanager/ResourceManager.h"
 #include "taskmanager/TaskManager.h"
-#include "taskmanager/TaskPool.h"
 #include "http/httpserver.h"
 #include "metrics/metrics.h"
 
@@ -20,9 +19,6 @@ void stop()
 
 	//停止http
 	SINGLETON(CHttpServer)->stop();
-
-	//停止异步队列
-	SINGLETON(CTaskPool)->stop();
 
 	//停止rpc
 	SINGLETON(CMasterServer)->stopServer();
@@ -90,10 +86,7 @@ int main(int argc, char **argv)
 		SINGLETON(CMetrics)->init();
 		SINGLETON(CMetrics)->updateStarttime(time(NULL));
 
-		//6.启动异步线程池
-		SINGLETON(CTaskPool)->init(SINGLETON(CConfig)->m_minPoolThreads, SINGLETON(CConfig)->m_maxPoolThreads, SINGLETON(CConfig)->m_maxPoolIdleTime);
-
-		//7.启动http服务
+		//6.启动http服务
 		ret = SINGLETON(CHttpServer)->init();
 		if (ret != 0)
 		{
@@ -102,7 +95,7 @@ int main(int argc, char **argv)
 		std::thread httpthd(std::bind(&CHttpServer::start, SINGLETON(CHttpServer)));
 		httpthd.detach(); 
 
-		//8.启动定时器
+		//7.启动定时器
 		SINGLETON(CTimerHandle)->init();
 
 		//8.启动rpc服务

@@ -136,7 +136,7 @@ void CResourceManager::heartbeat(HeartbeatResp& resp, const HeartbeatReq& req)
         if (iter == m_resourceList.end())
         {
             //机器未注册
-            setBase(resp.base, ErrCode::type::QUROOT_NOT_REGISTER);
+            setBase(resp.base, ErrCode::type::COM_NOT_REGISTER);
             LOG(ERROR) << "resource is not register(" << getPrint(req) << ").";
             return;
         }
@@ -173,7 +173,7 @@ ErrCode::type CResourceManager::getSignalGpuResource(const InitQubitsReq& req, c
     {
         //无可用资源
         LOG(ERROR) << "no resource is available(taskId:" << req.id << ").";
-        return ErrCode::type::QUROOT_NOT_RESOURCE;
+        return ErrCode::type::COM_NOT_RESOURCE;
     }
 
     long long int singlebytes = calcSingleBytes(req.qubits, req.density);
@@ -222,7 +222,7 @@ ErrCode::type CResourceManager::getSignalGpuResource(const InitQubitsReq& req, c
     if (0 == cpusize)
     {
         LOG(ERROR) << "resource memory is not enough(taskId:" << req.id << ").";
-        return ErrCode::type::QUROOT_MEM_NOT_ENOUGH;
+        return ErrCode::type::COM_MEM_NOT_ENOUGH;
     }
 
     resourcebytes.cpubytes = singlebytes;
@@ -243,7 +243,7 @@ ErrCode::type CResourceManager::getMpiCpuResource(const InitQubitsReq& req, cons
     {
         //无可用资源
         LOG(ERROR) << "no resource is available(taskId:" << req.id << ").";
-        return ErrCode::type::QUROOT_NOT_RESOURCE;
+        return ErrCode::type::COM_NOT_RESOURCE;
     }
 
     int numranks = 0;
@@ -296,7 +296,7 @@ ErrCode::type CResourceManager::getMpiCpuResource(const InitQubitsReq& req, cons
     if (0 == mpisize && mpisize < (size_t)numranks)
     {
         LOG(ERROR) << "resource memory is not enough(taskId:" << req.id << ").";
-        return ErrCode::type::QUROOT_MEM_NOT_ENOUGH;
+        return ErrCode::type::COM_MEM_NOT_ENOUGH;
     }
 
     resourcebytes.cpubytes = mpibytes;
@@ -321,7 +321,7 @@ ErrCode::type CResourceManager::getSignalCpuResource(const InitQubitsReq& req, c
     {
         //无可用资源
         LOG(ERROR) << "no resource is available(taskId:" << req.id << ").";
-        return ErrCode::type::QUROOT_NOT_RESOURCE;
+        return ErrCode::type::COM_NOT_RESOURCE;
     }
 
     long long int singlebytes = calcSingleBytes(req.qubits, req.density);
@@ -368,7 +368,7 @@ ErrCode::type CResourceManager::getSignalCpuResource(const InitQubitsReq& req, c
     if (0 == cpusize)
     {
         LOG(ERROR) << "resource memory is not enough(taskId:" << req.id << ").";
-        return ErrCode::type::QUROOT_MEM_NOT_ENOUGH;
+        return ErrCode::type::COM_MEM_NOT_ENOUGH;
     }
 
     resourcebytes.cpubytes = singlebytes;

@@ -98,7 +98,7 @@ void CSlaveClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -112,7 +112,7 @@ void CSlaveClient::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -125,7 +125,7 @@ void CSlaveClient::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -137,7 +137,7 @@ void CSlaveClient::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfO
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -149,7 +149,7 @@ void CSlaveClient::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -161,7 +161,7 @@ void CSlaveClient::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -173,7 +173,7 @@ void CSlaveClient::run(RunCircuitResp& resp, const RunCircuitReq& req)
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -185,7 +185,7 @@ void CSlaveClient::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -197,7 +197,7 @@ void CSlaveClient::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& r
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -209,7 +209,7 @@ void CSlaveClient::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -221,7 +221,7 @@ void CSlaveClient::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -233,7 +233,7 @@ void CSlaveClient::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -245,7 +245,7 @@ void CSlaveClient::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const 
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -257,7 +257,7 @@ void CSlaveClient::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -269,7 +269,7 @@ void CSlaveClient::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& r
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -281,7 +281,7 @@ void CSlaveClient::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -293,7 +293,7 @@ void CSlaveClient::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetS
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -305,7 +305,7 @@ void CSlaveClient::getProbabilities(GetProbabilitiesResp& resp, const GetProbabi
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 

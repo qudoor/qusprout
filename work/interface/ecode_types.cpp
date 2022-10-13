@@ -22,11 +22,11 @@ int _kErrCodeValues[] = {
   ErrCode::COM_NOT_EXIST,
   ErrCode::COM_IS_EXIST,
   ErrCode::COM_IS_QUEUE,
-  ErrCode::QUROOT_MEM_NOT_ENOUGH,
-  ErrCode::QUROOT_NOT_INIT,
-  ErrCode::QUROOT_NOT_REGISTER,
-  ErrCode::QUROOT_NOT_RESOURCE,
-  ErrCode::QUROOT_PRASE_ERROR
+  ErrCode::COM_MEM_NOT_ENOUGH,
+  ErrCode::COM_NOT_INIT,
+  ErrCode::COM_NOT_REGISTER,
+  ErrCode::COM_NOT_RESOURCE,
+  ErrCode::COM_PRASE_ERROR
 };
 const char* _kErrCodeNames[] = {
   "COM_SUCCESS",
@@ -37,11 +37,11 @@ const char* _kErrCodeNames[] = {
   "COM_NOT_EXIST",
   "COM_IS_EXIST",
   "COM_IS_QUEUE",
-  "QUROOT_MEM_NOT_ENOUGH",
-  "QUROOT_NOT_INIT",
-  "QUROOT_NOT_REGISTER",
-  "QUROOT_NOT_RESOURCE",
-  "QUROOT_PRASE_ERROR"
+  "COM_MEM_NOT_ENOUGH",
+  "COM_NOT_INIT",
+  "COM_NOT_REGISTER",
+  "COM_NOT_RESOURCE",
+  "COM_PRASE_ERROR"
 };
 const std::map<int, const char*> _ErrCode_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(13, _kErrCodeValues, _kErrCodeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
 

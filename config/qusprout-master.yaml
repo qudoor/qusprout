@@ -45,7 +45,3 @@ cap:
 http:
   listenHttpPort: 9093
   httpThreadNum: 5
-pool:
-  minPoolThreads: 1
-  maxPoolThreads: 5
-  maxPoolIdleTime: 0

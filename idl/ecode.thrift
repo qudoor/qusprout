@@ -26,21 +26,20 @@ enum ErrCode {
     //缓存中
     COM_IS_QUEUE = 7,  
 
-    //------quroot错误码------
     //内存不足
-    QUROOT_MEM_NOT_ENOUGH = 100,
+    COM_MEM_NOT_ENOUGH = 8,
 
     //未初始化
-    QUROOT_NOT_INIT = 101,
+    COM_NOT_INIT = 9,
 
     //机器未注册
-    QUROOT_NOT_REGISTER = 102,
+    COM_NOT_REGISTER = 10,
 
     //无可用的资源
-    QUROOT_NOT_RESOURCE = 103,
+    COM_NOT_RESOURCE = 11,
 
     //数据解析异常
-    QUROOT_PRASE_ERROR = 104,  
+    COM_PRASE_ERROR = 12,  
 }
 
 const map<ErrCode, string> ErrMsg = {
@@ -52,11 +51,11 @@ const map<ErrCode, string> ErrMsg = {
     ErrCode.COM_NOT_EXIST: "不存在",
     ErrCode.COM_IS_EXIST: "存在",
     ErrCode.COM_IS_QUEUE: "缓存中",
-    ErrCode.QUROOT_MEM_NOT_ENOUGH: "内存不足", 
-    ErrCode.QUROOT_NOT_INIT: "未初始化",
-    ErrCode.QUROOT_NOT_REGISTER: "机器未注册",
-    ErrCode.QUROOT_NOT_RESOURCE: "无可用的资源",
-    ErrCode.QUROOT_PRASE_ERROR: "数据解析异常",
+    ErrCode.COM_MEM_NOT_ENOUGH: "内存不足", 
+    ErrCode.COM_NOT_INIT: "未初始化",
+    ErrCode.COM_NOT_REGISTER: "机器未注册",
+    ErrCode.COM_NOT_RESOURCE: "无可用的资源",
+    ErrCode.COM_PRASE_ERROR: "数据解析异常",
 }
 
 //返回信息

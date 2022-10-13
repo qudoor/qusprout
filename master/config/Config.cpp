@@ -170,18 +170,6 @@ int CConfig::praseConfig(const std::string& configFile)
             m_httpThreadNum = handle["http"]["httpThreadNum"].as<int>();
     }
 
-    if (handle["pool"].IsDefined())
-    {
-        if (handle["pool"]["minPoolThreads"].IsDefined())
-            m_minPoolThreads = handle["pool"]["minPoolThreads"].as<int>();
-
-        if (handle["pool"]["maxPoolThreads"].IsDefined())
-            m_maxPoolThreads = handle["pool"]["maxPoolThreads"].as<int>();
-
-        if (handle["pool"]["maxPoolIdleTime"].IsDefined())
-            m_maxPoolIdleTime = handle["pool"]["maxPoolIdleTime"].as<int>();
-    }
-
     return 0;
 }
 
@@ -241,11 +229,6 @@ std::string CConfig::getPrintStr()
 
         << "http[listenHttpPort:" << m_listenHttpPort
         << ",httpThreadNum:" << m_httpThreadNum
-        << "];"
-
-        << "pool[minPoolThreads:" << m_minPoolThreads
-        << ",maxPoolThreads:" << m_maxPoolThreads
-        << ",maxPoolIdleTime:" << m_maxPoolIdleTime
         << "];"
 
         << "}.";

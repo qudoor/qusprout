@@ -80,9 +80,6 @@ struct InitQubitsReq {
 
     //mpi执行的host列表
     5: optional list<string> hosts
-
-    //是否异步执行，0：否，1：是
-    6: optional i32 async_type
 }
 
 struct InitQubitsResp {

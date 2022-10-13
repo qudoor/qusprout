@@ -79,7 +79,7 @@ int CRegister::resourceRegister()
     }
 
     client.resourceRegister(resp, req);
-    if (resp.base.code != ErrCode::COM_SUCCESS)
+    if (resp.base.code != ErrCode::type::COM_SUCCESS)
     {
         LOG(ERROR) << "resourceRegister return error(code:" << resp.base.code << ",msg:" << resp.base.msg << ").";
         return -3; 
@@ -105,7 +105,7 @@ int CRegister::unResourceRegister()
     }
 
     client.unResourceRegister(resp, req);
-    if (resp.base.code != ErrCode::COM_SUCCESS)
+    if (resp.base.code != ErrCode::type::COM_SUCCESS)
     {
         LOG(ERROR) << "unResourceRegister return error(code:" << resp.base.code << ",msg:" << resp.base.msg << ").";
         return -2; 
@@ -144,7 +144,7 @@ int CRegister::heart()
         client.heart(resp, req);
     }
 
-    if (resp.base.code == ErrCode::QUROOT_NOT_REGISTER)
+    if (resp.base.code == ErrCode::type::COM_NOT_REGISTER)
     {
         //未注册，进行注册
         return resourceRegister();

@@ -152,7 +152,7 @@ int CRegister::heartbeatToMaster()
         client.heartbeat(resp, req);
     }
 
-    if (resp.base.code == ErrCode::QUROOT_NOT_REGISTER)
+    if (resp.base.code == ErrCode::type::COM_NOT_REGISTER)
     {
         //未注册，进行注册
         return registerToMaster();

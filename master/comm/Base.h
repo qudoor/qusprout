@@ -13,7 +13,7 @@ int retry = 3; \
 do { \
     try { \
         CALL; \
-        if (resp.base.code == ErrCode::COM_SUCCESS) { \
+        if (resp.base.code != ErrCode::type::COM_MEM_NOT_ENOUGH && resp.base.code != ErrCode::type::COM_NOT_RESOURCE) { \
             break; \
         } \
     } catch (const TTransportException& e) { \

@@ -5,7 +5,6 @@
 #include "resourcemanager/ResourceManager.h"
 #include "TaskManager.h"
 #include "comm/SelfStruct.h"
-#include "TaskPool.h"
 #include "metrics/metrics.h"
 
 std::string getTaskStr(const TaskState& state)
@@ -72,51 +71,12 @@ void CTask::initQubits(InitQubitsResp& resp)
     SINGLETON(CMetrics)->addTaskCount(getResourceId(), os.str());
 }
 
-bool CTask::isZeroOfQubit()
-{
-    return (0 == m_taskinfo.qubits);
-}
-
-void CTask::asyncSendCircuitCmd(const SendCircuitCmdReq& req)
-{
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        for (auto cmd : req.circuit.cmds)
-        {
-            m_cmds.push_back(cmd);
-        }
-        m_state = TASK_STATE_QUEUED;
-    }
-
-    if (false == req.final)
-    {
-        return;
-    }
-
-    SINGLETON(CTaskPool)->addAddCmdTask(req.id);
-    return;
-}
-
-void CTask::syncSendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
+void CTask::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {
     setBase(resp.base, ErrCode::type::COM_SUCCESS);
     std::lock_guard<std::mutex> guard(m_mutex);
     m_state = TASK_STATE_RUNNING;
-    if (isAsync())
-    {
-        SendCircuitCmdReq cmdreq;
-        cmdreq.__set_id(req.id);
-        cmdreq.__set_final(req.final);
-        Circuit cmds;
-        cmds.__set_cmds(m_cmds);
-        cmdreq.__set_circuit(cmds);
-        m_client.sendCircuitCmd(resp, cmdreq);
-    }
-    else
-    {
-        m_client.sendCircuitCmd(resp, req);
-    }
-
+    m_client.sendCircuitCmd(resp, req);
     if (resp.base.code != ErrCode::type::COM_SUCCESS)
     {
         m_state = TASK_STATE_ERROR;
@@ -132,6 +92,7 @@ void CTask::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 {
     {
         std::lock_guard<std::mutex> guard(m_mutex);
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
         if (TASK_STATE_DONE != m_state && TASK_STATE_ERROR != m_state)
         {
             m_state = TASK_STATE_TIMEOUT;
@@ -139,6 +100,7 @@ void CTask::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
         if (m_client.isInit())
         {
             m_client.cancelCmd(resp, req);
+            m_client.close();
         }
     }
 
@@ -148,18 +110,7 @@ void CTask::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     SINGLETON(CMetrics)->addTaskEscapeTime(m_resourceid, os.str(), getEscapeTime());
 }
 
-void CTask::asyncRun(RunCircuitResp& resp, const RunCircuitReq& req)
-{
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        m_state = TASK_STATE_QUEUED;
-    }
-    SINGLETON(CTaskPool)->addRunCmdTask(req.id, req.shots);
-    setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    return;
-}
-
-void CTask::syncRun(RunCircuitResp& resp, const RunCircuitReq& req)
+void CTask::run(RunCircuitResp& resp, const RunCircuitReq& req)
 {
     {
         std::lock_guard<std::mutex> guard(m_mutex);
@@ -175,17 +126,12 @@ void CTask::syncRun(RunCircuitResp& resp, const RunCircuitReq& req)
         }
     }
 
-    if (isAsync() && resp.base.code == ErrCode::type::COM_SUCCESS)
+    if (resp.base.code == ErrCode::type::COM_SUCCESS)
     {
         m_results = resp.result.measureSet;
         m_outcomes = resp.result.outcomeSet;
         m_isexistmeasure = true;
     }
-
-    CancelCmdResp cancelresp;
-    CancelCmdReq cancelreq;
-    cancelreq.__set_id(req.id);
-    cancelCmd(cancelresp, cancelreq);
 }
 
 void CTask::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
@@ -193,6 +139,7 @@ void CTask::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
     std::lock_guard<std::mutex> guard(m_mutex);
     if (m_isexistmeasure)
     {
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
         resp.__set_results(m_results);
         resp.__set_outcomes(m_outcomes);
     }
@@ -312,20 +259,11 @@ void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
     if (taskhandle == nullptr)
     {
         LOG(ERROR) << "sendCircuitCmd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
-    //2.异步缓存获取添加到任务队列
-    if (taskhandle->isAsync())
-    {
-        taskhandle->asyncSendCircuitCmd(req);
-        setBase(resp.base, ErrCode::type::COM_IS_QUEUE);
-        return;
-    }
-
-    //3.同步执行
-    taskhandle->syncSendCircuitCmd(resp, req);
+    taskhandle->sendCircuitCmd(resp, req);
 }
 
 void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
@@ -343,7 +281,7 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     {
         //任务不存在
         LOG(ERROR) << "cancelCmd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -372,7 +310,7 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getProbAmp task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -395,7 +333,7 @@ void CTaskManager::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfO
     {
         //任务不存在
         LOG(ERROR) << "getProbOfOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -418,7 +356,7 @@ void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
     {
         //任务不存在
         LOG(ERROR) << "getProbOfAllOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -441,7 +379,7 @@ void CTaskManager::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getAllState task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -464,17 +402,16 @@ void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req)
     {
         //任务不存在
         LOG(ERROR) << "run task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
-    if (taskhandle->isAsync())
-    {
-        taskhandle->asyncRun(resp, req);
-        return;
-    }
+    taskhandle->run(resp, req);
 
-    taskhandle->syncRun(resp, req);
+    CancelCmdResp cancelresp;
+    CancelCmdReq cancelreq;
+    cancelreq.__set_id(req.id);
+    cancelCmd(cancelresp, cancelreq);
 }
 
 void CTaskManager::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
@@ -492,7 +429,7 @@ void CTaskManager::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
     {
         //任务不存在
         LOG(ERROR) << "applyQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -515,7 +452,7 @@ void CTaskManager::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& r
     {
         //任务不存在
         LOG(ERROR) << "applyFullQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -539,7 +476,7 @@ void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliProd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -563,7 +500,7 @@ void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliSum task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -596,7 +533,7 @@ void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
     {
         //任务不存在
         LOG(ERROR) << "measureQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -619,7 +556,7 @@ void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const 
     {
         //任务不存在
         LOG(ERROR) << "addCustomGateByMatrix task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -643,7 +580,7 @@ void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq
     {
         //任务不存在
         LOG(ERROR) << "addSubCircuit task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -667,7 +604,7 @@ void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& r
     {
         //任务不存在
         LOG(ERROR) << "appendQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -691,7 +628,7 @@ void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
     {
         //任务不存在
         LOG(ERROR) << "resetQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -715,7 +652,7 @@ void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetS
     {
         //任务不存在
         LOG(ERROR) << "getStateOfAllQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -739,7 +676,7 @@ void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabi
     {
         //任务不存在
         LOG(ERROR) << "getProbabilities task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
@@ -763,56 +700,12 @@ void CTaskManager::getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getProbabilities task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
 
     resp.__set_state((int)taskhandle->getTaskState());
     setBase(resp.base, ErrCode::type::COM_SUCCESS);
-}
-
-int CTaskManager::runAddCmdTask(const std::string& id)
-{
-    //1.判断任务是否已经初始化
-    auto taskhandle = getTask(id);
-    if (taskhandle == nullptr)
-    {
-        //任务不存在
-        LOG(ERROR) << "runAddCmdTask task is not exist(taskid:" << id << ").";
-        return -1;
-    }
-
-    SendCircuitCmdResp resp;
-    SendCircuitCmdReq req;
-    req.__set_id(id);
-    req.__set_final(true);
-    taskhandle->syncSendCircuitCmd(resp, req);
-
-    LOG(INFO) << "runAddCmdTask task(taskid:" << id << ").";
-
-    return 0;
-}
-
-int CTaskManager::runRunCmdTask(const std::string& id, const int shots)
-{
-    //1.判断任务是否已经初始化
-    auto taskhandle = getTask(id);
-    if (taskhandle == nullptr)
-    {
-        //任务不存在
-        LOG(ERROR) << "runRunCmdTask task is not exist(taskid:" << id << ").";
-        return -1;
-    }
-
-    RunCircuitReq req;
-    req.__set_id(id);
-    req.__set_shots(shots);
-    RunCircuitResp resp;
-    taskhandle->syncRun(resp, req);
-
-    LOG(INFO) << "runRunCmdTask task(taskid:" << id << ",shots:" << shots << ").";
-
-    return 0;
 }
 
 void CTaskManager::cleanTask()
