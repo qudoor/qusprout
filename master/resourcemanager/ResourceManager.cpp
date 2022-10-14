@@ -338,7 +338,6 @@ ErrCode::type CResourceManager::getSignalCpuResource(const InitQubitsReq& req, c
             {
                 cpumemory -= finditer->second.cpubytes;
             }
-            LOG(INFO) << "---------getSignalCpuResource self---------------(total memory:" << iter->second->m_resource.device.resource.cpu_total_memory << ",left memory:" << cpumemory << ",need memory:" << singlebytes << ").";
             if (cpumemory >= singlebytes)
             {
                 cpuhosts.push_back(addr);
@@ -356,7 +355,6 @@ ErrCode::type CResourceManager::getSignalCpuResource(const InitQubitsReq& req, c
             {
                 cpumemory -= finditer->second.cpubytes;
             }
-            LOG(INFO) << "---------getSignalCpuResource---------------(total memory:" << temp.second->m_resource.device.resource.cpu_total_memory << ",left memory:" << cpumemory << ",need memory:" << singlebytes << ").";
             if (cpumemory >= singlebytes)
             {
                 cpuhosts.push_back(addr);

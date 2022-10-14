@@ -279,8 +279,6 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     auto taskhandle = getTask(req.id);
     if (taskhandle == nullptr)
     {
-        //任务不存在
-        LOG(ERROR) << "cancelCmd task is not exist(taskid:" << req.id << ").";
         setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
