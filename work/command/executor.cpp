@@ -65,7 +65,8 @@ map<string, GateFunc> g_gateMap = {
     make_pair<string, GateFunc>("csqrtx", &CmdExecutor::CSqrtX),
     make_pair<string, GateFunc>("cswap", &CmdExecutor::CSwap),
     make_pair<string, GateFunc>("ph", &CmdExecutor::Ph),
-    make_pair<string, GateFunc>("amp", &CmdExecutor::Amp)
+    make_pair<string, GateFunc>("amp", &CmdExecutor::Amp),
+    make_pair<string, GateFunc>("matrix", &CmdExecutor::Mat)
 };
 
 inline string toLowerCase(string str) 
@@ -1578,4 +1579,26 @@ void CmdExecutor::Ph(const Cmd& cmd)
 void CmdExecutor::Amp(const Cmd& cmd)
 {
     setAmps(m_qureg, cmd.cmdex.amp.startind, (double*)cmd.cmdex.amp.reals.data(), (double*)cmd.cmdex.amp.imags.data(), cmd.cmdex.amp.numamps);
+}
+
+void CmdExecutor::Mat(const Cmd& cmd)
+{
+    int nSize = cmd.cmdex.mat.reals.size();
+    unique_ptr<double*> real(new double* [nSize]);
+    unique_ptr<double*> imag(new double* [nSize]);
+    for (int i= 0; i < nSize; i++)
+    {
+        real.get()[i] = (double*)cmd.cmdex.mat.reals[i].data();
+        imag.get()[i] = (double*)cmd.cmdex.mat.imags[i].data();
+    }
+
+    ComplexMatrixN matrixN;
+    matrixN.real = (double**)real.get();
+    matrixN.imag = (double**)imag.get();
+    matrixN.numQubits = cmd.targets.size();
+
+    if (cmd.cmdex.mat.unitary)
+        multiControlledMultiQubitUnitary(m_qureg, (int*)cmd.controls.data(), cmd.controls.size(), (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
+    else
+        applyMultiControlledMatrixN(m_qureg, (int*)cmd.controls.data(), cmd.controls.size(), (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
 }

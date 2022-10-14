@@ -54,6 +54,8 @@ std::string to_string(const PauliOperType::type& val);
 
 class Amplitude;
 
+class Matrix;
+
 class Cmdex;
 
 class Cmd;
@@ -201,9 +203,57 @@ void swap(Amplitude &a, Amplitude &b);
 
 std::ostream& operator<<(std::ostream& out, const Amplitude& obj);
 
+
+class Matrix : public virtual ::apache::thrift::TBase {
+ public:
+
+  Matrix(const Matrix&);
+  Matrix& operator=(const Matrix&);
+  Matrix() noexcept
+         : unitary(0) {
+  }
+
+  virtual ~Matrix() noexcept;
+  std::vector<std::vector<double> >  reals;
+  std::vector<std::vector<double> >  imags;
+  bool unitary;
+
+  void __set_reals(const std::vector<std::vector<double> > & val);
+
+  void __set_imags(const std::vector<std::vector<double> > & val);
+
+  void __set_unitary(const bool val);
+
+  bool operator == (const Matrix & rhs) const
+  {
+    if (!(reals == rhs.reals))
+      return false;
+    if (!(imags == rhs.imags))
+      return false;
+    if (!(unitary == rhs.unitary))
+      return false;
+    return true;
+  }
+  bool operator != (const Matrix &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Matrix & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(Matrix &a, Matrix &b);
+
+std::ostream& operator<<(std::ostream& out, const Matrix& obj);
+
 typedef struct _Cmdex__isset {
-  _Cmdex__isset() : amp(false) {}
+  _Cmdex__isset() : amp(false), mat(false) {}
   bool amp :1;
+  bool mat :1;
 } _Cmdex__isset;
 
 class Cmdex : public virtual ::apache::thrift::TBase {
@@ -216,16 +266,23 @@ class Cmdex : public virtual ::apache::thrift::TBase {
 
   virtual ~Cmdex() noexcept;
   Amplitude amp;
+  Matrix mat;
 
   _Cmdex__isset __isset;
 
   void __set_amp(const Amplitude& val);
+
+  void __set_mat(const Matrix& val);
 
   bool operator == (const Cmdex & rhs) const
   {
     if (__isset.amp != rhs.__isset.amp)
       return false;
     else if (__isset.amp && !(amp == rhs.amp))
+      return false;
+    if (__isset.mat != rhs.__isset.mat)
+      return false;
+    else if (__isset.mat && !(mat == rhs.mat))
       return false;
     return true;
   }

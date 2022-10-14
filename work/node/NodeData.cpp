@@ -49,6 +49,8 @@ void NodeData::packcircuit(const std::vector<Cmd>& cmds, const int& final, char*
         packstring(cmd.desc, packbuf, packsize);
         packvectordouble(cmd.cmdex.amp.reals, packbuf, packsize);
         packvectordouble(cmd.cmdex.amp.imags, packbuf, packsize);
+        packvectorvectordouble(cmd.cmdex.mat.reals, packbuf, packsize);
+        packvectorvectordouble(cmd.cmdex.mat.imags, packbuf, packsize);
         packint(cmd.cmdex.amp.startind, packbuf, packsize);
         packint(cmd.cmdex.amp.numamps, packbuf, packsize);
     }
@@ -72,6 +74,8 @@ void NodeData::unpackcircuit(char* packbuf, int& packsize)
         unpackstring(cmd.desc, packbuf, packsize);
         unpackvectordouble(cmd.cmdex.amp.reals, packbuf, packsize);
         unpackvectordouble(cmd.cmdex.amp.imags, packbuf, packsize);
+        unpackvectorvectordouble(cmd.cmdex.mat.reals, packbuf, packsize);
+        unpackvectorvectordouble(cmd.cmdex.mat.imags, packbuf, packsize);
         unpackint(cmd.cmdex.amp.startind, packbuf, packsize);
         unpackint(cmd.cmdex.amp.numamps, packbuf, packsize);
 
@@ -370,6 +374,17 @@ void NodeData::packvectordouble(const std::vector<double>& vec, char* packbuf, i
         MPI_Pack( &i, 1, MPI_DOUBLE, packbuf, PACKSIZE, &packsize, MPI_COMM_WORLD );
 }
 
+void NodeData::packvectorvectordouble(const std::vector<std::vector<double>>& vec, char* packbuf, int& packsize)
+{
+    int size = vec.size();
+    MPI_Pack( &size, 1, MPI_INT, packbuf, PACKSIZE, &packsize, MPI_COMM_WORLD );
+    for(int i = 0; i < size; i++)
+    {
+        const auto& temp = vec[i];
+        packvectordouble(temp, packbuf, packsize);
+    }
+}
+
 void NodeData::unpackstring(std::string& str, char* packbuf, int& packsize)
 {
     int size = 0;
@@ -407,6 +422,18 @@ void NodeData::unpackvectordouble(std::vector<double>& vec, char* packbuf, int& 
         double rotationbit = 0;
         MPI_Unpack( packbuf, packsize, &m_position, &rotationbit, 1, MPI_DOUBLE, MPI_COMM_WORLD );
         vec.push_back(rotationbit);
+    }
+}
+
+void NodeData::unpackvectorvectordouble(std::vector<std::vector<double>>& vec, char* packbuf, int& packsize)
+{
+    int size = 0;
+    MPI_Unpack( packbuf, packsize, &m_position, &size, 1, MPI_INT, MPI_COMM_WORLD );
+    for(int i = 0; i < size; i++)
+    {
+        std::vector<double> temp;
+        unpackvectordouble(temp, packbuf, packsize);
+        vec.push_back(temp);
     }
 }
 

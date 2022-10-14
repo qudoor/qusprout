@@ -98,11 +98,13 @@ private:
     void packint(const int& pint, char* packbuf, int& packsize);
     void packvectorint(const std::vector<int>& vec, char* packbuf, int& packsize);
     void packvectordouble(const std::vector<double>& vec, char* packbuf, int& packsize);
+    void packvectorvectordouble(const std::vector<std::vector<double>>& vec, char* packbuf, int& packsize);
 
     void unpackstring(std::string& str, char* packbuf, int& packsize);
     void unpackint(int& pint, char* packbuf, int& packsize);
     void unpackvectorint(std::vector<int>& vec, char* packbuf, int& packsize);
     void unpackvectordouble(std::vector<double>& vec, char* packbuf, int& packsize);
+    void unpackvectorvectordouble(std::vector<std::vector<double>>& vec, char* packbuf, int& packsize);
 
     void packdouble(const double& pdouble, char* packbuf, int& packsize);
     void unpackdouble(double& pdouble, char* packbuf, int& packsize);

@@ -95,6 +95,7 @@ public:
     void MatrixN(const Cmd& cmd);
     void Ph(const Cmd& cmd);
     void Amp(const Cmd& cmd);
+    void Mat(const Cmd& cmd);
 
 private:
     Qureg m_qureg;
