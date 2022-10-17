@@ -1583,6 +1583,9 @@ void CmdExecutor::Amp(const Cmd& cmd)
 
 void CmdExecutor::Mat(const Cmd& cmd)
 {
+    if (cmd.targets.size() <= 0)
+        return;
+
     int nSize = cmd.cmdex.mat.reals.size();
     unique_ptr<double*> real(new double* [nSize]);
     unique_ptr<double*> imag(new double* [nSize]);
@@ -1597,8 +1600,18 @@ void CmdExecutor::Mat(const Cmd& cmd)
     matrixN.imag = (double**)imag.get();
     matrixN.numQubits = cmd.targets.size();
 
-    if (cmd.cmdex.mat.unitary)
-        multiControlledMultiQubitUnitary(m_qureg, (int*)cmd.controls.data(), cmd.controls.size(), (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
+    if (cmd.controls.size() > 0)
+    {
+        if (cmd.cmdex.mat.unitary)
+            multiControlledMultiQubitUnitary(m_qureg, (int*)cmd.controls.data(), cmd.controls.size(), (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
+        else
+            applyMultiControlledMatrixN(m_qureg, (int*)cmd.controls.data(), cmd.controls.size(), (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
+    }
     else
-        applyMultiControlledMatrixN(m_qureg, (int*)cmd.controls.data(), cmd.controls.size(), (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
+    {
+        if (cmd.cmdex.mat.unitary)
+            multiQubitUnitary(m_qureg, (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
+        else
+            applyMatrixN(m_qureg, (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
+    }
 }
