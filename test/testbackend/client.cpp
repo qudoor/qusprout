@@ -16,7 +16,6 @@
 #include "ecode_constants.h"
 #include "MasterServer.h"
 #include "resource_types.h"
-#include "statistics_types.h"
 
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
@@ -295,29 +294,6 @@ void testTaskFree()
     std::cout << "begin cmd---------------" << std::endl;
     cmdresp.printTo(infoos1);
     std::cout << std::endl << "end cmd---------------" << std::endl;
-
-    transport->close();
-}
-
-void testGetStatisticsInfo()
-{
-    std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("192.168.158.146", 9092); 
-    std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
-    std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
-    std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "MasterServer");
-    transport->open();
-
-    std::shared_ptr<MasterServerClient> client = std::make_shared<MasterServerClient>(quest);
-
-    //获取统计信息
-    GetStatisticsInfoReq getreq;
-    getreq.__set_seq("1");
-    GetStatisticsInfoResp getresp;
-    client->GetStatisticsInfo(getresp, getreq);
-    std::cout << "begin GetStatisticsInfo---------------" << std::endl;
-    std::ostream& infoos = std::cout;
-    getresp.printTo(infoos);
-    std::cout << std::endl << "end GetStatisticsInfo---------------" << std::endl;
 
     transport->close();
 }
@@ -649,7 +625,7 @@ void testget()
             os << "h q[" << i << "]";
             cmd.desc = os.str();
             circuit.cmds.push_back(cmd);
-
+/*
             Cmd cmd1;
             cmd1.__set_gate("Z");
             cmd1.targets.push_back(i);
@@ -666,6 +642,7 @@ void testget()
             os << "Measure q[" << i << "]";
             cmd2.desc = os.str();
             circuit.cmds.push_back(cmd2);
+*/
         }
         cmdreq.__set_circuit(circuit);
         cmdreq.__set_final(true);
@@ -732,8 +709,11 @@ void testget()
         GetProbOfAllOutcomReq alloutcomreqex;
         alloutcomreqex.__set_id(id);
         std::vector<int32_t> outcomreex;
-        outcomreex.push_back(0);
-        outcomreex.push_back(1);
+        for (auto i = 0; i < qubitnum; ++i)
+        {
+            if (i == 1)
+                outcomreex.push_back(i);
+        }
         alloutcomreqex.__set_targets(outcomreex);
         GetProbOfAllOutcomResp alloutcomrespex;
         client->getProbOfAllOutcome(alloutcomrespex, alloutcomreqex);
@@ -851,7 +831,7 @@ void testget()
         client->getProbabilities(probresp1, probreq1);
         probresp1.printTo(osstream);
         std::cout << "end getProbabilities1---------------" << std::endl;
-*/
+
         //运行
         RunCircuitReq runreq;
         runreq.__set_id(id);
@@ -860,7 +840,7 @@ void testget()
         client->run(runresp, runreq);
         runresp.printTo(osstream);
         std::cout << "end run---------------" << std::endl;
-
+*/
         transport->close();
         sleep(1);
     }
@@ -1049,16 +1029,606 @@ void testreset()
     }
 }
 
+void testvqe()
+{
+    std::ostringstream os("");
+    os << time(NULL);
+    auto id = os.str();
+
+    int qubitnum = 2;
+    try
+    {
+        std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("192.168.158.146", 9091); 
+        socket->setConnTimeout(60000);
+        socket->setRecvTimeout(60000);
+        socket->setSendTimeout(60000);
+        std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+        std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+        std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+        transport->open();
+
+        std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+        //初始化
+        InitQubitsReq initreq;
+        initreq.__set_id(id);
+        initreq.__set_qubits(qubitnum);
+        initreq.__set_density(false);
+        initreq.__set_exec_type(ExecCmdType::ExecTypeCpuSingle);
+        InitQubitsResp initresp;
+        client->initQubits(initresp, initreq);
+        std::cout << "begin init---------------" << std::endl;
+
+        //发送指令
+        double theta = 2.9118;
+        auto rotation = M_PI/2;
+
+        SendCircuitCmdReq cmdreq;
+        cmdreq.__set_id(id);
+        Circuit circuit;
+        {
+            Cmd cmd;
+            cmd.__set_gate("x");
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "x q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit.cmds.push_back(cmd);
+        }
+        cmdreq.__set_circuit(circuit);
+        cmdreq.__set_final(false);
+        SendCircuitCmdResp cmdresp;
+        client->sendCircuitCmd(cmdresp, cmdreq);
+
+        SendCircuitCmdReq cmdreq1;
+        cmdreq1.__set_id(id);
+        Circuit circuit1;
+        {
+            Cmd cmd;
+            cmd.__set_gate("matrix");
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "-rx(PI/2) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            Cmdex ex;
+            Matrix mat;
+            
+            auto cos_value = cos(rotation);
+            auto sin_value = sin(rotation);
+            std::vector<double> real1;
+            real1.push_back(-cos_value);
+            real1.push_back(0);
+            std::vector<double> real2;
+            real2.push_back(0);
+            real2.push_back(-cos_value);
+            mat.reals.push_back(real1);
+            mat.reals.push_back(real2);
+            std::vector<double> imag1;
+            imag1.push_back(0);
+            imag1.push_back(sin_value);
+            std::vector<double> imag2;
+            imag2.push_back(sin_value);
+            imag2.push_back(0);
+            mat.imags.push_back(imag1);
+            mat.imags.push_back(imag2);
+            mat.__set_unitary(true);
+            ex.__set_mat(mat);
+            cmd.__set_cmdex(ex);
+            circuit1.cmds.push_back(cmd);
+        }
+        cmdreq1.__set_circuit(circuit1);
+        cmdreq1.__set_final(false);
+        SendCircuitCmdResp cmdresp1;
+        client->sendCircuitCmd(cmdresp1, cmdreq1);
+
+        SendCircuitCmdReq cmdreq2;
+        cmdreq2.__set_id(id);
+        Circuit circuit2;
+        {
+            Cmd cmd;
+            cmd.__set_gate("ry");
+            cmd.rotation.push_back(rotation);
+            cmd.targets.push_back(1);
+            os.str("");
+            os << "ry(PI/2) q[1]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit2.cmds.push_back(cmd);
+        }
+        cmdreq2.__set_circuit(circuit2);
+        cmdreq2.__set_final(false);
+        SendCircuitCmdResp cmdresp2;
+        client->sendCircuitCmd(cmdresp2, cmdreq2);
+
+        SendCircuitCmdReq cmdreq3;
+        cmdreq3.__set_id(id);
+        Circuit circuit3;
+        {
+            Cmd cmd;
+            cmd.__set_gate("cnot");
+            cmd.controls.push_back(1);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "cnot(1) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit3.cmds.push_back(cmd);
+        }
+        cmdreq3.__set_circuit(circuit3);
+        cmdreq3.__set_final(false);
+        SendCircuitCmdResp cmdresp3;
+        client->sendCircuitCmd(cmdresp3, cmdreq3);
+
+        SendCircuitCmdReq cmdreq4;
+        cmdreq4.__set_id(id);
+        Circuit circuit4;
+        {
+            Cmd cmd;
+            cmd.__set_gate("rz");
+            cmd.rotation.push_back(theta);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "rz(PI/2) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit4.cmds.push_back(cmd);
+        }
+        cmdreq4.__set_circuit(circuit4);
+        cmdreq4.__set_final(false);
+        SendCircuitCmdResp cmdresp4;
+        client->sendCircuitCmd(cmdresp4, cmdreq4);
+
+        SendCircuitCmdReq cmdreq5;
+        cmdreq5.__set_id(id);
+        Circuit circuit5;
+        {
+            Cmd cmd;
+            cmd.__set_gate("cnot");
+            cmd.controls.push_back(1);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "cnot(1) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit5.cmds.push_back(cmd);
+        }
+        cmdreq5.__set_circuit(circuit5);
+        cmdreq5.__set_final(false);
+        SendCircuitCmdResp cmdresp5;
+        client->sendCircuitCmd(cmdresp5, cmdreq5);
+
+        SendCircuitCmdReq cmdreq6;
+        cmdreq6.__set_id(id);
+        Circuit circuit6;
+        {
+            Cmd cmd;
+            cmd.__set_gate("rx");
+            cmd.rotation.push_back(rotation);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "rx(PI/2) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit6.cmds.push_back(cmd);
+        }
+        cmdreq6.__set_circuit(circuit6);
+        cmdreq6.__set_final(false);
+        SendCircuitCmdResp cmdresp6;
+        client->sendCircuitCmd(cmdresp6, cmdreq6);
+
+        SendCircuitCmdReq cmdreq7;
+        cmdreq7.__set_id(id);
+        Circuit circuit7;
+        {
+            Cmd cmd;
+            cmd.__set_gate("matrix");
+            cmd.targets.push_back(1);
+            os.str("");
+            os << "-ry(PI/2) q[1]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            Cmdex ex;
+            Matrix mat;
+            
+            auto cos_value = cos(rotation);
+            auto sin_value = sin(rotation);
+            std::vector<double> real1;
+            real1.push_back(-cos_value);
+            real1.push_back(sin_value);
+            std::vector<double> real2;
+            real2.push_back(-sin_value);
+            real2.push_back(-cos_value);
+            mat.reals.push_back(real1);
+            mat.reals.push_back(real2);
+            std::vector<double> imag1;
+            imag1.push_back(0);
+            imag1.push_back(0);
+            std::vector<double> imag2;
+            imag2.push_back(0);
+            imag2.push_back(0);
+            mat.imags.push_back(imag1);
+            mat.imags.push_back(imag2);
+            mat.__set_unitary(false);
+            ex.__set_mat(mat);
+            cmd.__set_cmdex(ex);
+            circuit7.cmds.push_back(cmd);
+        }
+        cmdreq7.__set_circuit(circuit7);
+        cmdreq7.__set_final(false);
+        SendCircuitCmdResp cmdresp7;
+        client->sendCircuitCmd(cmdresp7, cmdreq7);
+
+        //
+        std::vector<PauliOperType::type> oper_type_list;
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Y);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Y);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_X);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_X);
+
+        std::vector<double> term_coeff_list;
+        term_coeff_list.push_back(-0.4804);
+        term_coeff_list.push_back(0.3435);
+        term_coeff_list.push_back(-0.4347);
+        term_coeff_list.push_back(0.5716);
+        term_coeff_list.push_back(0.091);
+        term_coeff_list.push_back(0.091);
+
+        GetExpecPauliSumReq paulisumreq;
+        paulisumreq.__set_id(id);
+        paulisumreq.__set_oper_type_list(oper_type_list);
+        paulisumreq.__set_term_coeff_list(term_coeff_list);
+        GetExpecPauliSumResp paulisumresp;
+        client->getExpecPauliSum(paulisumresp, paulisumreq);
+        std::ostream& infoos4 = std::cout;
+        paulisumreq.printTo(infoos4);
+        paulisumresp.printTo(infoos4);
+        std::cout << std::endl << "end getExpecPauliSum---------------" << std::endl;
+
+        //取消任务
+        CancelCmdReq cancelreq;
+        cancelreq.__set_id(id);
+        CancelCmdResp cancelresp;
+        client->cancelCmd(cancelresp, cancelreq);
+
+        transport->close();
+        sleep(1);
+    }
+    catch(const TTransportException& e)
+    {
+        std::cout << "init exception(err:" << e.what() << ",getType:" << e.getType() << ").";
+    }
+    catch(...)
+    {
+        std::cout << "init other exception.";
+    }
+}
+
+void testvqe1()
+{
+    std::ostringstream os("");
+    os << time(NULL);
+    auto id = os.str();
+
+    int qubitnum = 2;
+    try
+    {
+        std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("192.168.158.146", 9091); 
+        socket->setConnTimeout(60000);
+        socket->setRecvTimeout(60000);
+        socket->setSendTimeout(60000);
+        std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+        std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+        std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+        transport->open();
+
+        std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+        //初始化
+        InitQubitsReq initreq;
+        initreq.__set_id(id);
+        initreq.__set_qubits(qubitnum);
+        initreq.__set_density(false);
+        initreq.__set_exec_type(ExecCmdType::ExecTypeCpuSingle);
+        InitQubitsResp initresp;
+        client->initQubits(initresp, initreq);
+        std::cout << "begin init---------------" << std::endl;
+
+        auto rotation = M_PI/2;
+        auto cos_value = cos(rotation);
+        auto sin_value = sin(rotation);
+
+        //注册一些自定义量子门，单次任务有效
+        AddCustomGateByMatrixReq addmatrixreq;
+        addmatrixreq.__set_id(id);
+        GateMatrix matrixgate;
+        matrixgate.__set_name("-rx");
+        matrixgate.__set_qubits(1);
+        std::vector<double> matrixlist;
+
+        matrixlist.push_back(-cos_value);
+        matrixlist.push_back(0);
+
+        matrixlist.push_back(0);
+        matrixlist.push_back(sin_value);
+
+        matrixlist.push_back(0);
+        matrixlist.push_back(sin_value);
+
+        matrixlist.push_back(-cos_value);
+        matrixlist.push_back(0);
+
+        matrixgate.__set_matrix(matrixlist);
+        addmatrixreq.__set_gate(matrixgate);
+        AddCustomGateByMatrixResp addmatrixresp;
+        client->addCustomGateByMatrix(addmatrixresp, addmatrixreq);
+        std::ostream& infoos1 = std::cout;
+        addmatrixresp.printTo(infoos1);
+        std::cout << "end addCustomGateByMatrix---------------" << std::endl;
+
+        //注册一些自定义量子门，单次任务有效
+        AddCustomGateByMatrixReq addmatrixreq1;
+        addmatrixreq1.__set_id(id);
+        GateMatrix matrixgate1;
+        matrixgate1.__set_name("-ry");
+        matrixgate1.__set_qubits(1);
+        std::vector<double> matrixlist1;
+
+        matrixlist1.push_back(-cos_value);
+        matrixlist1.push_back(0);
+
+        matrixlist1.push_back(sin_value);
+        matrixlist1.push_back(0);
+        
+        matrixlist1.push_back(-sin_value);
+        matrixlist1.push_back(0);
+
+        matrixlist1.push_back(-cos_value);
+        matrixlist1.push_back(0);
+
+        matrixgate1.__set_matrix(matrixlist1);
+        addmatrixreq1.__set_gate(matrixgate1);
+        AddCustomGateByMatrixResp addmatrixresp1;
+        client->addCustomGateByMatrix(addmatrixresp1, addmatrixreq1);
+        std::ostream& infoos2 = std::cout;
+        addmatrixresp1.printTo(infoos2);
+        std::cout << "end addCustomGateByMatrix---------------" << std::endl;
+
+        //发送指令
+        double theta = 2.9118;
+
+        SendCircuitCmdReq cmdreq;
+        cmdreq.__set_id(id);
+        Circuit circuit;
+        {
+            Cmd cmd;
+            cmd.__set_gate("x");
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "x q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit.cmds.push_back(cmd);
+        }
+        cmdreq.__set_circuit(circuit);
+        cmdreq.__set_final(false);
+        SendCircuitCmdResp cmdresp;
+        client->sendCircuitCmd(cmdresp, cmdreq);
+/*
+        SendCircuitCmdReq cmdreq1;
+        cmdreq1.__set_id(id);
+        Circuit circuit1;
+        {
+            Cmd cmd;
+            cmd.__set_gate("-rx");
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "-rx(PI/2) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit1.cmds.push_back(cmd);
+        }
+        cmdreq1.__set_circuit(circuit1);
+        cmdreq1.__set_final(false);
+        SendCircuitCmdResp cmdresp1;
+        client->sendCircuitCmd(cmdresp1, cmdreq1);
+
+        SendCircuitCmdReq cmdreq2;
+        cmdreq2.__set_id(id);
+        Circuit circuit2;
+        {
+            Cmd cmd;
+            cmd.__set_gate("ry");
+            cmd.rotation.push_back(rotation);
+            cmd.targets.push_back(1);
+            os.str("");
+            os << "ry(PI/2) q[1]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit2.cmds.push_back(cmd);
+        }
+        cmdreq2.__set_circuit(circuit2);
+        cmdreq2.__set_final(false);
+        SendCircuitCmdResp cmdresp2;
+        client->sendCircuitCmd(cmdresp2, cmdreq2);
+
+        SendCircuitCmdReq cmdreq3;
+        cmdreq3.__set_id(id);
+        Circuit circuit3;
+        {
+            Cmd cmd;
+            cmd.__set_gate("cnot");
+            cmd.controls.push_back(1);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "cnot(1) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit3.cmds.push_back(cmd);
+        }
+        cmdreq3.__set_circuit(circuit3);
+        cmdreq3.__set_final(false);
+        SendCircuitCmdResp cmdresp3;
+        client->sendCircuitCmd(cmdresp3, cmdreq3);
+
+        SendCircuitCmdReq cmdreq4;
+        cmdreq4.__set_id(id);
+        Circuit circuit4;
+        {
+            Cmd cmd;
+            cmd.__set_gate("rz");
+            cmd.rotation.push_back(theta);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "rz(theta) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit4.cmds.push_back(cmd);
+        }
+        cmdreq4.__set_circuit(circuit4);
+        cmdreq4.__set_final(false);
+        SendCircuitCmdResp cmdresp4;
+        client->sendCircuitCmd(cmdresp4, cmdreq4);
+
+        SendCircuitCmdReq cmdreq5;
+        cmdreq5.__set_id(id);
+        Circuit circuit5;
+        {
+            Cmd cmd;
+            cmd.__set_gate("cnot");
+            cmd.controls.push_back(1);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "cnot(1) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit5.cmds.push_back(cmd);
+        }
+        cmdreq5.__set_circuit(circuit5);
+        cmdreq5.__set_final(false);
+        SendCircuitCmdResp cmdresp5;
+        client->sendCircuitCmd(cmdresp5, cmdreq5);
+
+        SendCircuitCmdReq cmdreq6;
+        cmdreq6.__set_id(id);
+        Circuit circuit6;
+        {
+            Cmd cmd;
+            cmd.__set_gate("rx");
+            cmd.rotation.push_back(rotation);
+            cmd.targets.push_back(0);
+            os.str("");
+            os << "rx(PI/2) q[0]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit6.cmds.push_back(cmd);
+        }
+        cmdreq6.__set_circuit(circuit6);
+        cmdreq6.__set_final(false);
+        SendCircuitCmdResp cmdresp6;
+        client->sendCircuitCmd(cmdresp6, cmdreq6);
+
+        SendCircuitCmdReq cmdreq7;
+        cmdreq7.__set_id(id);
+        Circuit circuit7;
+        {
+            Cmd cmd;
+            cmd.__set_gate("-ry");
+            cmd.targets.push_back(1);
+            os.str("");
+            os << "-ry(PI/2) q[1]";
+            cmd.desc = os.str();
+            cmd.inverse = false;
+            circuit7.cmds.push_back(cmd);
+        }
+        cmdreq7.__set_circuit(circuit7);
+        cmdreq7.__set_final(false);
+        SendCircuitCmdResp cmdresp7;
+        client->sendCircuitCmd(cmdresp7, cmdreq7);
+*/
+        //
+        std::vector<PauliOperType::type> oper_type_list;
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_I);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Z);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Y);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_Y);
+
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_X);
+        oper_type_list.push_back(PauliOperType::type::POT_PAULI_X);
+
+        std::vector<double> term_coeff_list;
+        term_coeff_list.push_back(-0.4804);
+        term_coeff_list.push_back(0.3435);
+        term_coeff_list.push_back(-0.4347);
+        term_coeff_list.push_back(0.5716);
+        term_coeff_list.push_back(0.091);
+        term_coeff_list.push_back(0.091);
+
+        GetExpecPauliSumReq paulisumreq;
+        paulisumreq.__set_id(id);
+        paulisumreq.__set_oper_type_list(oper_type_list);
+        paulisumreq.__set_term_coeff_list(term_coeff_list);
+        GetExpecPauliSumResp paulisumresp;
+        client->getExpecPauliSum(paulisumresp, paulisumreq);
+        std::ostream& infoos4 = std::cout;
+        paulisumreq.printTo(infoos4);
+        paulisumresp.printTo(infoos4);
+        std::cout << std::endl << "end getExpecPauliSum---------------" << std::endl;
+
+        //取消任务
+        CancelCmdReq cancelreq;
+        cancelreq.__set_id(id);
+        CancelCmdResp cancelresp;
+        client->cancelCmd(cancelresp, cancelreq);
+
+        transport->close();
+        sleep(1);
+    }
+    catch(const TTransportException& e)
+    {
+        std::cout << "init exception(err:" << e.what() << ",getType:" << e.getType() << ").";
+    }
+    catch(...)
+    {
+        std::cout << "init other exception.";
+    }
+}
+
 int main(int argc, char **argv) {
     //testSimMultiCmd();
     //testSimThreadCmd();
     //testTaskState();
     //testTaskFree();
-    //testGetStatisticsInfo();
     //testpauil();
     //testpauil1();
     //testget();
-    testreset();
+    //testreset();
+    testvqe();
+    testvqe1();
     
     return 0;
 }
