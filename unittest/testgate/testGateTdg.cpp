@@ -31,7 +31,7 @@ Cmd(gate=Tdg, targets=[1], controls=[], rotation=[], desc=tdg q[1], inverse=0)
 test Tdg inverse state:Classical 初始振幅:[[0.5, 0],[0.5, 0],[0.5, 0],[0.5, 0],] 应用门后的振幅:[[0.5, 0],[0.353553390593, -0.353553390593],[0.353553390593, -0.353553390593],[0, -0.5],] 逆操作后的振幅:[[0.5, 0],[0.5, 0],[0.5, 0],[0.5, 0],]
 测试结论：通过
 */
-bool CTestGateTdg::TestInv(const InitState::type state)
+bool CTestGateTdg::TestInv()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -56,7 +56,7 @@ bool CTestGateTdg::TestInv(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test Tdg inverse state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test Tdg inverse 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -129,7 +129,5 @@ bool CTestGateTdg::TestInv(const InitState::type state)
 
 TEST_F(CTestGateTdg, TestInv)
 {
-	EXPECT_TRUE(TestInv(InitState::type::Zero));
-    EXPECT_TRUE(TestInv(InitState::type::Plus));
-    EXPECT_TRUE(TestInv(InitState::type::Classical));
+	EXPECT_TRUE(TestInv());
 }

@@ -13,7 +13,7 @@ public:
 	virtual ~CTestGateSdg();
 
 public:
-	bool TestInv(const InitState::type state);
+	bool TestInv();
 };
 
 #endif

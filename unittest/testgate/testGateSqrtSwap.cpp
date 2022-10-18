@@ -28,7 +28,7 @@ Cmd(gate=SqrtSwap, targets=[0, 1], controls=[], rotation=[], desc=sqrtswap q[ 0 
 test SqrtSwap inverse state:Classical 初始振幅:[[1, 0],[0, 0],[0, 0],[0, 0],] 应用门后的振幅:[[1, 0],[0, 0],[0, 0],[0, 0],] 逆操作后的振幅:[[1, 0],[0, 0],[0, 0],[0, 0],] 
 测试结论：不确定
 */
-bool CTestGateSqrtSwap::TestInv(const InitState::type state)
+bool CTestGateSqrtSwap::TestInv()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -41,7 +41,7 @@ bool CTestGateSqrtSwap::TestInv(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test SqrtSwap inverse state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test SqrtSwap inverse 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -114,7 +114,5 @@ bool CTestGateSqrtSwap::TestInv(const InitState::type state)
 
 TEST_F(CTestGateSqrtSwap, TestInv)
 {
-	EXPECT_TRUE(TestInv(InitState::type::Zero));
-    EXPECT_TRUE(TestInv(InitState::type::Plus));
-    EXPECT_TRUE(TestInv(InitState::type::Classical));
+	EXPECT_TRUE(TestInv());
 }

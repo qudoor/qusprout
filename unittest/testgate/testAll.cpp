@@ -19,7 +19,7 @@ CTestAll::~CTestAll()
 
 }
 
-bool CTestAll::TestInv(const InitState::type state)
+bool CTestAll::TestInv()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -44,7 +44,7 @@ bool CTestAll::TestInv(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test reset 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -73,7 +73,5 @@ bool CTestAll::TestInv(const InitState::type state)
 
 TEST_F(CTestAll, TestInv)
 {
-	EXPECT_TRUE(TestInv(InitState::type::Zero));
-    //EXPECT_TRUE(TestInv(InitState::type::Plus));
-    //EXPECT_TRUE(TestInv(InitState::type::Classical));
+	EXPECT_TRUE(TestInv());
 }

@@ -29,7 +29,7 @@ Cmd(gate=U3, targets=[0], controls=[], rotation=[3.1415926535897931, 1.570796326
 test U3 inverse state:Classical 初始振幅:[[1, 0],[0, 0],] 应用门后的振幅:[[0, 0],[0, 1],] 逆操作后的振幅:[[1, 0],[0, 0],] 
 测试结论：通过
 */
-bool CTestGateU3::TestInv(const InitState::type state)
+bool CTestGateU3::TestInv()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -42,7 +42,7 @@ bool CTestGateU3::TestInv(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test U3 inverse state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test U3 inverse 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -119,7 +119,7 @@ bool CTestGateU3::TestInv(const InitState::type state)
     return true;
 }
 
-bool CTestGateU3::VerifyXAndU3(const InitState::type state)
+bool CTestGateU3::VerifyXAndU3()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -132,7 +132,7 @@ bool CTestGateU3::VerifyXAndU3(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test X<===>U3 inverse state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test X<===>U3 inverse 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -221,7 +221,7 @@ bool CTestGateU3::VerifyXAndU3(const InitState::type state)
     return true;
 }
 
-bool CTestGateU3::VerifyRXAndU3(const InitState::type state)
+bool CTestGateU3::VerifyRXAndU3()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -234,7 +234,7 @@ bool CTestGateU3::VerifyRXAndU3(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test RX<===>U3 inverse state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test RX<===>U3 inverse 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -323,21 +323,15 @@ bool CTestGateU3::VerifyRXAndU3(const InitState::type state)
 
 TEST_F(CTestGateU3, TestInv)
 {
-	EXPECT_TRUE(TestInv(InitState::type::Zero));
-    EXPECT_TRUE(TestInv(InitState::type::Plus));
-    EXPECT_TRUE(TestInv(InitState::type::Classical));
+	EXPECT_TRUE(TestInv());
 }
 
 TEST_F(CTestGateU3, VerifyXAndU3)
 {
-	EXPECT_TRUE(VerifyXAndU3(InitState::type::Zero));
-    EXPECT_TRUE(VerifyXAndU3(InitState::type::Plus));
-    EXPECT_TRUE(VerifyXAndU3(InitState::type::Classical));
+	EXPECT_TRUE(VerifyXAndU3());
 }
 
 TEST_F(CTestGateU3, VerifyRXAndU3)
 {
-	EXPECT_TRUE(VerifyRXAndU3(InitState::type::Zero));
-    EXPECT_TRUE(VerifyRXAndU3(InitState::type::Plus));
-    EXPECT_TRUE(VerifyRXAndU3(InitState::type::Classical));
+	EXPECT_TRUE(VerifyRXAndU3());
 }

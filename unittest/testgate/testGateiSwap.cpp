@@ -29,7 +29,7 @@ Cmd(gate=iSwap, targets=[0, 1], controls=[], rotation=[1.5707963267948966], desc
 test iSwap inverse state:Classical 初始振幅:[[0.5, 0],[0.5, 0],[0.5, 0],[0.5, 0],] 应用门后的振幅:[[0.5, 0],[0, -0.5],[0, -0.5],[0.5, 0],] 逆操作后的振幅:[[0.5, 0],[0.5, 0],[0.5, 0],[0.5, 0],] 
 测试结论：通过
 */
-bool CTestGateiSwap::TestInv(const InitState::type state)
+bool CTestGateiSwap::TestInv()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -54,7 +54,7 @@ bool CTestGateiSwap::TestInv(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test iSwap inverse state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test iSwap inverse 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -129,7 +129,5 @@ bool CTestGateiSwap::TestInv(const InitState::type state)
 
 TEST_F(CTestGateiSwap, TestInv)
 {
-	EXPECT_TRUE(TestInv(InitState::type::Zero));
-    EXPECT_TRUE(TestInv(InitState::type::Plus));
-    EXPECT_TRUE(TestInv(InitState::type::Classical));
+	EXPECT_TRUE(TestInv());
 }

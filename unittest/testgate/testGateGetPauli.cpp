@@ -80,7 +80,7 @@ CTestGateGetPauli::~CTestGateGetPauli()
 
 }
 
-bool CTestGateGetPauli::TestInv(const InitState::type state)
+bool CTestGateGetPauli::TestInv()
 {
     std::ostringstream os("");
     std::ostringstream osprint("");
@@ -105,7 +105,7 @@ bool CTestGateGetPauli::TestInv(const InitState::type state)
 
     std::vector<std::string> initmatrix;
     handle.getAllState(initmatrix);
-    osprint << "test GetPauli inverse state:" << to_string(state) << " 初始振幅:[";
+    osprint << "test GetPauli inverse 初始振幅:[";
     for (auto temp : initmatrix)
     {
         osprint << "[" << temp << "],";
@@ -142,7 +142,5 @@ bool CTestGateGetPauli::TestInv(const InitState::type state)
 
 TEST_F(CTestGateGetPauli, TestInv)
 {
-	EXPECT_TRUE(TestInv(InitState::type::Zero));
-    //EXPECT_TRUE(TestInv(InitState::type::Plus));
-    //EXPECT_TRUE(TestInv(InitState::type::Classical));
+	EXPECT_TRUE(TestInv());
 }

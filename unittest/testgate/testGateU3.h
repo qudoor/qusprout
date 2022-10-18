@@ -13,9 +13,9 @@ public:
 	virtual ~CTestGateU3();
 
 public:
-	bool TestInv(const InitState::type state);
-	bool VerifyXAndU3(const InitState::type state);
-	bool VerifyRXAndU3(const InitState::type state);
+	bool TestInv();
+	bool VerifyXAndU3();
+	bool VerifyRXAndU3();
 };
 
 #endif
