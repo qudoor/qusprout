@@ -383,7 +383,7 @@ void CmdExecutor::getMeasureResult(const std::vector<int32_t>& qubits, Result& r
 int CmdExecutor::addCustomGateByMatrix(const GateMatrix& matrix)
 {
     int numrows = 1 << matrix.qubits;
-    if (numrows*numrows != matrix.matrix.size())
+    if (numrows*numrows*2 != matrix.matrix.size())
     {
         LOG(ERROR) << "matrix size is invaild(matrixsize:" << matrix.matrix.size() << ",numrows*numrows:" << numrows*numrows << ").";
         return -1;
