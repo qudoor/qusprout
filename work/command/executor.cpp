@@ -229,9 +229,9 @@ void CmdExecutor::apply_Full_QFT() {
     applyFullQFT(m_qureg);
 }
 
-// 执行任务
+//Execute circuit
 void CmdExecutor::run(Result& result, int32_t shots) {
-    // 如果只运行一次，那么在线路发送完成后已经自动运行一次了
+    // The circuit already run once when send
     int run_times = shots - 1;
     while (run_times > 0) {
         m_result.measureSet.clear();
@@ -491,7 +491,7 @@ void CmdExecutor::H(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-       //逆操作和正常操作一�
+        // Nothing to do
     }
 
     hadamard(m_qureg, targetQubit);
@@ -503,7 +503,7 @@ void CmdExecutor::CH(const Cmd& cmd) {
     } 
 
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     double factor = 1 / sqrt(2);
@@ -522,7 +522,7 @@ void CmdExecutor::CH(const Cmd& cmd) {
 }
 
 void CmdExecutor::barrier(const Cmd& cmd) {
-    // barrier在projectq起到分隔命令阻止命令优化的作用，并没有实际含�
+    // The barrier in projectq serves to separate commands and prevent command optimization, but it has no real meaning 
 }
 
 void CmdExecutor::P(const Cmd& cmd) {
@@ -606,7 +606,7 @@ void CmdExecutor::X(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     pauliX(m_qureg, targetQubit);
@@ -619,7 +619,7 @@ void CmdExecutor::Y(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     pauliY(m_qureg, targetQubit);
@@ -632,7 +632,7 @@ void CmdExecutor::Z(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     pauliZ(m_qureg, targetQubit);
@@ -713,7 +713,7 @@ void CmdExecutor::Sdg(const Cmd& cmd) {
         S(temp);
     } else {
         // sgate matrix([[1, 0], [0, 1j]])
-        // 共轭转置：matrix([[1, 0], [0, -1j]])
+        // Conjugate transpose：matrix([[1, 0], [0, -1j]])
         ComplexMatrix2 m = {
             .real = {
                 {1, 0},
@@ -735,7 +735,7 @@ void CmdExecutor::Tdg(const Cmd& cmd) {
         T(temp);
     } else {
         // matrix([[1, 0], [0, cmath.exp(1j * cmath.pi / 4)]])
-        // 共轭转置：matrix([[1, 0], [0, cmath.exp(-1j * cmath.pi / 4)]])
+        // Conjugate transpose：matrix([[1, 0], [0, cmath.exp(-1j * cmath.pi / 4)]])
         ComplexMatrix2 m = {
             .real = {
                 {1, 0},
@@ -1022,7 +1022,7 @@ void CmdExecutor::Swap(const Cmd& cmd) {
     }
 
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     swapGate(m_qureg, cmd.targets[0], cmd.targets[1]);
@@ -1034,7 +1034,7 @@ void CmdExecutor::CSwap(const Cmd& cmd) {
     } 
 
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     ComplexMatrix4 m = {
@@ -1058,7 +1058,7 @@ void CmdExecutor::CSwap(const Cmd& cmd) {
 void CmdExecutor::CNOT(const Cmd& cmd) {
     if (cmd.targets.size() == 1 && cmd.controls.size() == 1) {
         if (cmd.inverse) {
-            //逆操作和正常操作一�
+            // Nothing to do
         }
         controlledNot(m_qureg, cmd.controls[0], cmd.targets[0]);
     } else {
@@ -1067,7 +1067,7 @@ void CmdExecutor::CNOT(const Cmd& cmd) {
         int targs[cmd.targets.size()];
         copy(cmd.targets.begin(), cmd.targets.end(), targs);
         if (cmd.inverse) {
-            //逆操作和正常操作一�
+            // Nothing to do
         }
         multiControlledMultiQubitNot(m_qureg, 
             ctrls, 
@@ -1084,14 +1084,13 @@ void CmdExecutor::CY(const Cmd& cmd) {
     } 
 
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     controlledPauliY(m_qureg, cmd.controls[0], cmd.targets[0]);
 }
 
 void CmdExecutor::CZ(const Cmd& cmd) {
-    // cmd.controls.insert(cmd.controls.cend(), cmd.targets.cbegin(), cmd.targets.cend());
     vector<int32_t> tempCtls;
     tempCtls.assign(cmd.controls.begin(), cmd.controls.end());
     tempCtls.insert(tempCtls.end(), cmd.targets.begin(), cmd.targets.end());
@@ -1099,7 +1098,7 @@ void CmdExecutor::CZ(const Cmd& cmd) {
     copy(tempCtls.begin(), tempCtls.end(), ctrls);
     
     if (cmd.inverse) {
-        //逆操作和正常操作一�
+        // Nothing to do
     }
 
     multiControlledPhaseFlip(m_qureg, 
@@ -1494,7 +1493,7 @@ void CmdExecutor::iSwap(const Cmd& cmd)
 
 void CmdExecutor::id(const Cmd& cmd)
 {
-    // do nothing
+    // Nothing to do
 }
 
 void CmdExecutor::MatrixN(const Cmd& cmd) {
@@ -1507,7 +1506,7 @@ void CmdExecutor::MatrixN(const Cmd& cmd) {
     }
 
     if (cmd.inverse) {
-        //暂时不支�
+        // Not support for now
         LOG(ERROR) << "MatrixN is not support inverse";
         return;
     }
@@ -1543,7 +1542,7 @@ void CmdExecutor::Ph(const Cmd& cmd)
     }
 
     if (cmd.inverse) {
-        //暂时不支�
+        // Not support for now
         LOG(ERROR) << "MatrixN is not support inverse";
         return;
     }
@@ -1615,4 +1614,9 @@ void CmdExecutor::Mat(const Cmd& cmd)
         else
             applyMatrixN(m_qureg, (int*)cmd.targets.data(), cmd.targets.size(), matrixN);
     }
+}
+
+void CmdExecutor::Reset(const Cmd& cmd)
+{
+    resetQubits(cmd.targets);
 }
