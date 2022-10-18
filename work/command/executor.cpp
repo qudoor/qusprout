@@ -66,7 +66,7 @@ map<string, GateFunc> g_gateMap = {
     make_pair<string, GateFunc>("cswap", &CmdExecutor::CSwap),
     make_pair<string, GateFunc>("ph", &CmdExecutor::Ph),
     make_pair<string, GateFunc>("amp", &CmdExecutor::Amp),
-    make_pair<string, GateFunc>("reset", &CmdExecutor::Reset)
+    make_pair<string, GateFunc>("reset", &CmdExecutor::Reset),
     make_pair<string, GateFunc>("matrix", &CmdExecutor::Mat)
 };
 
