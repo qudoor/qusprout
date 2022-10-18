@@ -17,10 +17,10 @@ CTaskTimer::~CTaskTimer()
 void CTaskTimer::start()
 {
     //定时清理任务
-    SINGLETON(CTaskManager)->timerCleanTask();
+    SINGLETON(CTaskManager)->cleanTask();
 }
 
 void CTaskTimer::stop()
 {
-
+    //SINGLETON(CTaskManager)->cleanAllTask();
 }

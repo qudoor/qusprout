@@ -12,8 +12,8 @@ CC = g++
 TARGET_CLIENT = client
 
 #定义OBJ文件变量
-OBJ_THRIFT_DEF = .thrift/ecode.cpp .thrift/qusproutdata.cpp .thrift/qusprout.cpp .thrift/resource.cpp .thrift/statistics.cpp
-OBJS_THRIFT = .thrift/ecode_constants.o .thrift/ecode_types.o .thrift/qusproutdata_types.o .thrift/QuSproutServer.o .thrift/resource_types.o .thrift/statistics_types.o .thrift/MasterServer.o
+OBJ_THRIFT_DEF = .thrift/ecode.cpp .thrift/qusproutdata.cpp .thrift/qusprout.cpp .thrift/resource.cpp
+OBJS_THRIFT = .thrift/ecode_constants.o .thrift/ecode_types.o .thrift/qusproutdata_types.o .thrift/QuSproutServer.o .thrift/resource_types.o .thrift/MasterServer.o
 
 OBJS_CLIENT = client.o
 

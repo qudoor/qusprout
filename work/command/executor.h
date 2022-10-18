@@ -95,13 +95,14 @@ public:
     void MatrixN(const Cmd& cmd);
     void Ph(const Cmd& cmd);
     void Amp(const Cmd& cmd);
+    void Reset(const Cmd& cmd);
     void Mat(const Cmd& cmd);
 
 private:
     Qureg m_qureg;
     Result m_result;
 
-    // 如果要多次运行，则需要对指令做缓存
+    // 如果要多次运行，则需要对指令做缓�
     std::vector<::Circuit> m_circuitCache;
     std::map<std::string, GateMatrix> m_gateMatrix;
 };

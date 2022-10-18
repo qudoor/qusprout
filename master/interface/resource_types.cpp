@@ -13,19 +13,19 @@
 
 
 
-int _kRegTypeValues[] = {
-  RegType::RegType_Cpu_Simulator,
-  RegType::RegType_Gpu_Simulator
+int _kGpuInfoTypeValues[] = {
+  GpuInfoType::GpuType_Default,
+  GpuInfoType::GpuType_Nvidia
 };
-const char* _kRegTypeNames[] = {
-  "RegType_Cpu_Simulator",
-  "RegType_Gpu_Simulator"
+const char* _kGpuInfoTypeNames[] = {
+  "GpuType_Default",
+  "GpuType_Nvidia"
 };
-const std::map<int, const char*> _RegType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(2, _kRegTypeValues, _kRegTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
+const std::map<int, const char*> _GpuInfoType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(2, _kGpuInfoTypeValues, _kGpuInfoTypeNames), ::apache::thrift::TEnumIterator(-1, nullptr, nullptr));
 
-std::ostream& operator<<(std::ostream& out, const RegType::type& val) {
-  std::map<int, const char*>::const_iterator it = _RegType_VALUES_TO_NAMES.find(val);
-  if (it != _RegType_VALUES_TO_NAMES.end()) {
+std::ostream& operator<<(std::ostream& out, const GpuInfoType::type& val) {
+  std::map<int, const char*>::const_iterator it = _GpuInfoType_VALUES_TO_NAMES.find(val);
+  if (it != _GpuInfoType_VALUES_TO_NAMES.end()) {
     out << it->second;
   } else {
     out << static_cast<int>(val);
@@ -33,403 +33,13 @@ std::ostream& operator<<(std::ostream& out, const RegType::type& val) {
   return out;
 }
 
-std::string to_string(const RegType::type& val) {
-  std::map<int, const char*>::const_iterator it = _RegType_VALUES_TO_NAMES.find(val);
-  if (it != _RegType_VALUES_TO_NAMES.end()) {
+std::string to_string(const GpuInfoType::type& val) {
+  std::map<int, const char*>::const_iterator it = _GpuInfoType_VALUES_TO_NAMES.find(val);
+  if (it != _GpuInfoType_VALUES_TO_NAMES.end()) {
     return std::string(it->second);
   } else {
     return std::to_string(static_cast<int>(val));
   }
-}
-
-
-ResourceInfo::~ResourceInfo() noexcept {
-}
-
-
-void ResourceInfo::__set_total_cpu(const int64_t val) {
-  this->total_cpu = val;
-}
-
-void ResourceInfo::__set_free_cpu(const int64_t val) {
-  this->free_cpu = val;
-}
-
-void ResourceInfo::__set_total_memory(const int64_t val) {
-  this->total_memory = val;
-}
-
-void ResourceInfo::__set_free_memory(const int64_t val) {
-  this->free_memory = val;
-}
-
-void ResourceInfo::__set_create_time(const int64_t val) {
-  this->create_time = val;
-}
-std::ostream& operator<<(std::ostream& out, const ResourceInfo& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t ResourceInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_total_cpu = false;
-  bool isset_free_cpu = false;
-  bool isset_total_memory = false;
-  bool isset_free_memory = false;
-  bool isset_create_time = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->total_cpu);
-          isset_total_cpu = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 2:
-        if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->free_cpu);
-          isset_free_cpu = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 3:
-        if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->total_memory);
-          isset_total_memory = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 4:
-        if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->free_memory);
-          isset_free_memory = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 5:
-        if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->create_time);
-          isset_create_time = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_total_cpu)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_free_cpu)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_total_memory)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_free_memory)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_create_time)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t ResourceInfo::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("ResourceInfo");
-
-  xfer += oprot->writeFieldBegin("total_cpu", ::apache::thrift::protocol::T_I64, 1);
-  xfer += oprot->writeI64(this->total_cpu);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("free_cpu", ::apache::thrift::protocol::T_I64, 2);
-  xfer += oprot->writeI64(this->free_cpu);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("total_memory", ::apache::thrift::protocol::T_I64, 3);
-  xfer += oprot->writeI64(this->total_memory);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("free_memory", ::apache::thrift::protocol::T_I64, 4);
-  xfer += oprot->writeI64(this->free_memory);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I64, 5);
-  xfer += oprot->writeI64(this->create_time);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(ResourceInfo &a, ResourceInfo &b) {
-  using ::std::swap;
-  swap(a.total_cpu, b.total_cpu);
-  swap(a.free_cpu, b.free_cpu);
-  swap(a.total_memory, b.total_memory);
-  swap(a.free_memory, b.free_memory);
-  swap(a.create_time, b.create_time);
-}
-
-ResourceInfo::ResourceInfo(const ResourceInfo& other0) noexcept {
-  total_cpu = other0.total_cpu;
-  free_cpu = other0.free_cpu;
-  total_memory = other0.total_memory;
-  free_memory = other0.free_memory;
-  create_time = other0.create_time;
-}
-ResourceInfo& ResourceInfo::operator=(const ResourceInfo& other1) noexcept {
-  total_cpu = other1.total_cpu;
-  free_cpu = other1.free_cpu;
-  total_memory = other1.total_memory;
-  free_memory = other1.free_memory;
-  create_time = other1.create_time;
-  return *this;
-}
-void ResourceInfo::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "ResourceInfo(";
-  out << "total_cpu=" << to_string(total_cpu);
-  out << ", " << "free_cpu=" << to_string(free_cpu);
-  out << ", " << "total_memory=" << to_string(total_memory);
-  out << ", " << "free_memory=" << to_string(free_memory);
-  out << ", " << "create_time=" << to_string(create_time);
-  out << ")";
-}
-
-
-MachineInfo::~MachineInfo() noexcept {
-}
-
-
-void MachineInfo::__set_addr(const std::string& val) {
-  this->addr = val;
-}
-
-void MachineInfo::__set_sys_name(const std::string& val) {
-  this->sys_name = val;
-__isset.sys_name = true;
-}
-
-void MachineInfo::__set_sys_release(const std::string& val) {
-  this->sys_release = val;
-__isset.sys_release = true;
-}
-
-void MachineInfo::__set_sys_version(const std::string& val) {
-  this->sys_version = val;
-__isset.sys_version = true;
-}
-
-void MachineInfo::__set_sys_machine(const std::string& val) {
-  this->sys_machine = val;
-__isset.sys_machine = true;
-}
-
-void MachineInfo::__set_create_time(const int64_t val) {
-  this->create_time = val;
-}
-std::ostream& operator<<(std::ostream& out, const MachineInfo& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t MachineInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_addr = false;
-  bool isset_create_time = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->addr);
-          isset_addr = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 2:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->sys_name);
-          this->__isset.sys_name = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 3:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->sys_release);
-          this->__isset.sys_release = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 4:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->sys_version);
-          this->__isset.sys_version = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 5:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->sys_machine);
-          this->__isset.sys_machine = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 6:
-        if (ftype == ::apache::thrift::protocol::T_I64) {
-          xfer += iprot->readI64(this->create_time);
-          isset_create_time = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_addr)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_create_time)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t MachineInfo::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("MachineInfo");
-
-  xfer += oprot->writeFieldBegin("addr", ::apache::thrift::protocol::T_STRING, 1);
-  xfer += oprot->writeString(this->addr);
-  xfer += oprot->writeFieldEnd();
-
-  if (this->__isset.sys_name) {
-    xfer += oprot->writeFieldBegin("sys_name", ::apache::thrift::protocol::T_STRING, 2);
-    xfer += oprot->writeString(this->sys_name);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.sys_release) {
-    xfer += oprot->writeFieldBegin("sys_release", ::apache::thrift::protocol::T_STRING, 3);
-    xfer += oprot->writeString(this->sys_release);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.sys_version) {
-    xfer += oprot->writeFieldBegin("sys_version", ::apache::thrift::protocol::T_STRING, 4);
-    xfer += oprot->writeString(this->sys_version);
-    xfer += oprot->writeFieldEnd();
-  }
-  if (this->__isset.sys_machine) {
-    xfer += oprot->writeFieldBegin("sys_machine", ::apache::thrift::protocol::T_STRING, 5);
-    xfer += oprot->writeString(this->sys_machine);
-    xfer += oprot->writeFieldEnd();
-  }
-  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I64, 6);
-  xfer += oprot->writeI64(this->create_time);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(MachineInfo &a, MachineInfo &b) {
-  using ::std::swap;
-  swap(a.addr, b.addr);
-  swap(a.sys_name, b.sys_name);
-  swap(a.sys_release, b.sys_release);
-  swap(a.sys_version, b.sys_version);
-  swap(a.sys_machine, b.sys_machine);
-  swap(a.create_time, b.create_time);
-  swap(a.__isset, b.__isset);
-}
-
-MachineInfo::MachineInfo(const MachineInfo& other2) {
-  addr = other2.addr;
-  sys_name = other2.sys_name;
-  sys_release = other2.sys_release;
-  sys_version = other2.sys_version;
-  sys_machine = other2.sys_machine;
-  create_time = other2.create_time;
-  __isset = other2.__isset;
-}
-MachineInfo& MachineInfo::operator=(const MachineInfo& other3) {
-  addr = other3.addr;
-  sys_name = other3.sys_name;
-  sys_release = other3.sys_release;
-  sys_version = other3.sys_version;
-  sys_machine = other3.sys_machine;
-  create_time = other3.create_time;
-  __isset = other3.__isset;
-  return *this;
-}
-void MachineInfo::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "MachineInfo(";
-  out << "addr=" << to_string(addr);
-  out << ", " << "sys_name="; (__isset.sys_name ? (out << to_string(sys_name)) : (out << "<null>"));
-  out << ", " << "sys_release="; (__isset.sys_release ? (out << to_string(sys_release)) : (out << "<null>"));
-  out << ", " << "sys_version="; (__isset.sys_version ? (out << to_string(sys_version)) : (out << "<null>"));
-  out << ", " << "sys_machine="; (__isset.sys_machine ? (out << to_string(sys_machine)) : (out << "<null>"));
-  out << ", " << "create_time=" << to_string(create_time);
-  out << ")";
 }
 
 
@@ -530,13 +140,13 @@ void swap(RpcConnectInfo &a, RpcConnectInfo &b) {
   swap(a.port, b.port);
 }
 
-RpcConnectInfo::RpcConnectInfo(const RpcConnectInfo& other4) {
-  addr = other4.addr;
-  port = other4.port;
+RpcConnectInfo::RpcConnectInfo(const RpcConnectInfo& other0) {
+  addr = other0.addr;
+  port = other0.port;
 }
-RpcConnectInfo& RpcConnectInfo::operator=(const RpcConnectInfo& other5) {
-  addr = other5.addr;
-  port = other5.port;
+RpcConnectInfo& RpcConnectInfo::operator=(const RpcConnectInfo& other1) {
+  addr = other1.addr;
+  port = other1.port;
   return *this;
 }
 void RpcConnectInfo::printTo(std::ostream& out) const {
@@ -548,28 +158,482 @@ void RpcConnectInfo::printTo(std::ostream& out) const {
 }
 
 
+MachineInfo::~MachineInfo() noexcept {
+}
+
+
+void MachineInfo::__set_addr(const std::string& val) {
+  this->addr = val;
+}
+
+void MachineInfo::__set_sys_name(const std::string& val) {
+  this->sys_name = val;
+__isset.sys_name = true;
+}
+
+void MachineInfo::__set_sys_release(const std::string& val) {
+  this->sys_release = val;
+__isset.sys_release = true;
+}
+
+void MachineInfo::__set_sys_version(const std::string& val) {
+  this->sys_version = val;
+__isset.sys_version = true;
+}
+
+void MachineInfo::__set_sys_machine(const std::string& val) {
+  this->sys_machine = val;
+__isset.sys_machine = true;
+}
+std::ostream& operator<<(std::ostream& out, const MachineInfo& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t MachineInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_addr = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->addr);
+          isset_addr = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->sys_name);
+          this->__isset.sys_name = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->sys_release);
+          this->__isset.sys_release = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->sys_version);
+          this->__isset.sys_version = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->sys_machine);
+          this->__isset.sys_machine = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_addr)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t MachineInfo::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("MachineInfo");
+
+  xfer += oprot->writeFieldBegin("addr", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->addr);
+  xfer += oprot->writeFieldEnd();
+
+  if (this->__isset.sys_name) {
+    xfer += oprot->writeFieldBegin("sys_name", ::apache::thrift::protocol::T_STRING, 2);
+    xfer += oprot->writeString(this->sys_name);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.sys_release) {
+    xfer += oprot->writeFieldBegin("sys_release", ::apache::thrift::protocol::T_STRING, 3);
+    xfer += oprot->writeString(this->sys_release);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.sys_version) {
+    xfer += oprot->writeFieldBegin("sys_version", ::apache::thrift::protocol::T_STRING, 4);
+    xfer += oprot->writeString(this->sys_version);
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.sys_machine) {
+    xfer += oprot->writeFieldBegin("sys_machine", ::apache::thrift::protocol::T_STRING, 5);
+    xfer += oprot->writeString(this->sys_machine);
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(MachineInfo &a, MachineInfo &b) {
+  using ::std::swap;
+  swap(a.addr, b.addr);
+  swap(a.sys_name, b.sys_name);
+  swap(a.sys_release, b.sys_release);
+  swap(a.sys_version, b.sys_version);
+  swap(a.sys_machine, b.sys_machine);
+  swap(a.__isset, b.__isset);
+}
+
+MachineInfo::MachineInfo(const MachineInfo& other2) {
+  addr = other2.addr;
+  sys_name = other2.sys_name;
+  sys_release = other2.sys_release;
+  sys_version = other2.sys_version;
+  sys_machine = other2.sys_machine;
+  __isset = other2.__isset;
+}
+MachineInfo& MachineInfo::operator=(const MachineInfo& other3) {
+  addr = other3.addr;
+  sys_name = other3.sys_name;
+  sys_release = other3.sys_release;
+  sys_version = other3.sys_version;
+  sys_machine = other3.sys_machine;
+  __isset = other3.__isset;
+  return *this;
+}
+void MachineInfo::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "MachineInfo(";
+  out << "addr=" << to_string(addr);
+  out << ", " << "sys_name="; (__isset.sys_name ? (out << to_string(sys_name)) : (out << "<null>"));
+  out << ", " << "sys_release="; (__isset.sys_release ? (out << to_string(sys_release)) : (out << "<null>"));
+  out << ", " << "sys_version="; (__isset.sys_version ? (out << to_string(sys_version)) : (out << "<null>"));
+  out << ", " << "sys_machine="; (__isset.sys_machine ? (out << to_string(sys_machine)) : (out << "<null>"));
+  out << ")";
+}
+
+
+ResourceInfo::~ResourceInfo() noexcept {
+}
+
+
+void ResourceInfo::__set_cpu_total_memory(const int64_t val) {
+  this->cpu_total_memory = val;
+}
+
+void ResourceInfo::__set_cpu_free_memory(const int64_t val) {
+  this->cpu_free_memory = val;
+}
+
+void ResourceInfo::__set_gpu_type(const GpuInfoType::type val) {
+  this->gpu_type = val;
+__isset.gpu_type = true;
+}
+
+void ResourceInfo::__set_gpu_total_memory(const int64_t val) {
+  this->gpu_total_memory = val;
+__isset.gpu_total_memory = true;
+}
+std::ostream& operator<<(std::ostream& out, const ResourceInfo& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t ResourceInfo::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_cpu_total_memory = false;
+  bool isset_cpu_free_memory = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->cpu_total_memory);
+          isset_cpu_total_memory = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->cpu_free_memory);
+          isset_cpu_free_memory = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          int32_t ecast4;
+          xfer += iprot->readI32(ecast4);
+          this->gpu_type = static_cast<GpuInfoType::type>(ecast4);
+          this->__isset.gpu_type = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->gpu_total_memory);
+          this->__isset.gpu_total_memory = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_cpu_total_memory)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_cpu_free_memory)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t ResourceInfo::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("ResourceInfo");
+
+  xfer += oprot->writeFieldBegin("cpu_total_memory", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64(this->cpu_total_memory);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("cpu_free_memory", ::apache::thrift::protocol::T_I64, 2);
+  xfer += oprot->writeI64(this->cpu_free_memory);
+  xfer += oprot->writeFieldEnd();
+
+  if (this->__isset.gpu_type) {
+    xfer += oprot->writeFieldBegin("gpu_type", ::apache::thrift::protocol::T_I32, 3);
+    xfer += oprot->writeI32(static_cast<int32_t>(this->gpu_type));
+    xfer += oprot->writeFieldEnd();
+  }
+  if (this->__isset.gpu_total_memory) {
+    xfer += oprot->writeFieldBegin("gpu_total_memory", ::apache::thrift::protocol::T_I64, 4);
+    xfer += oprot->writeI64(this->gpu_total_memory);
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(ResourceInfo &a, ResourceInfo &b) {
+  using ::std::swap;
+  swap(a.cpu_total_memory, b.cpu_total_memory);
+  swap(a.cpu_free_memory, b.cpu_free_memory);
+  swap(a.gpu_type, b.gpu_type);
+  swap(a.gpu_total_memory, b.gpu_total_memory);
+  swap(a.__isset, b.__isset);
+}
+
+ResourceInfo::ResourceInfo(const ResourceInfo& other5) noexcept {
+  cpu_total_memory = other5.cpu_total_memory;
+  cpu_free_memory = other5.cpu_free_memory;
+  gpu_type = other5.gpu_type;
+  gpu_total_memory = other5.gpu_total_memory;
+  __isset = other5.__isset;
+}
+ResourceInfo& ResourceInfo::operator=(const ResourceInfo& other6) noexcept {
+  cpu_total_memory = other6.cpu_total_memory;
+  cpu_free_memory = other6.cpu_free_memory;
+  gpu_type = other6.gpu_type;
+  gpu_total_memory = other6.gpu_total_memory;
+  __isset = other6.__isset;
+  return *this;
+}
+void ResourceInfo::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "ResourceInfo(";
+  out << "cpu_total_memory=" << to_string(cpu_total_memory);
+  out << ", " << "cpu_free_memory=" << to_string(cpu_free_memory);
+  out << ", " << "gpu_type="; (__isset.gpu_type ? (out << to_string(gpu_type)) : (out << "<null>"));
+  out << ", " << "gpu_total_memory="; (__isset.gpu_total_memory ? (out << to_string(gpu_total_memory)) : (out << "<null>"));
+  out << ")";
+}
+
+
+DeviceResourceDetail::~DeviceResourceDetail() noexcept {
+}
+
+
+void DeviceResourceDetail::__set_machine(const MachineInfo& val) {
+  this->machine = val;
+}
+
+void DeviceResourceDetail::__set_resource(const ResourceInfo& val) {
+  this->resource = val;
+}
+std::ostream& operator<<(std::ostream& out, const DeviceResourceDetail& obj)
+{
+  obj.printTo(out);
+  return out;
+}
+
+
+uint32_t DeviceResourceDetail::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_machine = false;
+  bool isset_resource = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->machine.read(iprot);
+          isset_machine = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->resource.read(iprot);
+          isset_resource = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_machine)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_resource)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t DeviceResourceDetail::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
+  xfer += oprot->writeStructBegin("DeviceResourceDetail");
+
+  xfer += oprot->writeFieldBegin("machine", ::apache::thrift::protocol::T_STRUCT, 1);
+  xfer += this->machine.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("resource", ::apache::thrift::protocol::T_STRUCT, 2);
+  xfer += this->resource.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(DeviceResourceDetail &a, DeviceResourceDetail &b) {
+  using ::std::swap;
+  swap(a.machine, b.machine);
+  swap(a.resource, b.resource);
+}
+
+DeviceResourceDetail::DeviceResourceDetail(const DeviceResourceDetail& other7) {
+  machine = other7.machine;
+  resource = other7.resource;
+}
+DeviceResourceDetail& DeviceResourceDetail::operator=(const DeviceResourceDetail& other8) {
+  machine = other8.machine;
+  resource = other8.resource;
+  return *this;
+}
+void DeviceResourceDetail::printTo(std::ostream& out) const {
+  using ::apache::thrift::to_string;
+  out << "DeviceResourceDetail(";
+  out << "machine=" << to_string(machine);
+  out << ", " << "resource=" << to_string(resource);
+  out << ")";
+}
+
+
 RegisterReq::~RegisterReq() noexcept {
 }
 
 
-void RegisterReq::__set_type(const RegType::type val) {
-  this->type = val;
-}
-
-void RegisterReq::__set_seq(const std::string& val) {
-  this->seq = val;
-}
-
-void RegisterReq::__set_machine(const MachineInfo& val) {
-  this->machine = val;
+void RegisterReq::__set_resource_id(const std::string& val) {
+  this->resource_id = val;
 }
 
 void RegisterReq::__set_rpc(const RpcConnectInfo& val) {
   this->rpc = val;
 }
 
-void RegisterReq::__set_resource(const ResourceInfo& val) {
-  this->resource = val;
+void RegisterReq::__set_device(const DeviceResourceDetail& val) {
+  this->device = val;
 }
 std::ostream& operator<<(std::ostream& out, const RegisterReq& obj)
 {
@@ -590,11 +654,9 @@ uint32_t RegisterReq::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   using ::apache::thrift::protocol::TProtocolException;
 
-  bool isset_type = false;
-  bool isset_seq = false;
-  bool isset_machine = false;
+  bool isset_resource_id = false;
   bool isset_rpc = false;
-  bool isset_resource = false;
+  bool isset_device = false;
 
   while (true)
   {
@@ -605,32 +667,14 @@ uint32_t RegisterReq::read(::apache::thrift::protocol::TProtocol* iprot) {
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          int32_t ecast6;
-          xfer += iprot->readI32(ecast6);
-          this->type = static_cast<RegType::type>(ecast6);
-          isset_type = true;
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->resource_id);
+          isset_resource_id = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
       case 2:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->seq);
-          isset_seq = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 3:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->machine.read(iprot);
-          isset_machine = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 4:
         if (ftype == ::apache::thrift::protocol::T_STRUCT) {
           xfer += this->rpc.read(iprot);
           isset_rpc = true;
@@ -638,10 +682,10 @@ uint32_t RegisterReq::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
-      case 5:
+      case 3:
         if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->resource.read(iprot);
-          isset_resource = true;
+          xfer += this->device.read(iprot);
+          isset_device = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -655,15 +699,11 @@ uint32_t RegisterReq::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   xfer += iprot->readStructEnd();
 
-  if (!isset_type)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_seq)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_machine)
+  if (!isset_resource_id)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_rpc)
     throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_resource)
+  if (!isset_device)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -673,24 +713,16 @@ uint32_t RegisterReq::write(::apache::thrift::protocol::TProtocol* oprot) const 
   ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("RegisterReq");
 
-  xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(static_cast<int32_t>(this->type));
+  xfer += oprot->writeFieldBegin("resource_id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->resource_id);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("seq", ::apache::thrift::protocol::T_STRING, 2);
-  xfer += oprot->writeString(this->seq);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("machine", ::apache::thrift::protocol::T_STRUCT, 3);
-  xfer += this->machine.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("rpc", ::apache::thrift::protocol::T_STRUCT, 4);
+  xfer += oprot->writeFieldBegin("rpc", ::apache::thrift::protocol::T_STRUCT, 2);
   xfer += this->rpc.write(oprot);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("resource", ::apache::thrift::protocol::T_STRUCT, 5);
-  xfer += this->resource.write(oprot);
+  xfer += oprot->writeFieldBegin("device", ::apache::thrift::protocol::T_STRUCT, 3);
+  xfer += this->device.write(oprot);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -700,36 +732,28 @@ uint32_t RegisterReq::write(::apache::thrift::protocol::TProtocol* oprot) const 
 
 void swap(RegisterReq &a, RegisterReq &b) {
   using ::std::swap;
-  swap(a.type, b.type);
-  swap(a.seq, b.seq);
-  swap(a.machine, b.machine);
+  swap(a.resource_id, b.resource_id);
   swap(a.rpc, b.rpc);
-  swap(a.resource, b.resource);
+  swap(a.device, b.device);
 }
 
-RegisterReq::RegisterReq(const RegisterReq& other7) {
-  type = other7.type;
-  seq = other7.seq;
-  machine = other7.machine;
-  rpc = other7.rpc;
-  resource = other7.resource;
+RegisterReq::RegisterReq(const RegisterReq& other9) {
+  resource_id = other9.resource_id;
+  rpc = other9.rpc;
+  device = other9.device;
 }
-RegisterReq& RegisterReq::operator=(const RegisterReq& other8) {
-  type = other8.type;
-  seq = other8.seq;
-  machine = other8.machine;
-  rpc = other8.rpc;
-  resource = other8.resource;
+RegisterReq& RegisterReq::operator=(const RegisterReq& other10) {
+  resource_id = other10.resource_id;
+  rpc = other10.rpc;
+  device = other10.device;
   return *this;
 }
 void RegisterReq::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "RegisterReq(";
-  out << "type=" << to_string(type);
-  out << ", " << "seq=" << to_string(seq);
-  out << ", " << "machine=" << to_string(machine);
+  out << "resource_id=" << to_string(resource_id);
   out << ", " << "rpc=" << to_string(rpc);
-  out << ", " << "resource=" << to_string(resource);
+  out << ", " << "device=" << to_string(device);
   out << ")";
 }
 
@@ -811,11 +835,11 @@ void swap(RegisterResp &a, RegisterResp &b) {
   swap(a.base, b.base);
 }
 
-RegisterResp::RegisterResp(const RegisterResp& other9) {
-  base = other9.base;
+RegisterResp::RegisterResp(const RegisterResp& other11) {
+  base = other11.base;
 }
-RegisterResp& RegisterResp::operator=(const RegisterResp& other10) {
-  base = other10.base;
+RegisterResp& RegisterResp::operator=(const RegisterResp& other12) {
+  base = other12.base;
   return *this;
 }
 void RegisterResp::printTo(std::ostream& out) const {
@@ -830,16 +854,8 @@ UnRegisterReq::~UnRegisterReq() noexcept {
 }
 
 
-void UnRegisterReq::__set_type(const RegType::type val) {
-  this->type = val;
-}
-
-void UnRegisterReq::__set_seq(const std::string& val) {
-  this->seq = val;
-}
-
-void UnRegisterReq::__set_machine(const MachineInfo& val) {
-  this->machine = val;
+void UnRegisterReq::__set_resource_id(const std::string& val) {
+  this->resource_id = val;
 }
 std::ostream& operator<<(std::ostream& out, const UnRegisterReq& obj)
 {
@@ -860,9 +876,7 @@ uint32_t UnRegisterReq::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   using ::apache::thrift::protocol::TProtocolException;
 
-  bool isset_type = false;
-  bool isset_seq = false;
-  bool isset_machine = false;
+  bool isset_resource_id = false;
 
   while (true)
   {
@@ -873,27 +887,9 @@ uint32_t UnRegisterReq::read(::apache::thrift::protocol::TProtocol* iprot) {
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          int32_t ecast11;
-          xfer += iprot->readI32(ecast11);
-          this->type = static_cast<RegType::type>(ecast11);
-          isset_type = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 2:
         if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->seq);
-          isset_seq = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 3:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->machine.read(iprot);
-          isset_machine = true;
+          xfer += iprot->readString(this->resource_id);
+          isset_resource_id = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -907,11 +903,7 @@ uint32_t UnRegisterReq::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   xfer += iprot->readStructEnd();
 
-  if (!isset_type)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_seq)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_machine)
+  if (!isset_resource_id)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -921,16 +913,8 @@ uint32_t UnRegisterReq::write(::apache::thrift::protocol::TProtocol* oprot) cons
   ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("UnRegisterReq");
 
-  xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(static_cast<int32_t>(this->type));
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("seq", ::apache::thrift::protocol::T_STRING, 2);
-  xfer += oprot->writeString(this->seq);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("machine", ::apache::thrift::protocol::T_STRUCT, 3);
-  xfer += this->machine.write(oprot);
+  xfer += oprot->writeFieldBegin("resource_id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->resource_id);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -940,28 +924,20 @@ uint32_t UnRegisterReq::write(::apache::thrift::protocol::TProtocol* oprot) cons
 
 void swap(UnRegisterReq &a, UnRegisterReq &b) {
   using ::std::swap;
-  swap(a.type, b.type);
-  swap(a.seq, b.seq);
-  swap(a.machine, b.machine);
+  swap(a.resource_id, b.resource_id);
 }
 
-UnRegisterReq::UnRegisterReq(const UnRegisterReq& other12) {
-  type = other12.type;
-  seq = other12.seq;
-  machine = other12.machine;
+UnRegisterReq::UnRegisterReq(const UnRegisterReq& other13) {
+  resource_id = other13.resource_id;
 }
-UnRegisterReq& UnRegisterReq::operator=(const UnRegisterReq& other13) {
-  type = other13.type;
-  seq = other13.seq;
-  machine = other13.machine;
+UnRegisterReq& UnRegisterReq::operator=(const UnRegisterReq& other14) {
+  resource_id = other14.resource_id;
   return *this;
 }
 void UnRegisterReq::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "UnRegisterReq(";
-  out << "type=" << to_string(type);
-  out << ", " << "seq=" << to_string(seq);
-  out << ", " << "machine=" << to_string(machine);
+  out << "resource_id=" << to_string(resource_id);
   out << ")";
 }
 
@@ -1043,11 +1019,11 @@ void swap(UnRegisterResp &a, UnRegisterResp &b) {
   swap(a.base, b.base);
 }
 
-UnRegisterResp::UnRegisterResp(const UnRegisterResp& other14) {
-  base = other14.base;
-}
-UnRegisterResp& UnRegisterResp::operator=(const UnRegisterResp& other15) {
+UnRegisterResp::UnRegisterResp(const UnRegisterResp& other15) {
   base = other15.base;
+}
+UnRegisterResp& UnRegisterResp::operator=(const UnRegisterResp& other16) {
+  base = other16.base;
   return *this;
 }
 void UnRegisterResp::printTo(std::ostream& out) const {
@@ -1062,16 +1038,17 @@ HeartbeatReq::~HeartbeatReq() noexcept {
 }
 
 
-void HeartbeatReq::__set_type(const RegType::type val) {
-  this->type = val;
+void HeartbeatReq::__set_resource_id(const std::string& val) {
+  this->resource_id = val;
 }
 
-void HeartbeatReq::__set_seq(const std::string& val) {
-  this->seq = val;
+void HeartbeatReq::__set_up_resource(const bool val) {
+  this->up_resource = val;
 }
 
-void HeartbeatReq::__set_machine(const MachineInfo& val) {
-  this->machine = val;
+void HeartbeatReq::__set_device(const DeviceResourceDetail& val) {
+  this->device = val;
+__isset.device = true;
 }
 std::ostream& operator<<(std::ostream& out, const HeartbeatReq& obj)
 {
@@ -1092,9 +1069,8 @@ uint32_t HeartbeatReq::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   using ::apache::thrift::protocol::TProtocolException;
 
-  bool isset_type = false;
-  bool isset_seq = false;
-  bool isset_machine = false;
+  bool isset_resource_id = false;
+  bool isset_up_resource = false;
 
   while (true)
   {
@@ -1105,27 +1081,25 @@ uint32_t HeartbeatReq::read(::apache::thrift::protocol::TProtocol* iprot) {
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          int32_t ecast16;
-          xfer += iprot->readI32(ecast16);
-          this->type = static_cast<RegType::type>(ecast16);
-          isset_type = true;
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->resource_id);
+          isset_resource_id = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
       case 2:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->seq);
-          isset_seq = true;
+        if (ftype == ::apache::thrift::protocol::T_BOOL) {
+          xfer += iprot->readBool(this->up_resource);
+          isset_up_resource = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
       case 3:
         if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->machine.read(iprot);
-          isset_machine = true;
+          xfer += this->device.read(iprot);
+          this->__isset.device = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -1139,11 +1113,9 @@ uint32_t HeartbeatReq::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   xfer += iprot->readStructEnd();
 
-  if (!isset_type)
+  if (!isset_resource_id)
     throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_seq)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_machine)
+  if (!isset_up_resource)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -1153,18 +1125,19 @@ uint32_t HeartbeatReq::write(::apache::thrift::protocol::TProtocol* oprot) const
   ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
   xfer += oprot->writeStructBegin("HeartbeatReq");
 
-  xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(static_cast<int32_t>(this->type));
+  xfer += oprot->writeFieldBegin("resource_id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->resource_id);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("seq", ::apache::thrift::protocol::T_STRING, 2);
-  xfer += oprot->writeString(this->seq);
+  xfer += oprot->writeFieldBegin("up_resource", ::apache::thrift::protocol::T_BOOL, 2);
+  xfer += oprot->writeBool(this->up_resource);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("machine", ::apache::thrift::protocol::T_STRUCT, 3);
-  xfer += this->machine.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
+  if (this->__isset.device) {
+    xfer += oprot->writeFieldBegin("device", ::apache::thrift::protocol::T_STRUCT, 3);
+    xfer += this->device.write(oprot);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -1172,28 +1145,31 @@ uint32_t HeartbeatReq::write(::apache::thrift::protocol::TProtocol* oprot) const
 
 void swap(HeartbeatReq &a, HeartbeatReq &b) {
   using ::std::swap;
-  swap(a.type, b.type);
-  swap(a.seq, b.seq);
-  swap(a.machine, b.machine);
+  swap(a.resource_id, b.resource_id);
+  swap(a.up_resource, b.up_resource);
+  swap(a.device, b.device);
+  swap(a.__isset, b.__isset);
 }
 
 HeartbeatReq::HeartbeatReq(const HeartbeatReq& other17) {
-  type = other17.type;
-  seq = other17.seq;
-  machine = other17.machine;
+  resource_id = other17.resource_id;
+  up_resource = other17.up_resource;
+  device = other17.device;
+  __isset = other17.__isset;
 }
 HeartbeatReq& HeartbeatReq::operator=(const HeartbeatReq& other18) {
-  type = other18.type;
-  seq = other18.seq;
-  machine = other18.machine;
+  resource_id = other18.resource_id;
+  up_resource = other18.up_resource;
+  device = other18.device;
+  __isset = other18.__isset;
   return *this;
 }
 void HeartbeatReq::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "HeartbeatReq(";
-  out << "type=" << to_string(type);
-  out << ", " << "seq=" << to_string(seq);
-  out << ", " << "machine=" << to_string(machine);
+  out << "resource_id=" << to_string(resource_id);
+  out << ", " << "up_resource=" << to_string(up_resource);
+  out << ", " << "device="; (__isset.device ? (out << to_string(device)) : (out << "<null>"));
   out << ")";
 }
 
@@ -1286,722 +1262,6 @@ void HeartbeatResp::printTo(std::ostream& out) const {
   using ::apache::thrift::to_string;
   out << "HeartbeatResp(";
   out << "base=" << to_string(base);
-  out << ")";
-}
-
-
-ReportResourceReq::~ReportResourceReq() noexcept {
-}
-
-
-void ReportResourceReq::__set_type(const RegType::type val) {
-  this->type = val;
-}
-
-void ReportResourceReq::__set_seq(const std::string& val) {
-  this->seq = val;
-}
-
-void ReportResourceReq::__set_machine(const MachineInfo& val) {
-  this->machine = val;
-}
-
-void ReportResourceReq::__set_resource(const ResourceInfo& val) {
-  this->resource = val;
-}
-std::ostream& operator<<(std::ostream& out, const ReportResourceReq& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t ReportResourceReq::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_type = false;
-  bool isset_seq = false;
-  bool isset_machine = false;
-  bool isset_resource = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          int32_t ecast21;
-          xfer += iprot->readI32(ecast21);
-          this->type = static_cast<RegType::type>(ecast21);
-          isset_type = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 2:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->seq);
-          isset_seq = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 3:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->machine.read(iprot);
-          isset_machine = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 4:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->resource.read(iprot);
-          isset_resource = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_type)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_seq)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_machine)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_resource)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t ReportResourceReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("ReportResourceReq");
-
-  xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(static_cast<int32_t>(this->type));
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("seq", ::apache::thrift::protocol::T_STRING, 2);
-  xfer += oprot->writeString(this->seq);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("machine", ::apache::thrift::protocol::T_STRUCT, 3);
-  xfer += this->machine.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("resource", ::apache::thrift::protocol::T_STRUCT, 4);
-  xfer += this->resource.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(ReportResourceReq &a, ReportResourceReq &b) {
-  using ::std::swap;
-  swap(a.type, b.type);
-  swap(a.seq, b.seq);
-  swap(a.machine, b.machine);
-  swap(a.resource, b.resource);
-}
-
-ReportResourceReq::ReportResourceReq(const ReportResourceReq& other22) {
-  type = other22.type;
-  seq = other22.seq;
-  machine = other22.machine;
-  resource = other22.resource;
-}
-ReportResourceReq& ReportResourceReq::operator=(const ReportResourceReq& other23) {
-  type = other23.type;
-  seq = other23.seq;
-  machine = other23.machine;
-  resource = other23.resource;
-  return *this;
-}
-void ReportResourceReq::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "ReportResourceReq(";
-  out << "type=" << to_string(type);
-  out << ", " << "seq=" << to_string(seq);
-  out << ", " << "machine=" << to_string(machine);
-  out << ", " << "resource=" << to_string(resource);
-  out << ")";
-}
-
-
-ReportResourceResp::~ReportResourceResp() noexcept {
-}
-
-
-void ReportResourceResp::__set_base(const  ::BaseCode& val) {
-  this->base = val;
-}
-std::ostream& operator<<(std::ostream& out, const ReportResourceResp& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t ReportResourceResp::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_base = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->base.read(iprot);
-          isset_base = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_base)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t ReportResourceResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("ReportResourceResp");
-
-  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
-  xfer += this->base.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(ReportResourceResp &a, ReportResourceResp &b) {
-  using ::std::swap;
-  swap(a.base, b.base);
-}
-
-ReportResourceResp::ReportResourceResp(const ReportResourceResp& other24) {
-  base = other24.base;
-}
-ReportResourceResp& ReportResourceResp::operator=(const ReportResourceResp& other25) {
-  base = other25.base;
-  return *this;
-}
-void ReportResourceResp::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "ReportResourceResp(";
-  out << "base=" << to_string(base);
-  out << ")";
-}
-
-
-ReportStatisticsInfoReq::~ReportStatisticsInfoReq() noexcept {
-}
-
-
-void ReportStatisticsInfoReq::__set_seq(const std::string& val) {
-  this->seq = val;
-}
-
-void ReportStatisticsInfoReq::__set_machine(const MachineInfo& val) {
-  this->machine = val;
-}
-
-void ReportStatisticsInfoReq::__set_sis(const  ::StatisticsInfo& val) {
-  this->sis = val;
-}
-std::ostream& operator<<(std::ostream& out, const ReportStatisticsInfoReq& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t ReportStatisticsInfoReq::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_seq = false;
-  bool isset_machine = false;
-  bool isset_sis = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->seq);
-          isset_seq = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 2:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->machine.read(iprot);
-          isset_machine = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 3:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->sis.read(iprot);
-          isset_sis = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_seq)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_machine)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_sis)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t ReportStatisticsInfoReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("ReportStatisticsInfoReq");
-
-  xfer += oprot->writeFieldBegin("seq", ::apache::thrift::protocol::T_STRING, 1);
-  xfer += oprot->writeString(this->seq);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("machine", ::apache::thrift::protocol::T_STRUCT, 2);
-  xfer += this->machine.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("sis", ::apache::thrift::protocol::T_STRUCT, 3);
-  xfer += this->sis.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(ReportStatisticsInfoReq &a, ReportStatisticsInfoReq &b) {
-  using ::std::swap;
-  swap(a.seq, b.seq);
-  swap(a.machine, b.machine);
-  swap(a.sis, b.sis);
-}
-
-ReportStatisticsInfoReq::ReportStatisticsInfoReq(const ReportStatisticsInfoReq& other26) {
-  seq = other26.seq;
-  machine = other26.machine;
-  sis = other26.sis;
-}
-ReportStatisticsInfoReq& ReportStatisticsInfoReq::operator=(const ReportStatisticsInfoReq& other27) {
-  seq = other27.seq;
-  machine = other27.machine;
-  sis = other27.sis;
-  return *this;
-}
-void ReportStatisticsInfoReq::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "ReportStatisticsInfoReq(";
-  out << "seq=" << to_string(seq);
-  out << ", " << "machine=" << to_string(machine);
-  out << ", " << "sis=" << to_string(sis);
-  out << ")";
-}
-
-
-ReportStatisticsInfoResp::~ReportStatisticsInfoResp() noexcept {
-}
-
-
-void ReportStatisticsInfoResp::__set_base(const  ::BaseCode& val) {
-  this->base = val;
-}
-std::ostream& operator<<(std::ostream& out, const ReportStatisticsInfoResp& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t ReportStatisticsInfoResp::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_base = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->base.read(iprot);
-          isset_base = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_base)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t ReportStatisticsInfoResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("ReportStatisticsInfoResp");
-
-  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
-  xfer += this->base.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(ReportStatisticsInfoResp &a, ReportStatisticsInfoResp &b) {
-  using ::std::swap;
-  swap(a.base, b.base);
-}
-
-ReportStatisticsInfoResp::ReportStatisticsInfoResp(const ReportStatisticsInfoResp& other28) {
-  base = other28.base;
-}
-ReportStatisticsInfoResp& ReportStatisticsInfoResp::operator=(const ReportStatisticsInfoResp& other29) {
-  base = other29.base;
-  return *this;
-}
-void ReportStatisticsInfoResp::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "ReportStatisticsInfoResp(";
-  out << "base=" << to_string(base);
-  out << ")";
-}
-
-
-GetStatisticsInfoReq::~GetStatisticsInfoReq() noexcept {
-}
-
-
-void GetStatisticsInfoReq::__set_seq(const std::string& val) {
-  this->seq = val;
-}
-std::ostream& operator<<(std::ostream& out, const GetStatisticsInfoReq& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t GetStatisticsInfoReq::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_seq = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->seq);
-          isset_seq = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_seq)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t GetStatisticsInfoReq::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("GetStatisticsInfoReq");
-
-  xfer += oprot->writeFieldBegin("seq", ::apache::thrift::protocol::T_STRING, 1);
-  xfer += oprot->writeString(this->seq);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(GetStatisticsInfoReq &a, GetStatisticsInfoReq &b) {
-  using ::std::swap;
-  swap(a.seq, b.seq);
-}
-
-GetStatisticsInfoReq::GetStatisticsInfoReq(const GetStatisticsInfoReq& other30) {
-  seq = other30.seq;
-}
-GetStatisticsInfoReq& GetStatisticsInfoReq::operator=(const GetStatisticsInfoReq& other31) {
-  seq = other31.seq;
-  return *this;
-}
-void GetStatisticsInfoReq::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "GetStatisticsInfoReq(";
-  out << "seq=" << to_string(seq);
-  out << ")";
-}
-
-
-GetStatisticsInfoResp::~GetStatisticsInfoResp() noexcept {
-}
-
-
-void GetStatisticsInfoResp::__set_base(const  ::BaseCode& val) {
-  this->base = val;
-}
-
-void GetStatisticsInfoResp::__set_sis_list(const std::map<std::string,  ::StatisticsInfo> & val) {
-  this->sis_list = val;
-}
-std::ostream& operator<<(std::ostream& out, const GetStatisticsInfoResp& obj)
-{
-  obj.printTo(out);
-  return out;
-}
-
-
-uint32_t GetStatisticsInfoResp::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  ::apache::thrift::protocol::TInputRecursionTracker tracker(*iprot);
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-  bool isset_base = false;
-  bool isset_sis_list = false;
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
-          xfer += this->base.read(iprot);
-          isset_base = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 2:
-        if (ftype == ::apache::thrift::protocol::T_MAP) {
-          {
-            this->sis_list.clear();
-            uint32_t _size32;
-            ::apache::thrift::protocol::TType _ktype33;
-            ::apache::thrift::protocol::TType _vtype34;
-            xfer += iprot->readMapBegin(_ktype33, _vtype34, _size32);
-            uint32_t _i36;
-            for (_i36 = 0; _i36 < _size32; ++_i36)
-            {
-              std::string _key37;
-              xfer += iprot->readString(_key37);
-               ::StatisticsInfo& _val38 = this->sis_list[_key37];
-              xfer += _val38.read(iprot);
-            }
-            xfer += iprot->readMapEnd();
-          }
-          isset_sis_list = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  if (!isset_base)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_sis_list)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  return xfer;
-}
-
-uint32_t GetStatisticsInfoResp::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  ::apache::thrift::protocol::TOutputRecursionTracker tracker(*oprot);
-  xfer += oprot->writeStructBegin("GetStatisticsInfoResp");
-
-  xfer += oprot->writeFieldBegin("base", ::apache::thrift::protocol::T_STRUCT, 1);
-  xfer += this->base.write(oprot);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("sis_list", ::apache::thrift::protocol::T_MAP, 2);
-  {
-    xfer += oprot->writeMapBegin(::apache::thrift::protocol::T_STRING, ::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->sis_list.size()));
-    std::map<std::string,  ::StatisticsInfo> ::const_iterator _iter39;
-    for (_iter39 = this->sis_list.begin(); _iter39 != this->sis_list.end(); ++_iter39)
-    {
-      xfer += oprot->writeString(_iter39->first);
-      xfer += _iter39->second.write(oprot);
-    }
-    xfer += oprot->writeMapEnd();
-  }
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-void swap(GetStatisticsInfoResp &a, GetStatisticsInfoResp &b) {
-  using ::std::swap;
-  swap(a.base, b.base);
-  swap(a.sis_list, b.sis_list);
-}
-
-GetStatisticsInfoResp::GetStatisticsInfoResp(const GetStatisticsInfoResp& other40) {
-  base = other40.base;
-  sis_list = other40.sis_list;
-}
-GetStatisticsInfoResp& GetStatisticsInfoResp::operator=(const GetStatisticsInfoResp& other41) {
-  base = other41.base;
-  sis_list = other41.sis_list;
-  return *this;
-}
-void GetStatisticsInfoResp::printTo(std::ostream& out) const {
-  using ::apache::thrift::to_string;
-  out << "GetStatisticsInfoResp(";
-  out << "base=" << to_string(base);
-  out << ", " << "sis_list=" << to_string(sis_list);
   out << ")";
 }
 

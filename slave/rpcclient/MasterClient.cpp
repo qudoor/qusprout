@@ -16,13 +16,6 @@ CMasterClient::~CMasterClient()
     close();
 }
 
-int CMasterClient::init(const std::string& addr, const int port)
-{
-    m_addr = addr;
-    m_port = port;
-    return reInit(false);
-}
-
 void CMasterClient::close()
 {
     if (m_transport != nullptr)
@@ -32,13 +25,12 @@ void CMasterClient::close()
     }
 }
 
-//重新初始化客户端
-int CMasterClient::reInit(const bool isprint)
+//连接客户端
+int CMasterClient::connect()
 {
     try
     {
-        close();
-        std::shared_ptr<TSocket> socket = std::make_shared<TSocket>(m_addr, m_port); 
+        std::shared_ptr<TSocket> socket = std::make_shared<TSocket>(SINGLETON(CConfig)->m_masterAddr, SINGLETON(CConfig)->m_masterPort); 
         socket->setConnTimeout(SINGLETON(CConfig)->m_clientConnTimeout);
         socket->setRecvTimeout(SINGLETON(CConfig)->m_clientSendTimeout);
         socket->setSendTimeout(SINGLETON(CConfig)->m_clientRecvTimeout);
@@ -51,8 +43,7 @@ int CMasterClient::reInit(const bool isprint)
     }
     catch(const TTransportException& e)
     {
-        if (isprint)
-            LOG(ERROR) << "init exception(err:" << e.what() << ").";
+        LOG(ERROR) << "init exception(err:" << e.what() << ").";
         return -1;
     }
     catch(...)
@@ -67,43 +58,23 @@ int CMasterClient::reInit(const bool isprint)
 //处理机器注册接口
 void CMasterClient::registerResource(RegisterResp& resp, const RegisterReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request registerResource(req:" << reqbuf << ").";
+    LOG(INFO) << "request registerResource(req:" << getPrint(req) << ").";
 
-    CALL_WITH_SERVICE(m_client->registerResource(resp, req), req);
-    LOG(INFO) << "response registerResource(seq:" << req.seq << ",resp:" << getPrint(resp) << ").";
+    CALL_WITH_TRY_SERVICE(m_client->registerResource(resp, req), req);
+    LOG(INFO) << "response registerResource(resp:" << getPrint(resp) << ").";
 }
 
 //处理机器注销接口
 void CMasterClient::unRegister(UnRegisterResp& resp, const UnRegisterReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request unRegister(req:" << reqbuf << ").";
+    LOG(INFO) << "request unRegister(req:" << getPrint(req) << ").";
 
-    CALL_WITH_SERVICE(m_client->unRegister(resp, req), req);
-    LOG(INFO) << "response unRegister(seq:" << req.seq << ",resp:" << getPrint(resp) << ").";
+    CALL_WITH_TRY_SERVICE(m_client->unRegister(resp, req), req);
+    LOG(INFO) << "response unRegister(resp:" << getPrint(resp) << ").";
 }
 
 //处理机器心跳接口
 void CMasterClient::heartbeat(HeartbeatResp& resp, const HeartbeatReq& req)
 {
-    CALL_WITH_SERVICE(m_client->heartbeat(resp, req), req);
-}
-
-//处理上报资源接口
-void CMasterClient::reportResource(ReportResourceResp& resp, const ReportResourceReq& req)
-{
-    CALL_WITH_SERVICE(m_client->reportResource(resp, req), req);
-}
-
-//上报统计信息
-void CMasterClient::ReportStatisticsInfo(ReportStatisticsInfoResp& resp, const ReportStatisticsInfoReq& req)
-{
-    CALL_WITH_SERVICE(m_client->ReportStatisticsInfo(resp, req), req);
-}
-
-//获取统计信息
-void CMasterClient::GetStatisticsInfo(GetStatisticsInfoResp& resp, const GetStatisticsInfoReq& req)
-{
-    CALL_WITH_SERVICE(m_client->GetStatisticsInfo(resp, req), req);
+    CALL_WITH_TRY_SERVICE(m_client->heartbeat(resp, req), req);
 }

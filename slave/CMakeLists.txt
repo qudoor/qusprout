@@ -9,7 +9,6 @@ execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cp
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusproutdata.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/qusprout.thrift)
 execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/resource.thrift)
-execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../idl/statistics.thrift)
 if(EXISTS ${PROJECT_SOURCE_DIR}/interface/MasterServer_server.skeleton.cpp)
     execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/interface/MasterServer_server.skeleton.cpp)
 endif()
@@ -49,7 +48,6 @@ file(GLOB SRC_LIST
 	"rpcclient/*.cpp"
 	"rpcserver/*.cpp"
 	"taskmanager/*.cpp"
-	"statistics/*.cpp"
 	"timertask/*.cpp"
 )
 

@@ -18,29 +18,30 @@
 #include <functional>
 #include <memory>
 #include "ecode_types.h"
-#include "statistics_types.h"
 
 
 
 
-struct RegType {
+struct GpuInfoType {
   enum type {
-    RegType_Cpu_Simulator = 0,
-    RegType_Gpu_Simulator = 1
+    GpuType_Default = 0,
+    GpuType_Nvidia = 1
   };
 };
 
-extern const std::map<int, const char*> _RegType_VALUES_TO_NAMES;
+extern const std::map<int, const char*> _GpuInfoType_VALUES_TO_NAMES;
 
-std::ostream& operator<<(std::ostream& out, const RegType::type& val);
+std::ostream& operator<<(std::ostream& out, const GpuInfoType::type& val);
 
-std::string to_string(const RegType::type& val);
+std::string to_string(const GpuInfoType::type& val);
 
-class ResourceInfo;
+class RpcConnectInfo;
 
 class MachineInfo;
 
-class RpcConnectInfo;
+class ResourceInfo;
+
+class DeviceResourceDetail;
 
 class RegisterReq;
 
@@ -53,163 +54,6 @@ class UnRegisterResp;
 class HeartbeatReq;
 
 class HeartbeatResp;
-
-class ReportResourceReq;
-
-class ReportResourceResp;
-
-class ReportStatisticsInfoReq;
-
-class ReportStatisticsInfoResp;
-
-class GetStatisticsInfoReq;
-
-class GetStatisticsInfoResp;
-
-
-class ResourceInfo : public virtual ::apache::thrift::TBase {
- public:
-
-  ResourceInfo(const ResourceInfo&) noexcept;
-  ResourceInfo& operator=(const ResourceInfo&) noexcept;
-  ResourceInfo() noexcept
-               : total_cpu(0),
-                 free_cpu(0),
-                 total_memory(0),
-                 free_memory(0),
-                 create_time(0) {
-  }
-
-  virtual ~ResourceInfo() noexcept;
-  int64_t total_cpu;
-  int64_t free_cpu;
-  int64_t total_memory;
-  int64_t free_memory;
-  int64_t create_time;
-
-  void __set_total_cpu(const int64_t val);
-
-  void __set_free_cpu(const int64_t val);
-
-  void __set_total_memory(const int64_t val);
-
-  void __set_free_memory(const int64_t val);
-
-  void __set_create_time(const int64_t val);
-
-  bool operator == (const ResourceInfo & rhs) const
-  {
-    if (!(total_cpu == rhs.total_cpu))
-      return false;
-    if (!(free_cpu == rhs.free_cpu))
-      return false;
-    if (!(total_memory == rhs.total_memory))
-      return false;
-    if (!(free_memory == rhs.free_memory))
-      return false;
-    if (!(create_time == rhs.create_time))
-      return false;
-    return true;
-  }
-  bool operator != (const ResourceInfo &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const ResourceInfo & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(ResourceInfo &a, ResourceInfo &b);
-
-std::ostream& operator<<(std::ostream& out, const ResourceInfo& obj);
-
-typedef struct _MachineInfo__isset {
-  _MachineInfo__isset() : sys_name(false), sys_release(false), sys_version(false), sys_machine(false) {}
-  bool sys_name :1;
-  bool sys_release :1;
-  bool sys_version :1;
-  bool sys_machine :1;
-} _MachineInfo__isset;
-
-class MachineInfo : public virtual ::apache::thrift::TBase {
- public:
-
-  MachineInfo(const MachineInfo&);
-  MachineInfo& operator=(const MachineInfo&);
-  MachineInfo() noexcept
-              : addr(),
-                sys_name(),
-                sys_release(),
-                sys_version(),
-                sys_machine(),
-                create_time(0) {
-  }
-
-  virtual ~MachineInfo() noexcept;
-  std::string addr;
-  std::string sys_name;
-  std::string sys_release;
-  std::string sys_version;
-  std::string sys_machine;
-  int64_t create_time;
-
-  _MachineInfo__isset __isset;
-
-  void __set_addr(const std::string& val);
-
-  void __set_sys_name(const std::string& val);
-
-  void __set_sys_release(const std::string& val);
-
-  void __set_sys_version(const std::string& val);
-
-  void __set_sys_machine(const std::string& val);
-
-  void __set_create_time(const int64_t val);
-
-  bool operator == (const MachineInfo & rhs) const
-  {
-    if (!(addr == rhs.addr))
-      return false;
-    if (__isset.sys_name != rhs.__isset.sys_name)
-      return false;
-    else if (__isset.sys_name && !(sys_name == rhs.sys_name))
-      return false;
-    if (__isset.sys_release != rhs.__isset.sys_release)
-      return false;
-    else if (__isset.sys_release && !(sys_release == rhs.sys_release))
-      return false;
-    if (__isset.sys_version != rhs.__isset.sys_version)
-      return false;
-    else if (__isset.sys_version && !(sys_version == rhs.sys_version))
-      return false;
-    if (__isset.sys_machine != rhs.__isset.sys_machine)
-      return false;
-    else if (__isset.sys_machine && !(sys_machine == rhs.sys_machine))
-      return false;
-    if (!(create_time == rhs.create_time))
-      return false;
-    return true;
-  }
-  bool operator != (const MachineInfo &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const MachineInfo & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(MachineInfo &a, MachineInfo &b);
-
-std::ostream& operator<<(std::ostream& out, const MachineInfo& obj);
 
 
 class RpcConnectInfo : public virtual ::apache::thrift::TBase {
@@ -254,6 +98,195 @@ void swap(RpcConnectInfo &a, RpcConnectInfo &b);
 
 std::ostream& operator<<(std::ostream& out, const RpcConnectInfo& obj);
 
+typedef struct _MachineInfo__isset {
+  _MachineInfo__isset() : sys_name(false), sys_release(false), sys_version(false), sys_machine(false) {}
+  bool sys_name :1;
+  bool sys_release :1;
+  bool sys_version :1;
+  bool sys_machine :1;
+} _MachineInfo__isset;
+
+class MachineInfo : public virtual ::apache::thrift::TBase {
+ public:
+
+  MachineInfo(const MachineInfo&);
+  MachineInfo& operator=(const MachineInfo&);
+  MachineInfo() noexcept
+              : addr(),
+                sys_name(),
+                sys_release(),
+                sys_version(),
+                sys_machine() {
+  }
+
+  virtual ~MachineInfo() noexcept;
+  std::string addr;
+  std::string sys_name;
+  std::string sys_release;
+  std::string sys_version;
+  std::string sys_machine;
+
+  _MachineInfo__isset __isset;
+
+  void __set_addr(const std::string& val);
+
+  void __set_sys_name(const std::string& val);
+
+  void __set_sys_release(const std::string& val);
+
+  void __set_sys_version(const std::string& val);
+
+  void __set_sys_machine(const std::string& val);
+
+  bool operator == (const MachineInfo & rhs) const
+  {
+    if (!(addr == rhs.addr))
+      return false;
+    if (__isset.sys_name != rhs.__isset.sys_name)
+      return false;
+    else if (__isset.sys_name && !(sys_name == rhs.sys_name))
+      return false;
+    if (__isset.sys_release != rhs.__isset.sys_release)
+      return false;
+    else if (__isset.sys_release && !(sys_release == rhs.sys_release))
+      return false;
+    if (__isset.sys_version != rhs.__isset.sys_version)
+      return false;
+    else if (__isset.sys_version && !(sys_version == rhs.sys_version))
+      return false;
+    if (__isset.sys_machine != rhs.__isset.sys_machine)
+      return false;
+    else if (__isset.sys_machine && !(sys_machine == rhs.sys_machine))
+      return false;
+    return true;
+  }
+  bool operator != (const MachineInfo &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const MachineInfo & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(MachineInfo &a, MachineInfo &b);
+
+std::ostream& operator<<(std::ostream& out, const MachineInfo& obj);
+
+typedef struct _ResourceInfo__isset {
+  _ResourceInfo__isset() : gpu_type(false), gpu_total_memory(false) {}
+  bool gpu_type :1;
+  bool gpu_total_memory :1;
+} _ResourceInfo__isset;
+
+class ResourceInfo : public virtual ::apache::thrift::TBase {
+ public:
+
+  ResourceInfo(const ResourceInfo&) noexcept;
+  ResourceInfo& operator=(const ResourceInfo&) noexcept;
+  ResourceInfo() noexcept
+               : cpu_total_memory(0),
+                 cpu_free_memory(0),
+                 gpu_type(static_cast<GpuInfoType::type>(0)),
+                 gpu_total_memory(0) {
+  }
+
+  virtual ~ResourceInfo() noexcept;
+  int64_t cpu_total_memory;
+  int64_t cpu_free_memory;
+  /**
+   * 
+   * @see GpuInfoType
+   */
+  GpuInfoType::type gpu_type;
+  int64_t gpu_total_memory;
+
+  _ResourceInfo__isset __isset;
+
+  void __set_cpu_total_memory(const int64_t val);
+
+  void __set_cpu_free_memory(const int64_t val);
+
+  void __set_gpu_type(const GpuInfoType::type val);
+
+  void __set_gpu_total_memory(const int64_t val);
+
+  bool operator == (const ResourceInfo & rhs) const
+  {
+    if (!(cpu_total_memory == rhs.cpu_total_memory))
+      return false;
+    if (!(cpu_free_memory == rhs.cpu_free_memory))
+      return false;
+    if (__isset.gpu_type != rhs.__isset.gpu_type)
+      return false;
+    else if (__isset.gpu_type && !(gpu_type == rhs.gpu_type))
+      return false;
+    if (__isset.gpu_total_memory != rhs.__isset.gpu_total_memory)
+      return false;
+    else if (__isset.gpu_total_memory && !(gpu_total_memory == rhs.gpu_total_memory))
+      return false;
+    return true;
+  }
+  bool operator != (const ResourceInfo &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const ResourceInfo & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(ResourceInfo &a, ResourceInfo &b);
+
+std::ostream& operator<<(std::ostream& out, const ResourceInfo& obj);
+
+
+class DeviceResourceDetail : public virtual ::apache::thrift::TBase {
+ public:
+
+  DeviceResourceDetail(const DeviceResourceDetail&);
+  DeviceResourceDetail& operator=(const DeviceResourceDetail&);
+  DeviceResourceDetail() noexcept {
+  }
+
+  virtual ~DeviceResourceDetail() noexcept;
+  MachineInfo machine;
+  ResourceInfo resource;
+
+  void __set_machine(const MachineInfo& val);
+
+  void __set_resource(const ResourceInfo& val);
+
+  bool operator == (const DeviceResourceDetail & rhs) const
+  {
+    if (!(machine == rhs.machine))
+      return false;
+    if (!(resource == rhs.resource))
+      return false;
+    return true;
+  }
+  bool operator != (const DeviceResourceDetail &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const DeviceResourceDetail & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
+
+  virtual void printTo(std::ostream& out) const;
+};
+
+void swap(DeviceResourceDetail &a, DeviceResourceDetail &b);
+
+std::ostream& operator<<(std::ostream& out, const DeviceResourceDetail& obj);
+
 
 class RegisterReq : public virtual ::apache::thrift::TBase {
  public:
@@ -261,42 +294,27 @@ class RegisterReq : public virtual ::apache::thrift::TBase {
   RegisterReq(const RegisterReq&);
   RegisterReq& operator=(const RegisterReq&);
   RegisterReq() noexcept
-              : type(static_cast<RegType::type>(0)),
-                seq() {
+              : resource_id() {
   }
 
   virtual ~RegisterReq() noexcept;
-  /**
-   * 
-   * @see RegType
-   */
-  RegType::type type;
-  std::string seq;
-  MachineInfo machine;
+  std::string resource_id;
   RpcConnectInfo rpc;
-  ResourceInfo resource;
+  DeviceResourceDetail device;
 
-  void __set_type(const RegType::type val);
-
-  void __set_seq(const std::string& val);
-
-  void __set_machine(const MachineInfo& val);
+  void __set_resource_id(const std::string& val);
 
   void __set_rpc(const RpcConnectInfo& val);
 
-  void __set_resource(const ResourceInfo& val);
+  void __set_device(const DeviceResourceDetail& val);
 
   bool operator == (const RegisterReq & rhs) const
   {
-    if (!(type == rhs.type))
-      return false;
-    if (!(seq == rhs.seq))
-      return false;
-    if (!(machine == rhs.machine))
+    if (!(resource_id == rhs.resource_id))
       return false;
     if (!(rpc == rhs.rpc))
       return false;
-    if (!(resource == rhs.resource))
+    if (!(device == rhs.device))
       return false;
     return true;
   }
@@ -359,32 +377,17 @@ class UnRegisterReq : public virtual ::apache::thrift::TBase {
   UnRegisterReq(const UnRegisterReq&);
   UnRegisterReq& operator=(const UnRegisterReq&);
   UnRegisterReq() noexcept
-                : type(static_cast<RegType::type>(0)),
-                  seq() {
+                : resource_id() {
   }
 
   virtual ~UnRegisterReq() noexcept;
-  /**
-   * 
-   * @see RegType
-   */
-  RegType::type type;
-  std::string seq;
-  MachineInfo machine;
+  std::string resource_id;
 
-  void __set_type(const RegType::type val);
-
-  void __set_seq(const std::string& val);
-
-  void __set_machine(const MachineInfo& val);
+  void __set_resource_id(const std::string& val);
 
   bool operator == (const UnRegisterReq & rhs) const
   {
-    if (!(type == rhs.type))
-      return false;
-    if (!(seq == rhs.seq))
-      return false;
-    if (!(machine == rhs.machine))
+    if (!(resource_id == rhs.resource_id))
       return false;
     return true;
   }
@@ -440,6 +443,10 @@ void swap(UnRegisterResp &a, UnRegisterResp &b);
 
 std::ostream& operator<<(std::ostream& out, const UnRegisterResp& obj);
 
+typedef struct _HeartbeatReq__isset {
+  _HeartbeatReq__isset() : device(false) {}
+  bool device :1;
+} _HeartbeatReq__isset;
 
 class HeartbeatReq : public virtual ::apache::thrift::TBase {
  public:
@@ -447,32 +454,32 @@ class HeartbeatReq : public virtual ::apache::thrift::TBase {
   HeartbeatReq(const HeartbeatReq&);
   HeartbeatReq& operator=(const HeartbeatReq&);
   HeartbeatReq() noexcept
-               : type(static_cast<RegType::type>(0)),
-                 seq() {
+               : resource_id(),
+                 up_resource(0) {
   }
 
   virtual ~HeartbeatReq() noexcept;
-  /**
-   * 
-   * @see RegType
-   */
-  RegType::type type;
-  std::string seq;
-  MachineInfo machine;
+  std::string resource_id;
+  bool up_resource;
+  DeviceResourceDetail device;
 
-  void __set_type(const RegType::type val);
+  _HeartbeatReq__isset __isset;
 
-  void __set_seq(const std::string& val);
+  void __set_resource_id(const std::string& val);
 
-  void __set_machine(const MachineInfo& val);
+  void __set_up_resource(const bool val);
+
+  void __set_device(const DeviceResourceDetail& val);
 
   bool operator == (const HeartbeatReq & rhs) const
   {
-    if (!(type == rhs.type))
+    if (!(resource_id == rhs.resource_id))
       return false;
-    if (!(seq == rhs.seq))
+    if (!(up_resource == rhs.up_resource))
       return false;
-    if (!(machine == rhs.machine))
+    if (__isset.device != rhs.__isset.device)
+      return false;
+    else if (__isset.device && !(device == rhs.device))
       return false;
     return true;
   }
@@ -527,260 +534,6 @@ class HeartbeatResp : public virtual ::apache::thrift::TBase {
 void swap(HeartbeatResp &a, HeartbeatResp &b);
 
 std::ostream& operator<<(std::ostream& out, const HeartbeatResp& obj);
-
-
-class ReportResourceReq : public virtual ::apache::thrift::TBase {
- public:
-
-  ReportResourceReq(const ReportResourceReq&);
-  ReportResourceReq& operator=(const ReportResourceReq&);
-  ReportResourceReq() noexcept
-                    : type(static_cast<RegType::type>(0)),
-                      seq() {
-  }
-
-  virtual ~ReportResourceReq() noexcept;
-  /**
-   * 
-   * @see RegType
-   */
-  RegType::type type;
-  std::string seq;
-  MachineInfo machine;
-  ResourceInfo resource;
-
-  void __set_type(const RegType::type val);
-
-  void __set_seq(const std::string& val);
-
-  void __set_machine(const MachineInfo& val);
-
-  void __set_resource(const ResourceInfo& val);
-
-  bool operator == (const ReportResourceReq & rhs) const
-  {
-    if (!(type == rhs.type))
-      return false;
-    if (!(seq == rhs.seq))
-      return false;
-    if (!(machine == rhs.machine))
-      return false;
-    if (!(resource == rhs.resource))
-      return false;
-    return true;
-  }
-  bool operator != (const ReportResourceReq &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const ReportResourceReq & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(ReportResourceReq &a, ReportResourceReq &b);
-
-std::ostream& operator<<(std::ostream& out, const ReportResourceReq& obj);
-
-
-class ReportResourceResp : public virtual ::apache::thrift::TBase {
- public:
-
-  ReportResourceResp(const ReportResourceResp&);
-  ReportResourceResp& operator=(const ReportResourceResp&);
-  ReportResourceResp() noexcept {
-  }
-
-  virtual ~ReportResourceResp() noexcept;
-   ::BaseCode base;
-
-  void __set_base(const  ::BaseCode& val);
-
-  bool operator == (const ReportResourceResp & rhs) const
-  {
-    if (!(base == rhs.base))
-      return false;
-    return true;
-  }
-  bool operator != (const ReportResourceResp &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const ReportResourceResp & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(ReportResourceResp &a, ReportResourceResp &b);
-
-std::ostream& operator<<(std::ostream& out, const ReportResourceResp& obj);
-
-
-class ReportStatisticsInfoReq : public virtual ::apache::thrift::TBase {
- public:
-
-  ReportStatisticsInfoReq(const ReportStatisticsInfoReq&);
-  ReportStatisticsInfoReq& operator=(const ReportStatisticsInfoReq&);
-  ReportStatisticsInfoReq() noexcept
-                          : seq() {
-  }
-
-  virtual ~ReportStatisticsInfoReq() noexcept;
-  std::string seq;
-  MachineInfo machine;
-   ::StatisticsInfo sis;
-
-  void __set_seq(const std::string& val);
-
-  void __set_machine(const MachineInfo& val);
-
-  void __set_sis(const  ::StatisticsInfo& val);
-
-  bool operator == (const ReportStatisticsInfoReq & rhs) const
-  {
-    if (!(seq == rhs.seq))
-      return false;
-    if (!(machine == rhs.machine))
-      return false;
-    if (!(sis == rhs.sis))
-      return false;
-    return true;
-  }
-  bool operator != (const ReportStatisticsInfoReq &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const ReportStatisticsInfoReq & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(ReportStatisticsInfoReq &a, ReportStatisticsInfoReq &b);
-
-std::ostream& operator<<(std::ostream& out, const ReportStatisticsInfoReq& obj);
-
-
-class ReportStatisticsInfoResp : public virtual ::apache::thrift::TBase {
- public:
-
-  ReportStatisticsInfoResp(const ReportStatisticsInfoResp&);
-  ReportStatisticsInfoResp& operator=(const ReportStatisticsInfoResp&);
-  ReportStatisticsInfoResp() noexcept {
-  }
-
-  virtual ~ReportStatisticsInfoResp() noexcept;
-   ::BaseCode base;
-
-  void __set_base(const  ::BaseCode& val);
-
-  bool operator == (const ReportStatisticsInfoResp & rhs) const
-  {
-    if (!(base == rhs.base))
-      return false;
-    return true;
-  }
-  bool operator != (const ReportStatisticsInfoResp &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const ReportStatisticsInfoResp & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(ReportStatisticsInfoResp &a, ReportStatisticsInfoResp &b);
-
-std::ostream& operator<<(std::ostream& out, const ReportStatisticsInfoResp& obj);
-
-
-class GetStatisticsInfoReq : public virtual ::apache::thrift::TBase {
- public:
-
-  GetStatisticsInfoReq(const GetStatisticsInfoReq&);
-  GetStatisticsInfoReq& operator=(const GetStatisticsInfoReq&);
-  GetStatisticsInfoReq() noexcept
-                       : seq() {
-  }
-
-  virtual ~GetStatisticsInfoReq() noexcept;
-  std::string seq;
-
-  void __set_seq(const std::string& val);
-
-  bool operator == (const GetStatisticsInfoReq & rhs) const
-  {
-    if (!(seq == rhs.seq))
-      return false;
-    return true;
-  }
-  bool operator != (const GetStatisticsInfoReq &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const GetStatisticsInfoReq & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(GetStatisticsInfoReq &a, GetStatisticsInfoReq &b);
-
-std::ostream& operator<<(std::ostream& out, const GetStatisticsInfoReq& obj);
-
-
-class GetStatisticsInfoResp : public virtual ::apache::thrift::TBase {
- public:
-
-  GetStatisticsInfoResp(const GetStatisticsInfoResp&);
-  GetStatisticsInfoResp& operator=(const GetStatisticsInfoResp&);
-  GetStatisticsInfoResp() noexcept {
-  }
-
-  virtual ~GetStatisticsInfoResp() noexcept;
-   ::BaseCode base;
-  std::map<std::string,  ::StatisticsInfo>  sis_list;
-
-  void __set_base(const  ::BaseCode& val);
-
-  void __set_sis_list(const std::map<std::string,  ::StatisticsInfo> & val);
-
-  bool operator == (const GetStatisticsInfoResp & rhs) const
-  {
-    if (!(base == rhs.base))
-      return false;
-    if (!(sis_list == rhs.sis_list))
-      return false;
-    return true;
-  }
-  bool operator != (const GetStatisticsInfoResp &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const GetStatisticsInfoResp & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot) override;
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const override;
-
-  virtual void printTo(std::ostream& out) const;
-};
-
-void swap(GetStatisticsInfoResp &a, GetStatisticsInfoResp &b);
-
-std::ostream& operator<<(std::ostream& out, const GetStatisticsInfoResp& obj);
 
 
 

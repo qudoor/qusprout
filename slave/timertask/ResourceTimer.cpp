@@ -16,11 +16,10 @@ CResourceTimer::~CResourceTimer()
 
 void CResourceTimer::start()
 {
-   //定时上报资源
-   SINGLETON(CRegister)->reportResourceToMaster(); 
+   SINGLETON(CRegister)->heartbeatToMaster();
 }
 
 void CResourceTimer::stop()
 {
-
+   SINGLETON(CRegister)->unRegisterToMaster();
 }

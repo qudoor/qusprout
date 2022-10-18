@@ -41,6 +41,7 @@ class QuSproutServerIf {
   virtual void resetQubits( ::ResetQubitsResp& _return, const  ::ResetQubitsReq& req) = 0;
   virtual void getStateOfAllQubits( ::GetStateOfAllQubitsResp& _return, const  ::GetStateOfAllQubitsReq& req) = 0;
   virtual void getProbabilities( ::GetProbabilitiesResp& _return, const  ::GetProbabilitiesReq& req) = 0;
+  virtual void getTaskInfo( ::GetTaskInfoResp& _return, const  ::GetTaskInfoReq& req) = 0;
 };
 
 class QuSproutServerIfFactory {
@@ -125,6 +126,9 @@ class QuSproutServerNull : virtual public QuSproutServerIf {
     return;
   }
   void getProbabilities( ::GetProbabilitiesResp& /* _return */, const  ::GetProbabilitiesReq& /* req */) override {
+    return;
+  }
+  void getTaskInfo( ::GetTaskInfoResp& /* _return */, const  ::GetTaskInfoReq& /* req */) override {
     return;
   }
 };
@@ -2105,6 +2109,110 @@ class QuSproutServer_getProbabilities_presult {
 
 };
 
+typedef struct _QuSproutServer_getTaskInfo_args__isset {
+  _QuSproutServer_getTaskInfo_args__isset() : req(false) {}
+  bool req :1;
+} _QuSproutServer_getTaskInfo_args__isset;
+
+class QuSproutServer_getTaskInfo_args {
+ public:
+
+  QuSproutServer_getTaskInfo_args(const QuSproutServer_getTaskInfo_args&);
+  QuSproutServer_getTaskInfo_args& operator=(const QuSproutServer_getTaskInfo_args&);
+  QuSproutServer_getTaskInfo_args() noexcept {
+  }
+
+  virtual ~QuSproutServer_getTaskInfo_args() noexcept;
+   ::GetTaskInfoReq req;
+
+  _QuSproutServer_getTaskInfo_args__isset __isset;
+
+  void __set_req(const  ::GetTaskInfoReq& val);
+
+  bool operator == (const QuSproutServer_getTaskInfo_args & rhs) const
+  {
+    if (!(req == rhs.req))
+      return false;
+    return true;
+  }
+  bool operator != (const QuSproutServer_getTaskInfo_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const QuSproutServer_getTaskInfo_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class QuSproutServer_getTaskInfo_pargs {
+ public:
+
+
+  virtual ~QuSproutServer_getTaskInfo_pargs() noexcept;
+  const  ::GetTaskInfoReq* req;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _QuSproutServer_getTaskInfo_result__isset {
+  _QuSproutServer_getTaskInfo_result__isset() : success(false) {}
+  bool success :1;
+} _QuSproutServer_getTaskInfo_result__isset;
+
+class QuSproutServer_getTaskInfo_result {
+ public:
+
+  QuSproutServer_getTaskInfo_result(const QuSproutServer_getTaskInfo_result&);
+  QuSproutServer_getTaskInfo_result& operator=(const QuSproutServer_getTaskInfo_result&);
+  QuSproutServer_getTaskInfo_result() noexcept {
+  }
+
+  virtual ~QuSproutServer_getTaskInfo_result() noexcept;
+   ::GetTaskInfoResp success;
+
+  _QuSproutServer_getTaskInfo_result__isset __isset;
+
+  void __set_success(const  ::GetTaskInfoResp& val);
+
+  bool operator == (const QuSproutServer_getTaskInfo_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const QuSproutServer_getTaskInfo_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const QuSproutServer_getTaskInfo_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _QuSproutServer_getTaskInfo_presult__isset {
+  _QuSproutServer_getTaskInfo_presult__isset() : success(false) {}
+  bool success :1;
+} _QuSproutServer_getTaskInfo_presult__isset;
+
+class QuSproutServer_getTaskInfo_presult {
+ public:
+
+
+  virtual ~QuSproutServer_getTaskInfo_presult() noexcept;
+   ::GetTaskInfoResp* success;
+
+  _QuSproutServer_getTaskInfo_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
 class QuSproutServerClient : virtual public QuSproutServerIf {
  public:
   QuSproutServerClient(std::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) {
@@ -2187,6 +2295,9 @@ class QuSproutServerClient : virtual public QuSproutServerIf {
   void getProbabilities( ::GetProbabilitiesResp& _return, const  ::GetProbabilitiesReq& req) override;
   void send_getProbabilities(const  ::GetProbabilitiesReq& req);
   void recv_getProbabilities( ::GetProbabilitiesResp& _return);
+  void getTaskInfo( ::GetTaskInfoResp& _return, const  ::GetTaskInfoReq& req) override;
+  void send_getTaskInfo(const  ::GetTaskInfoReq& req);
+  void recv_getTaskInfo( ::GetTaskInfoResp& _return);
  protected:
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -2221,6 +2332,7 @@ class QuSproutServerProcessor : public ::apache::thrift::TDispatchProcessor {
   void process_resetQubits(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_getStateOfAllQubits(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_getProbabilities(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_getTaskInfo(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   QuSproutServerProcessor(::std::shared_ptr<QuSproutServerIf> iface) :
     iface_(iface) {
@@ -2243,6 +2355,7 @@ class QuSproutServerProcessor : public ::apache::thrift::TDispatchProcessor {
     processMap_["resetQubits"] = &QuSproutServerProcessor::process_resetQubits;
     processMap_["getStateOfAllQubits"] = &QuSproutServerProcessor::process_getStateOfAllQubits;
     processMap_["getProbabilities"] = &QuSproutServerProcessor::process_getProbabilities;
+    processMap_["getTaskInfo"] = &QuSproutServerProcessor::process_getTaskInfo;
   }
 
   virtual ~QuSproutServerProcessor() {}
@@ -2461,6 +2574,16 @@ class QuSproutServerMultiface : virtual public QuSproutServerIf {
     return;
   }
 
+  void getTaskInfo( ::GetTaskInfoResp& _return, const  ::GetTaskInfoReq& req) override {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->getTaskInfo(_return, req);
+    }
+    ifaces_[i]->getTaskInfo(_return, req);
+    return;
+  }
+
 };
 
 // The 'concurrent' client is a thread safe client that correctly handles
@@ -2550,6 +2673,9 @@ class QuSproutServerConcurrentClient : virtual public QuSproutServerIf {
   void getProbabilities( ::GetProbabilitiesResp& _return, const  ::GetProbabilitiesReq& req) override;
   int32_t send_getProbabilities(const  ::GetProbabilitiesReq& req);
   void recv_getProbabilities( ::GetProbabilitiesResp& _return, const int32_t seqid);
+  void getTaskInfo( ::GetTaskInfoResp& _return, const  ::GetTaskInfoReq& req) override;
+  int32_t send_getTaskInfo(const  ::GetTaskInfoReq& req);
+  void recv_getTaskInfo( ::GetTaskInfoResp& _return, const int32_t seqid);
  protected:
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   std::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;

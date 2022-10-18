@@ -66,6 +66,7 @@ map<string, GateFunc> g_gateMap = {
     make_pair<string, GateFunc>("cswap", &CmdExecutor::CSwap),
     make_pair<string, GateFunc>("ph", &CmdExecutor::Ph),
     make_pair<string, GateFunc>("amp", &CmdExecutor::Amp),
+    make_pair<string, GateFunc>("reset", &CmdExecutor::Reset)
     make_pair<string, GateFunc>("matrix", &CmdExecutor::Mat)
 };
 
@@ -384,7 +385,7 @@ void CmdExecutor::getMeasureResult(const std::vector<int32_t>& qubits, Result& r
 int CmdExecutor::addCustomGateByMatrix(const GateMatrix& matrix)
 {
     int numrows = 1 << matrix.qubits;
-    if (numrows*numrows != matrix.matrix.size())
+    if (numrows*numrows*2 != matrix.matrix.size())
     {
         LOG(ERROR) << "matrix size is invaild(matrixsize:" << matrix.matrix.size() << ",numrows*numrows:" << numrows*numrows << ").";
         return -1;
@@ -490,7 +491,7 @@ void CmdExecutor::H(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-       //逆操作和正常操作一样
+       //逆操作和正常操作一�
     }
 
     hadamard(m_qureg, targetQubit);
@@ -502,7 +503,7 @@ void CmdExecutor::CH(const Cmd& cmd) {
     } 
 
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     double factor = 1 / sqrt(2);
@@ -521,7 +522,7 @@ void CmdExecutor::CH(const Cmd& cmd) {
 }
 
 void CmdExecutor::barrier(const Cmd& cmd) {
-    // barrier在projectq起到分隔命令阻止命令优化的作用，并没有实际含�
+    // barrier在projectq起到分隔命令阻止命令优化的作用，并没有实际含�
 }
 
 void CmdExecutor::P(const Cmd& cmd) {
@@ -605,7 +606,7 @@ void CmdExecutor::X(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     pauliX(m_qureg, targetQubit);
@@ -618,7 +619,7 @@ void CmdExecutor::Y(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     pauliY(m_qureg, targetQubit);
@@ -631,7 +632,7 @@ void CmdExecutor::Z(const Cmd& cmd) {
     int targetQubit = cmd.targets[0];
 
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     pauliZ(m_qureg, targetQubit);
@@ -1021,7 +1022,7 @@ void CmdExecutor::Swap(const Cmd& cmd) {
     }
 
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     swapGate(m_qureg, cmd.targets[0], cmd.targets[1]);
@@ -1033,7 +1034,7 @@ void CmdExecutor::CSwap(const Cmd& cmd) {
     } 
 
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     ComplexMatrix4 m = {
@@ -1057,7 +1058,7 @@ void CmdExecutor::CSwap(const Cmd& cmd) {
 void CmdExecutor::CNOT(const Cmd& cmd) {
     if (cmd.targets.size() == 1 && cmd.controls.size() == 1) {
         if (cmd.inverse) {
-            //逆操作和正常操作一样
+            //逆操作和正常操作一�
         }
         controlledNot(m_qureg, cmd.controls[0], cmd.targets[0]);
     } else {
@@ -1066,7 +1067,7 @@ void CmdExecutor::CNOT(const Cmd& cmd) {
         int targs[cmd.targets.size()];
         copy(cmd.targets.begin(), cmd.targets.end(), targs);
         if (cmd.inverse) {
-            //逆操作和正常操作一样
+            //逆操作和正常操作一�
         }
         multiControlledMultiQubitNot(m_qureg, 
             ctrls, 
@@ -1083,7 +1084,7 @@ void CmdExecutor::CY(const Cmd& cmd) {
     } 
 
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     controlledPauliY(m_qureg, cmd.controls[0], cmd.targets[0]);
@@ -1098,7 +1099,7 @@ void CmdExecutor::CZ(const Cmd& cmd) {
     copy(tempCtls.begin(), tempCtls.end(), ctrls);
     
     if (cmd.inverse) {
-        //逆操作和正常操作一样
+        //逆操作和正常操作一�
     }
 
     multiControlledPhaseFlip(m_qureg, 
@@ -1506,7 +1507,7 @@ void CmdExecutor::MatrixN(const Cmd& cmd) {
     }
 
     if (cmd.inverse) {
-        //暂时不支持
+        //暂时不支�
         LOG(ERROR) << "MatrixN is not support inverse";
         return;
     }
@@ -1542,7 +1543,7 @@ void CmdExecutor::Ph(const Cmd& cmd)
     }
 
     if (cmd.inverse) {
-        //暂时不支持
+        //暂时不支�
         LOG(ERROR) << "MatrixN is not support inverse";
         return;
     }

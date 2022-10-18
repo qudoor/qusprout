@@ -19,15 +19,6 @@ public:
 
     //处理机器心跳接口
     void heartbeat(HeartbeatResp& resp, const HeartbeatReq& req);
-
-    //处理上报资源接口
-    void reportResource(ReportResourceResp& resp, const ReportResourceReq& req);
-
-    //上报统计信息
-    void ReportStatisticsInfo(ReportStatisticsInfoResp& resp, const ReportStatisticsInfoReq& req);
-
-    //获取统计信息
-    void GetStatisticsInfo(GetStatisticsInfoResp& resp, const GetStatisticsInfoReq& req);
 };
 
 #endif

@@ -86,6 +86,9 @@ public:
     //获取当前所有可能状态组合的概率
     void getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req);
 
+    //获取任务状态
+    void getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req);
+
 private:
     QS::CmdExecutor m_executor;
     

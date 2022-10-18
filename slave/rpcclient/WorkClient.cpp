@@ -67,8 +67,7 @@ int CWorkClient::reInit(const bool isprint)
 //qubit初始化
 void CWorkClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request initQubits(req:" << reqbuf << ").";
+    LOG(INFO) << "request initQubits(req:" << getPrint(req) << ").";
 
     CALL_WITH_SERVICE(m_client->initQubits(resp, req), req);
     LOG(INFO) << "response initQubits(id:" << req.id << ",resp:" << getPrint(resp) << ").";
@@ -83,8 +82,7 @@ void CWorkClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdR
 //取消任务
 void CWorkClient::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 {
-    std::string reqbuf = getPrint(req);
-    LOG(INFO) << "request cancelCmd(req:" << reqbuf << ").";
+    LOG(INFO) << "request cancelCmd(req:" << getPrint(req) << ").";
 
     CALL_WITH_SERVICE(m_client->cancelCmd(resp, req), req);
     LOG(INFO) << "response cancelCmd(id:" << req.id << ",resp:" << getPrint(resp) << ").";
