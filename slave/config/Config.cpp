@@ -34,9 +34,6 @@ int CConfig::praseConfig(const std::string& configFile)
 
         if (handle["common"]["processName"].IsDefined())
             m_processName = handle["common"]["processName"].as<std::string>();
-
-        if (handle["common"]["statisticsInterval"].IsDefined())
-            m_statisticsInterval = handle["common"]["statisticsInterval"].as<int>();
     }
 
     if (handle["rpc"].IsDefined())
@@ -60,19 +57,10 @@ int CConfig::praseConfig(const std::string& configFile)
             m_taskTimeOutDuration = handle["task"]["taskTimeOutDuration"].as<int>();
     }
 
-    if (handle["resource"].IsDefined())
-    {
-        if (handle["resource"]["cleanResourceInterval"].IsDefined())
-            m_cleanResourceInterval = handle["resource"]["cleanResourceInterval"].as<int>();
-
-        if (handle["resource"]["resourceTimeOutDuration"].IsDefined())
-            m_resourceTimeOutDuration = handle["resource"]["resourceTimeOutDuration"].as<int>();
-    }
-
     if (handle["register"].IsDefined())
     {
-        if (handle["register"]["cleanHeartbeatInterval"].IsDefined())
-            m_cleanHeartbeatInterval = handle["register"]["cleanHeartbeatInterval"].as<int>();
+        if (handle["register"]["masterHeartInterval"].IsDefined())
+            m_masterHeartInterval = handle["register"]["masterHeartInterval"].as<int>();
     }
 
     if (handle["master"].IsDefined())
@@ -143,11 +131,7 @@ std::string CConfig::getPrintStr()
         << ",taskTimeOutDuration:" << m_taskTimeOutDuration
         << "];"
 
-        << "resource[cleanResourceInterval:" << m_cleanResourceInterval
-        << ",resourceTimeOutDuration:" << m_resourceTimeOutDuration
-        << "];"
-
-        << "register[cleanHeartbeatInterval:" << m_cleanHeartbeatInterval
+        << "register[masterHeartInterval:" << m_masterHeartInterval
         << "];"
 
         << "master[masterPort:" << m_masterPort

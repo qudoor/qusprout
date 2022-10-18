@@ -5,7 +5,6 @@ log:
 common:
   verbose: 0
   processName: qusprout-slave
-  statisticsInterval: 60
 rpc:
   listenPort: 9095
   sendTimeout: 0
@@ -13,11 +12,8 @@ rpc:
 task:
   cleanTaskInterval: 150
   taskTimeOutDuration: 300
-resource:
-  cleanResourceInterval: 3
-  resourceTimeOutDuration: 120
 register:
-  cleanHeartbeatInterval: 20
+  masterHeartInterval: 20
 master:
   masterPort: 9092
   masterAddr: 127.0.0.1

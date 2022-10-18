@@ -24,14 +24,6 @@ CTaskManager::~CTaskManager()
 {
 }
 
-//清理所有任务
-void CTaskManager::stop()
-{
-    LOG(INFO) << "begin machine task is exited.";
-    cleanTask(0);
-    LOG(INFO) << "curr machine task is exited.";
-}
-
 void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
     if (req.id.empty() || req.qubits <= 0)
@@ -60,7 +52,7 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
 }
 
-void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req, InitQubitsReq& initInfo)
+void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {
     if (req.id.empty() || (req.final == false && req.circuit.cmds.size() <= 0))
     {
@@ -75,16 +67,15 @@ void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
     {
         //任务不存在
         LOG(ERROR) << "sendCircuitCmd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.sendCircuitCmd(resp, req);
 }
 
-void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req, InitQubitsReq& initInfo)
+void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 {
     if (req.id.empty())
     {
@@ -97,12 +88,9 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req, InitQ
     auto taskhandle = getTask(req.id);
     if (taskhandle == nullptr)
     {
-        //任务不存在
-        LOG(ERROR) << "cancelCmd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     {
         std::lock_guard<std::mutex> guard(taskhandle->mutex);
@@ -115,7 +103,7 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req, InitQ
     }
 }
 
-void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
 {
     if (req.id.empty())
     {
@@ -130,16 +118,15 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req, In
     {
         //任务不存在
         LOG(ERROR) << "getProbAmp task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getProbAmp(resp, req);
 }
 
-void CTaskManager::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req)
 {
     if (req.id.empty())
     {
@@ -154,16 +141,15 @@ void CTaskManager::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfO
     {
         //任务不存在
         LOG(ERROR) << "getProbOfOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getProbOfOutcome(resp, req);
 }
 
-void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req)
 {
     if (req.id.empty())
     {
@@ -178,16 +164,15 @@ void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
     {
         //任务不存在
         LOG(ERROR) << "getProbOfAllOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getProbOfAllOutcome(resp, req);
 }
 
-void CTaskManager::getAllState(GetAllStateResp& resp, const GetAllStateReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
 {
     if (req.id.empty())
     {
@@ -202,16 +187,15 @@ void CTaskManager::getAllState(GetAllStateResp& resp, const GetAllStateReq& req,
     {
         //任务不存在
         LOG(ERROR) << "getAllState task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getAllState(resp, req);
 }
 
-void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req, InitQubitsReq& initInfo)
+void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req)
 {
     if (req.id.empty())
     {
@@ -226,27 +210,15 @@ void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req, InitQubit
     {
         //任务不存在
         LOG(ERROR) << "run task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
-    {
-        CancelCmdResp cancelresp;
-        CancelCmdReq cancelreq;
-        cancelreq.__set_id(req.id);
-        std::lock_guard<std::mutex> guard(taskhandle->mutex);
-        taskhandle->client.run(resp, req);
-        taskhandle->client.cancelCmd(cancelresp, cancelreq);
-    }
-
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        m_taskList.erase(req.id);
-    }
+    std::lock_guard<std::mutex> guard(taskhandle->mutex);
+    taskhandle->client.run(resp, req);
 }
 
-void CTaskManager::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req, InitQubitsReq& initInfo)
+void CTaskManager::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
 {
     if (req.id.empty())
     {
@@ -261,16 +233,15 @@ void CTaskManager::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req, InitQubi
     {
         //任务不存在
         LOG(ERROR) << "applyQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.applyQFT(resp, req);
 }
 
-void CTaskManager::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req, InitQubitsReq& initInfo)
+void CTaskManager::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req)
 {
     if (req.id.empty())
     {
@@ -285,17 +256,16 @@ void CTaskManager::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& r
     {
         //任务不存在
         LOG(ERROR) << "applyFullQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.applyFullQFT(resp, req);
 }
 
 //获取泡利算子乘积的期望值
-void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req)
 {
     if (req.id.empty())
     {
@@ -310,17 +280,16 @@ void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliProd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getExpecPauliProd(resp, req);
 }
 
 //获取泡利算子乘积之和的期望值
-void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req)
 {
     if (req.id.empty())
     {
@@ -335,17 +304,16 @@ void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliSum task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getExpecPauliSum(resp, req);
 }
 
 //获取测量结果
-void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req, InitQubitsReq& initInfo)
+void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
 {
     if (req.id.empty())
     {
@@ -360,17 +328,16 @@ void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
     {
         //任务不存在
         LOG(ERROR) << "measureQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.measureQubits(resp, req);
 }
 
 //注册一些自定义量子门，单次任务有效
-void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req, InitQubitsReq& initInfo)
+void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req)
 {
     if (req.id.empty())
     {
@@ -385,17 +352,16 @@ void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const 
     {
         //任务不存在
         LOG(ERROR) << "addCustomGateByMatrix task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.addCustomGateByMatrix(resp, req);
 }
 
 //添加量子门操作
-void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req, InitQubitsReq& initInfo)
+void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req)
 {
     if (req.id.empty())
     {
@@ -410,17 +376,16 @@ void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq
     {
         //任务不存在
         LOG(ERROR) << "addSubCircuit task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.addSubCircuit(resp, req);
 }
 
 //追加量子比特到当前的量子电路
-void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req, InitQubitsReq& initInfo)
+void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req)
 {
     if (req.id.empty())
     {
@@ -435,17 +400,16 @@ void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& r
     {
         //任务不存在
         LOG(ERROR) << "appendQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.appendQubits(resp, req);
 }
 
 //重置指定的qubits
-void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req, InitQubitsReq& initInfo)
+void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
 {
     if (req.id.empty())
     {
@@ -460,17 +424,16 @@ void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req,
     {
         //任务不存在
         LOG(ERROR) << "resetQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.resetQubits(resp, req);
 }
 
 //获取当前量子状态向量
-void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req)
 {
     if (req.id.empty())
     {
@@ -485,17 +448,16 @@ void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetS
     {
         //任务不存在
         LOG(ERROR) << "getStateOfAllQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getStateOfAllQubits(resp, req);
 }
 
 //获取当前所有可能状态组合的概率
-void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req, InitQubitsReq& initInfo)
+void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req)
 {
     if (req.id.empty())
     {
@@ -510,19 +472,12 @@ void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabi
     {
         //任务不存在
         LOG(ERROR) << "getProbabilities task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::QUROOT_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
     }
-    initInfo = taskhandle->taskinfo;
 
     std::lock_guard<std::mutex> guard(taskhandle->mutex);
     taskhandle->client.getProbabilities(resp, req);
-}
-
-//定时清理资源
-void CTaskManager::timerCleanTask()
-{
-    cleanTask(SINGLETON(CConfig)->m_taskTimeOutDuration);
 }
 
 //开机清理task
@@ -531,30 +486,8 @@ int CTaskManager::killAllTask()
     return  killTask(SINGLETON(CConfig)->m_workBinName);
 }
 
-//获取当前正在运行的任务信息
-void CTaskManager::getCurrTaskInfo(std::vector<SisCurrTaskNum>& currTaskNum)
-{
-    time_t now = time(NULL);
-    std::string hostname = SINGLETON(CRegister)->getHostName();
-    std::lock_guard<std::mutex> guard(m_mutex);
-    auto iter  = m_taskList.begin();
-    for (; iter != m_taskList.end(); ++iter)
-    {
-        SisCurrTaskNum temp;
-        temp.tag.base.hostname = hostname;
-        temp.tag.base.type = iter->second->taskinfo.exec_type;
-        temp.tag.qubits = iter->second->taskinfo.qubits;
-        temp.num += 1;
-        if (now - iter->second->updatetime >= 60)
-        {
-            temp.timeout_num += 1;
-        }
-        currTaskNum.push_back(temp);
-    }
-}
-
 //定时任务清理
-void CTaskManager::cleanTask(const int timeOutDuration)
+void CTaskManager::cleanTask()
 {
     int tasknum = 0;
     CancelCmdResp resp;
@@ -565,9 +498,9 @@ void CTaskManager::cleanTask(const int timeOutDuration)
     auto iter = m_taskList.begin();
     while (iter != m_taskList.end())
     {
-        if (now - iter->second->updatetime >= timeOutDuration)
+        if (now - iter->second->updatetime >= SINGLETON(CConfig)->m_taskTimeOutDuration)
         {
-            LOG(WARNING) << "clear task(taskid:" << iter->first << ",updatetime:" << iter->second->updatetime << ",timeOutDuration:" << timeOutDuration << ").";
+            LOG(WARNING) << "clear task(taskid:" << iter->first << ",updatetime:" << iter->second->updatetime << ",timeOutDuration:" << SINGLETON(CConfig)->m_taskTimeOutDuration << ").";
             req.__set_id(iter->second->taskinfo.id);
             {
                 std::lock_guard<std::mutex> guard(iter->second->mutex);
@@ -583,6 +516,22 @@ void CTaskManager::cleanTask(const int timeOutDuration)
     }
 
     LOG(INFO) << "curr task list(tasknum:" << tasknum << ").";
+}
+
+//清空任务
+void CTaskManager::cleanAllTask()
+{
+    CancelCmdResp resp;
+    CancelCmdReq req;
+    std::lock_guard<std::mutex> guard(m_mutex);
+    auto iter = m_taskList.begin();
+    while (iter != m_taskList.end())
+    {
+        req.__set_id(iter->second->taskinfo.id);
+        std::lock_guard<std::mutex> guard(iter->second->mutex);
+        iter->second->client.cancelCmd(resp, req);
+    }
+    m_taskList.clear();
 }
 
 //查找任务

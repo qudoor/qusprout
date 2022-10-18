@@ -33,14 +33,11 @@ public:
     //任务超时时长，单位：秒
     int m_taskTimeOutDuration{3600};
 
+    //机器资源超时时长，单位：秒
+    int m_resourceTimeOutDuration{30};
+
     //定时清理机器资源的间隔，单位：秒
     int m_cleanResourceInterval{30};
-
-    //机器资源超时时长，单位：秒
-    int m_resourceTimeOutDuration{60};
-
-    //机器心跳间隔，单位：秒
-    int m_resourceHeartInterval{20};
 
     //rpc的地址
     std::string m_listenAddr{""};
@@ -80,6 +77,15 @@ public:
 
     //设备支持的量子门
     std::map<std::string, std::set<std::string>> m_supportGate;
+
+    //提供http的端口
+    int m_listenHttpPort{8001};
+
+    //http线程数
+    int m_httpThreadNum{0};
+
+    //任务清理超时时间，单位：秒
+    std::map<int, int> m_cleanTaskTimeout;
 };
 
 #endif

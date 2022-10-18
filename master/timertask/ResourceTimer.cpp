@@ -16,11 +16,10 @@ CResourceTimer::~CResourceTimer()
 
 void CResourceTimer::start()
 {
-   //定时清理机器资源和清理机器的所有任务
-   SINGLETON(CResourceManager)->timerCleanResource();
+   SINGLETON(CResourceManager)->cleanResource();
 }
 
 void CResourceTimer::stop()
 {
-
+   //SINGLETON(CResourceManager)->cleanAllResource();
 }

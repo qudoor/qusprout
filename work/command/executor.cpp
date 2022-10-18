@@ -64,7 +64,8 @@ map<string, GateFunc> g_gateMap = {
     make_pair<string, GateFunc>("sqrtxdg", &CmdExecutor::SqrtXdg),
     make_pair<string, GateFunc>("csqrtx", &CmdExecutor::CSqrtX),
     make_pair<string, GateFunc>("cswap", &CmdExecutor::CSwap),
-    make_pair<string, GateFunc>("ph", &CmdExecutor::Ph)
+    make_pair<string, GateFunc>("ph", &CmdExecutor::Ph),
+    make_pair<string, GateFunc>("reset", &CmdExecutor::Reset)
 };
 
 inline string toLowerCase(string str) 
@@ -382,7 +383,7 @@ void CmdExecutor::getMeasureResult(const std::vector<int32_t>& qubits, Result& r
 int CmdExecutor::addCustomGateByMatrix(const GateMatrix& matrix)
 {
     int numrows = 1 << matrix.qubits;
-    if (numrows*numrows != matrix.matrix.size())
+    if (numrows*numrows*2 != matrix.matrix.size())
     {
         LOG(ERROR) << "matrix size is invaild(matrixsize:" << matrix.matrix.size() << ",numrows*numrows:" << numrows*numrows << ").";
         return -1;
@@ -1572,4 +1573,9 @@ void CmdExecutor::Ph(const Cmd& cmd)
     applyMatrixN(m_qureg, targs.get(), targsnum, m);
 
     destroyComplexMatrixN(m);
+}
+
+void CmdExecutor::Reset(const Cmd& cmd)
+{
+    resetQubits(cmd.targets);
 }

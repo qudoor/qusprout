@@ -416,3 +416,17 @@ struct GetProbabilitiesResp {
     //以此类推：probabilities[0] 为 '00' 的概率，probabilities[2] 为 '10' 的概率， probabilities[3] 为 '11' 的概率
     2: optional list<double> probabilities
 }
+
+//获取任务状态
+struct GetTaskInfoReq {
+    //任务id
+    1: required string id
+}
+
+struct GetTaskInfoResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //任务状态，0：initial, 1：initialized, 2:queued, 3:running, 4:done, 5:error 
+    2: required i32 state
+}
