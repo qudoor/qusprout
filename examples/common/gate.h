@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 #include <atomic>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <transport/TSocket.h>
 #include <transport/TBufferTransports.h>
 #include <protocol/TBinaryProtocol.h>
@@ -20,6 +23,15 @@ using namespace apache::thrift;
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
 
+//打印rpc的结构
+template <typename T>
+inline std::string getPrint(const T& req)
+{
+    std::stringstream os("");
+    req.printTo(os);
+    return os.str();
+}
+
 class CGate
 {
 public:
@@ -30,11 +42,14 @@ public:
 public:
     bool createPlusState();
     bool getProbAmp(const int index, double& amp);
+    bool run(const int shots, Result& result);
 
 public:
     bool hGate(const std::vector<int>& targets);
     bool mczGate(const std::vector<int>& controls, const std::vector<int>& targets);
     bool xGate(const std::vector<int>& targets);
+    bool cnotGate(const std::vector<int>& controls, const std::vector<int>& targets);
+    bool measureGate(const std::vector<int>& targets);
 
 private:
     bool createQCircuit();
@@ -47,6 +62,7 @@ private:
     std::atomic_long m_index{0};
     std::shared_ptr<QuSproutServerClient> m_client;
     std::shared_ptr<TTransport> m_transport{nullptr};
+    bool m_isrelease{false};
 };
 
 #endif

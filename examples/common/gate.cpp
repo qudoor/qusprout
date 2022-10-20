@@ -1,7 +1,3 @@
-
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <stdlib.h>
 #include <math.h>
 #include <sys/time.h>
@@ -22,15 +18,6 @@ try { \
 if (code != ErrCode::type::COM_SUCCESS) { \
     std::cout << "call " << __func__ << " failed(code:" << code << ",msg:" << msg << ")." << std::endl; \
     return false; \
-}
-
-//打印rpc的结构
-template <typename T>
-inline std::string getPrint(const T& req)
-{
-    std::stringstream os("");
-    req.printTo(os);
-    return os.str();
 }
 
 long long int getCurrMs()
@@ -111,6 +98,20 @@ bool CGate::getProbAmp(const int index, double& amp)
     CALL_WITH_TRY_SERVICE(m_client->getProbAmp(ampresp, ampreq), ampreq);
     ASSERT_CODE(ampresp.base.code, ampresp.base.msg);
     amp = ampresp.amp;
+    return true;
+}
+
+bool CGate::run(const int shots, Result& result)
+{
+    RunCircuitReq runreq;
+    RunCircuitResp runresp;
+    runreq.__set_id(m_taskid);
+    runreq.__set_shots(shots);
+    CALL_WITH_TRY_SERVICE(m_client->run(runresp, runreq), runreq);
+    ASSERT_CODE(runresp.base.code, runresp.base.msg);
+    result.__set_measureSet(runresp.result.measureSet);
+    result.__set_outcomeSet(runresp.result.outcomeSet);
+    m_isrelease = true;
     return true;
 }
 
@@ -212,6 +213,79 @@ bool CGate::xGate(const std::vector<int>& targets)
     return true;
 }
 
+bool CGate::cnotGate(const std::vector<int>& controls, const std::vector<int>& targets)
+{
+    std::ostringstream os(""), osdesc("");
+    SendCircuitCmdReq cmdreq;
+    cmdreq.__set_id(m_taskid);
+    Circuit circuit;
+    {
+        Cmd cmd;
+        cmd.__set_gate("cnot");
+        size_t ctlsize = controls.size();
+        size_t tagsize = targets.size();
+        for (size_t i = 0; i < ctlsize; i++)
+        {
+            cmd.controls.push_back(controls[i]);
+            if (0 == i)
+            {
+                os << "q[" << controls[i] << "]";
+            }
+            else
+            {
+                os << ",q[" << controls[i] << "]";
+            }
+        }
+        for (size_t i = 0; i < tagsize; i++)
+        {
+            cmd.targets.push_back(targets[i]);
+            if (0 == ctlsize && 0 == i)
+            {
+                os << "q[" << targets[i] << "]";
+            }
+            else
+            {
+                os << ",q[" << targets[i] << "]";
+            }
+        }
+        osdesc << "cnot(" << ctlsize << ") " << os.str();
+        cmd.__set_desc(osdesc.str());
+        cmd.__set_inverse(false);
+        circuit.cmds.push_back(cmd);
+    }
+    cmdreq.__set_circuit(circuit);
+    cmdreq.__set_final(false);
+    SendCircuitCmdResp cmdresp;
+    CALL_WITH_TRY_SERVICE(m_client->sendCircuitCmd(cmdresp, cmdreq), cmdreq);
+    ASSERT_CODE(cmdresp.base.code, cmdresp.base.msg);
+    return true;
+}
+
+bool CGate::measureGate(const std::vector<int>& targets)
+{
+    std::ostringstream os("");
+    SendCircuitCmdReq cmdreq;
+    cmdreq.__set_id(m_taskid);
+    Circuit circuit;
+    for (auto target : targets)
+    {
+        Cmd cmd;
+        cmd.__set_gate("measure");
+        cmd.targets.push_back(target);
+        os.str("");
+        os << "measure q[" << target << "]";
+        cmd.__set_desc(os.str());
+        cmd.__set_inverse(false);
+        circuit.cmds.push_back(cmd);
+    }
+    cmdreq.__set_circuit(circuit);
+    cmdreq.__set_final(false);
+    SendCircuitCmdResp cmdresp;
+    CALL_WITH_TRY_SERVICE(m_client->sendCircuitCmd(cmdresp, cmdreq), cmdreq);
+    ASSERT_CODE(cmdresp.base.code, cmdresp.base.msg);
+    return true;
+}
+
 bool CGate::createQCircuit()
 {
     InitQubitsReq initreq;
@@ -227,11 +301,16 @@ bool CGate::createQCircuit()
 
 bool CGate::releaseQCircuit()
 {
+    if (m_isrelease)
+    {
+        return true;
+    }
     CancelCmdReq cancelreq;
     cancelreq.__set_id(m_taskid);
     CancelCmdResp cancelresp;
     CALL_WITH_TRY_SERVICE(m_client->cancelCmd(cancelresp, cancelreq), cancelreq);
     ASSERT_CODE(cancelresp.base.code, cancelresp.base.msg);
+	m_isrelease = true;
     return true;
 }
 
