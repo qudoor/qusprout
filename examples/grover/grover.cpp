@@ -7,6 +7,11 @@
 CGate g_handle;
 const int g_qubitnum = 10;
 
+#define ASSERT_RNT(rnt) \
+if (false == rnt) { \
+    return false; \
+}
+
 bool flip(const int operindexs)
 {
     std::vector<int> targets;
@@ -29,22 +34,13 @@ bool flip(const int operindexs)
         }
     }
     bool rnt = g_handle.xGate(targets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
 
     rnt = g_handle.mczGate(mczcontrols, mcztargets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
     
     rnt = g_handle.xGate(targets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
 
     return true;
 }
@@ -69,34 +65,19 @@ bool image()
     }
 
     bool rnt = g_handle.hGate(targets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
 
     rnt = g_handle.xGate(targets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
 
     rnt = g_handle.mczGate(mczcontrols, mcztargets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
     
     rnt = g_handle.xGate(targets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
 
     rnt = g_handle.hGate(targets);
-    if (false == rnt)
-    {
-        return false;
-    }
+    ASSERT_RNT(rnt);
 
     return true;
 }
@@ -104,16 +85,10 @@ bool image()
 int main(int argc, char** argv)
 {
     bool rnt = g_handle.init(g_qubitnum);
-    if (false == rnt)
-    {
-        return -1;
-    }
+    ASSERT_RNT(rnt);
 
     rnt = g_handle.createPlusState();
-    if (false == rnt)
-    {
-        return -1;
-    }
+    ASSERT_RNT(rnt);
 
     int qubitindexs = (int)(1 << g_qubitnum);
     int count = ceil(M_PI/4 * sqrt(qubitindexs));
@@ -124,23 +99,14 @@ int main(int argc, char** argv)
 
     for (int i = 0; i < count; i++) {
         rnt = flip(operindexs);
-        if (false == rnt)
-        {
-            return -1;
-        }
+        ASSERT_RNT(rnt);
 
         rnt = image();
-        if (false == rnt)
-        {
-            return -1;
-        }
+        ASSERT_RNT(rnt);
         
         double amp = 0.0;
         rnt = g_handle.getProbAmp(operindexs, amp);
-        if (false == rnt)
-        {
-            return -1;
-        }
+        ASSERT_RNT(rnt);
 
         std::cout << "prob of state |"<< operindexs << "> = " << std::setprecision(14) << amp << std::endl;
     }

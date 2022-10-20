@@ -18,6 +18,12 @@ try { \
     return false; \
 }
 
+#define ASSERT_CODE(code, msg) \
+if (code != ErrCode::type::COM_SUCCESS) { \
+    std::cout << "call " << __func__ << " failed(code:" << code << ",msg:" << msg << ")." << std::endl; \
+    return false; \
+}
+
 //打印rpc的结构
 template <typename T>
 inline std::string getPrint(const T& req)
@@ -103,11 +109,7 @@ bool CGate::getProbAmp(const int index, double& amp)
     ampreq.__set_index(index);
     GetProbAmpResp ampresp;
     CALL_WITH_TRY_SERVICE(m_client->getProbAmp(ampresp, ampreq), ampreq);
-    if (ampresp.base.code != ErrCode::type::COM_SUCCESS)
-    {
-        std::cout << "call getProbAmp failed(code:" << ampresp.base.code << ",msg:" << ampresp.base.msg << ")." << std::endl;
-        return false;
-    }
+    ASSERT_CODE(ampresp.base.code, ampresp.base.msg);
     amp = ampresp.amp;
     return true;
 }
@@ -133,11 +135,7 @@ bool CGate::hGate(const std::vector<int>& targets)
     cmdreq.__set_final(false);
     SendCircuitCmdResp cmdresp;
     CALL_WITH_TRY_SERVICE(m_client->sendCircuitCmd(cmdresp, cmdreq), cmdreq);
-    if (cmdresp.base.code != ErrCode::type::COM_SUCCESS)
-    {
-        std::cout << "call hGate failed(code:" << cmdresp.base.code << ",msg:" << cmdresp.base.msg << ")." << std::endl;
-        return false;
-    }
+    ASSERT_CODE(cmdresp.base.code, cmdresp.base.msg);
     return true;
 }
 
@@ -185,11 +183,7 @@ bool CGate::mczGate(const std::vector<int>& controls, const std::vector<int>& ta
     cmdreq.__set_final(false);
     SendCircuitCmdResp cmdresp;
     CALL_WITH_TRY_SERVICE(m_client->sendCircuitCmd(cmdresp, cmdreq), cmdreq);
-    if (cmdresp.base.code != ErrCode::type::COM_SUCCESS)
-    {
-        std::cout << "call mczGate failed(code:" << cmdresp.base.code << ",msg:" << cmdresp.base.msg << ")." << std::endl;
-        return false;
-    }
+    ASSERT_CODE(cmdresp.base.code, cmdresp.base.msg);
     return true;
 }
 
@@ -214,11 +208,7 @@ bool CGate::xGate(const std::vector<int>& targets)
     cmdreq.__set_final(false);
     SendCircuitCmdResp cmdresp;
     CALL_WITH_TRY_SERVICE(m_client->sendCircuitCmd(cmdresp, cmdreq), cmdreq);
-    if (cmdresp.base.code != ErrCode::type::COM_SUCCESS)
-    {
-        std::cout << "call xGate failed(code:" << cmdresp.base.code << ",msg:" << cmdresp.base.msg << ")." << std::endl;
-        return false;
-    }
+    ASSERT_CODE(cmdresp.base.code, cmdresp.base.msg);
     return true;
 }
 
@@ -231,11 +221,7 @@ bool CGate::createQCircuit()
     initreq.__set_exec_type(ExecCmdType::type::ExecTypeCpuSingle);
     InitQubitsResp initresp;
     CALL_WITH_TRY_SERVICE(m_client->initQubits(initresp, initreq), initreq);
-    if (initresp.base.code != ErrCode::type::COM_SUCCESS)
-    {
-        std::cout << "call createQCircuit failed(code:" << initresp.base.code << ",msg:" << initresp.base.msg << ")." << std::endl;
-        return false;
-    }
+    ASSERT_CODE(initresp.base.code, initresp.base.msg);
     return true;
 }
 
@@ -245,11 +231,7 @@ bool CGate::releaseQCircuit()
     cancelreq.__set_id(m_taskid);
     CancelCmdResp cancelresp;
     CALL_WITH_TRY_SERVICE(m_client->cancelCmd(cancelresp, cancelreq), cancelreq);
-    if (cancelresp.base.code != ErrCode::type::COM_SUCCESS)
-    {
-        std::cout << "call releaseQCircuit failed(code:" << cancelresp.base.code << ",msg:" << cancelresp.base.msg << ")." << std::endl;
-        return false;
-    }
+    ASSERT_CODE(cancelresp.base.code, cancelresp.base.msg);
     return true;
 }
 
