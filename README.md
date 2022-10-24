@@ -386,7 +386,814 @@ client->sendCircuitCmd(cmdresp, cmdreq);
 ......
 ```
 
-### 4.11 错误码定义
+### 4.3 重复线路操作
+接口说明：
+1.重复运行sendCircuitCmd添加的所有线路shots次；
+
+2.改接口运行完成后，不能再做其它任何操作，运行完后线路会被释放；
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+|2 |shots  |int  |y  |重复shots次运行整个线路 |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |result  |object   |n  |响应数据 |
+|2.1 |measureSet  |arrary  |n  |数组,测量结果 |
+|2.1.1 |id  |int  |y  |目标比特位 |
+|2.1.2 |value  |int  |y  |测量的值（0或者1） |
+|2.2 |outcomeSet |arrary  |n  |数组，目标出现概率 |
+|2.2.1 |bitstr  |string  |y  |比特位组成的字符串，例如2个qubit时，那么有"00","01","10","11"的4个值 |
+|2.2.2 |count  |int  |y  |目标出现的次数 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//测量结果
+struct MeasureResult {
+    //量子比特
+    1: required i32 id
+
+    //测量结果
+    2: required i32 value
+}
+
+//运行结果
+struct Outcome {
+    //比特位组成的字符串
+    1: required string bitstr
+
+    //出现次数
+    2: required i32 count
+}
+
+//指令结果集
+struct Result {
+    //测量结果
+    1: required list<MeasureResult> measureSet
+
+    //结果集
+    2: required list<Outcome> outcomeSet
+}
+
+//执行任务
+struct RunCircuitReq {
+    //任务id
+    1: required string id
+
+    //运行次数
+    2: required i32 shots
+}
+
+struct RunCircuitResp {
+    //返回码
+    1: required ecode.BaseCode base 
+
+    //返回结果
+    2: optional Result result
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //重复线路操作
+    qusproutdata.RunCircuitResp run(1:qusproutdata.RunCircuitReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+//初始化量子环境
+......
+
+//添加量子指令
+......
+
+//重复线路操作
+RunCircuitReq runreq;
+runreq.__set_id(id);
+runreq.__set_shots(100);
+RunCircuitResp runresp;
+client->run(runresp, runreq);
+```
+
+### 4.4 获取振幅
+接口说明：
+1.获取振幅；
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+|2 |index  |int  |y  |目标索引，取值范围：[0, 2^qubitnum) |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |amp  |double  |y  |目标比特为0的概率的数组 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//获取振幅
+struct GetProbAmpReq {
+    //任务id
+    1: required string id
+
+    //qubit索引
+    2: required i64 index
+}
+
+struct GetProbAmpResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //振幅
+    2: optional double amp
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //获取振幅
+    qusproutdata.GetProbAmpResp getProbAmp(1:qusproutdata.GetProbAmpReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+//初始化量子环境
+......
+
+//添加量子指令
+......
+
+//获取振幅
+GetProbAmpReq ampreq;
+ampreq.__set_id(id);
+ampreq.__set_index(0);
+GetProbAmpResp ampresp;
+client->getProbAmp(ampresp, ampreq);
+
+//释放量子环境
+......
+```
+
+### 4.5 获取概率
+接口说明：
+1.获取概率;
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+|2 |qubit  |int  |y  |目标比特位，取值范围：[0, qubitnum) |
+|3 |outcom  |int  |y  |需要获取0或者1的概率 |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |pro_outcome  |double  |y  |目标比特为0或者1的概率 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//获取当前qubit的概率
+struct GetProbOfOutcomeReq {
+    //任务id
+    1: required string id
+
+    //qubit索引
+    2: required i32 qubit
+
+    //需要获取0或者1的概率
+    3: required i32 outcom
+}
+
+struct GetProbOfOutcomeResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //概率
+    2: optional double pro_outcome
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //获取当前qubit的概率
+    qusproutdata.GetProbOfOutcomeResp getProbOfOutcome(1:qusproutdata.GetProbOfOutcomeReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+//初始化量子环境
+......
+
+//添加量子指令
+......
+
+//获取振幅
+GetProbOfOutcomeReq alloutcomreq;
+alloutcomreq.__set_id(id);
+alloutcomreq.__set_qubit(0);
+alloutcomreq.__set_outcom(0);
+GetProbOfOutcomeResp alloutcomresp;
+client->getProbOfOutcome(alloutcomresp, alloutcomreq);
+
+//释放量子环境
+......
+```
+
+### 4.6 获取组合概率
+接口说明：
+1.获取组合概率;
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+|2 |targets  |int  |y  |目标比特列表，取值范围：[0, qubitnum) |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |pro_outcomes  |arrary-double  |y  |目标比特的组合概率 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//获取组合概率
+struct GetProbOfAllOutcomReq {
+    //任务id
+    1: required string id
+
+    //概率目标列表
+    2: required list<i32> targets
+}
+
+struct GetProbOfAllOutcomResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //概率
+    2: optional list<double> pro_outcomes
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //获取组合概率
+    qusproutdata.GetProbOfAllOutcomResp getProbOfAllOutcome(1:qusproutdata.GetProbOfAllOutcomReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+//初始化量子环境
+......
+
+//添加量子指令
+......
+
+//获取组合概率
+GetProbOfAllOutcomReq alloutcomreq;
+alloutcomreq.__set_id(id);
+std::vector<int32_t> targets;
+for (auto i = 0; i < qubitnum; ++i)
+{
+    targets.push_back(i);
+}
+alloutcomreq.__set_targets(targets);
+GetProbOfAllOutcomResp alloutcomresp;
+client->getProbOfAllOutcome(alloutcomresp, alloutcomreq);
+
+//释放量子环境
+......
+```
+
+### 4.7 获取量子执行状态
+接口说明：
+1.获取量子执行状态;
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |all_state  |arrary-string  |y  |每个状态位的实部和虚部的组成的字符串，格式位：real,imag，数量为2^qubitnum |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//获取所有的计算状态
+struct GetAllStateReq {
+    //任务id
+    1: required string id
+}
+
+struct GetAllStateResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //状态
+    2: optional list<string> all_state
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //获取所有的计算结果
+    qusproutdata.GetAllStateResp getAllState(1:qusproutdata.GetAllStateReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+//初始化量子环境
+......
+
+//添加量子指令
+......
+
+//获取所有的计算结果
+GetAllStateReq statereq;
+statereq.__set_id(id);
+GetAllStateResp stateresp;
+client->getAllState(stateresp, statereq);
+
+//释放量子环境
+......
+```
+
+### 4.8 释放量子环境
+接口说明：
+1.释放量子环境;
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//释放量子环境
+struct CancelCmdReq {
+    //任务id
+    1: required string id
+}
+
+struct CancelCmdResp {
+    //返回码
+    1: required ecode.BaseCode base
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //释放量子环境
+    qusproutdata.CancelCmdResp cancelCmd(1:qusproutdata.CancelCmdReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+//初始化量子环境
+......
+
+//释放量子环境
+CancelCmdReq cancelreq;
+cancelreq.__set_id(id);
+CancelCmdResp cancelresp;
+client->cancelCmd(cancelresp, cancelreq);
+```
+
+### 4.9 获取泡利算子乘积的期望值
+接口说明：
+1.释放量子环境;
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+|2 |pauli_prod  |object   |y  |期望值信息 |
+|2.1 |oper_type  |enum   |y  |泡利算子操作类型 0:I 1:x 2:Y 3:Z |
+|2.2 |target  |iny   |y  |目标比特位，取值范围：[0, qubitnum) |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |expect  |double   |y  |期望值 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//泡利算子操作类型
+enum PauliOperType {
+    POT_PAULI_I = 0, 
+    POT_PAULI_X = 1, 
+    POT_PAULI_Y = 2, 
+    POT_PAULI_Z = 3
+}
+
+struct PauliProdInfo {
+    //泡利算子操作类型
+    1: required PauliOperType oper_type
+
+    //目标比特位
+    2: required i32 target
+}
+
+//获取泡利算子乘积的期望值
+struct GetExpecPauliProdReq {
+    //任务id
+    1: required string id
+
+    //期望值信息
+    2: required list<PauliProdInfo> pauli_prod
+}
+
+struct GetExpecPauliProdResp {
+    //返回码
+    1: required ecode.BaseCode base 
+
+    //期望值
+    2: optional double expect
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //获取泡利算子乘积的期望值
+    qusproutdata.GetExpecPauliProdResp getExpecPauliProd(1:qusproutdata.GetExpecPauliProdReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+const int qubitnum = 3;
+//初始化量子环境
+......
+
+//获取泡利算子乘积的期望值
+GetExpecPauliProdReq pauliprodreq;
+pauliprodreq.__set_id(id);
+std::vector<PauliProdInfo> pauliprod;
+for (auto i = 0; i < qubitnum; ++i)
+{
+    PauliProdInfo temp;
+    temp.__set_target(i);
+    temp.__set_oper_type((PauliOperType::type)(rand() % 4));
+    pauliprod.push_back(temp);
+}
+pauliprodreq.__set_pauli_prod(pauliprod);
+GetExpecPauliProdResp pauliprodresp;
+client->getExpecPauliProd(pauliprodresp, pauliprodreq);
+
+//释放量子环境
+......
+```
+
+### 4.10 获取泡利算子乘积之和的期望值
+接口说明：
+1.释放量子环境;
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+|2.1 |oper_type_list  |enum   |y  |泡利算子操作类型，注意：oper_type_list的数量必须是qubitnum*term_coeff_list的数量 0:I 1:x 2:Y 3:Z |
+|2.2 |term_coeff_list  |iny   |y  |回归系数 |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |expect  |double   |y  |期望值 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//泡利算子操作类型
+enum PauliOperType {
+    POT_PAULI_I = 0, 
+    POT_PAULI_X = 1, 
+    POT_PAULI_Y = 2, 
+    POT_PAULI_Z = 3
+}
+
+//获取泡利算子乘积之和的期望值
+struct GetExpecPauliSumReq {
+    //任务id
+    1: required string id
+
+    //泡利算子操作类型，注意：oper_type_list的数量必须是qubitnum*term_coeff_list的数量
+    2: required list<PauliOperType> oper_type_list
+
+    //回归系数
+    3: required list<double> term_coeff_list
+}
+
+struct GetExpecPauliSumResp {
+    //返回码
+    1: required ecode.BaseCode base 
+
+    //期望值
+    2: optional double expect
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //获取泡利算子乘积之和的期望值
+    qusproutdata.GetExpecPauliSumResp getExpecPauliSum(1:qusproutdata.GetExpecPauliSumReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+const int qubitnum = 3;
+//初始化量子环境
+......
+
+//获取泡利算子乘积之和的期望值
+int termsnum = 1;
+std::vector<PauliOperType::type> oper_type_list;
+std::vector<double> term_coeff_list;
+GetExpecPauliSumReq paulisumreq;
+paulisumreq.__set_id(id);
+for (auto i = 0; i < termsnum*qubitnum; ++i)
+{
+    srand(now + i);
+    oper_type_list.push_back((PauliOperType::type)(rand() % 4));
+
+    double coeff = rand() % 1000;
+    coeff += coeff/100.0;
+    if (rand() % 2 == 0)
+    {
+        coeff = -coeff;
+    }
+    term_coeff_list.push_back(coeff);
+}
+paulisumreq.__set_oper_type_list(oper_type_list);
+paulisumreq.__set_term_coeff_list(term_coeff_list);
+GetExpecPauliSumResp paulisumresp;
+client->getExpecPauliSum(paulisumresp, paulisumreq);
+
+//释放量子环境
+......
+```
+
+### 4.11 获取测量结果
+接口说明：
+1.获取测量结果；
+
+请求说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |id  |string   |y  |任务id，同一任务保持一致 |
+|2 |qubits  |arrary-int  |y  |指定要获取的测量的量子比特位，取值范围：[0, qubitnum) |
+
+响应说明：
+| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
+| ---- | ---- | ---- | ---- | ---- |
+|1 |base  |object   |y  |返回码 |
+|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
+|1.2 |msg  |string   |y  |返回信息描述 |
+|2 |measureSet  |arrary  |n  |数组,测量结果 |
+|2.1 |id  |int  |y  |目标比特位 |
+|2.2 |value  |int  |y  |测量的值（0或者1） |
+|3 |outcomeSet |arrary  |n  |数组，目标出现概率 |
+|3.1 |bitstr  |string  |y  |比特位组成的字符串，例如2个qubit时，那么有"00","01","10","11"的4个值 |
+|3.2 |count  |int  |y  |目标出现的次数 |
+
+请求和响应数据（qusproutdata.thrift）定义：
+```
+//测量结果
+struct MeasureResult {
+    //量子比特
+    1: required i32 id
+
+    //测量结果
+    2: required i32 value
+}
+
+//运行结果
+struct Outcome {
+    //比特位组成的字符串
+    1: required string bitstr
+
+    //出现次数
+    2: required i32 count
+}
+
+//获取测量结果
+struct MeasureQubitsReq {
+    // 任务id。
+    1: required string id
+
+    // 指定要 measure 的 qubits 。
+    2: required list<i32> qubits
+}
+
+struct MeasureQubitsResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //测量结果
+    2: optional list<MeasureResult> results
+
+    //结果集
+    3: required list<Outcome> outcomes
+}
+```
+
+接口文件（qusprout.thrift）定义：
+```
+service QuSproutServer {
+    //获取测量结果
+    qusproutdata.MeasureQubitsResp measureQubits(1:qusproutdata.MeasureQubitsReq req)
+
+}
+```
+
+c++示例：
+```
+//连接QuSprout
+std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
+std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
+std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
+std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
+transport->open();
+std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
+
+std::ostringstream os("");
+os << time(NULL);
+auto id = os.str();
+
+//初始化量子环境
+......
+
+const int qubitnum = 3;
+//添加量子指令
+......
+
+//获取测量结果
+MeasureQubitsReq measurereq;
+measurereq.__set_id(id);
+std::vector<int32_t> measurequbits;
+for (auto i = 0; i < qubitnum; ++i)
+{
+    measurequbits.push_back(i);
+}
+measurereq.__set_qubits(measurequbits);
+MeasureQubitsResp measureresp;
+client->measureQubits(measureresp, measurereq);
+
+//释放量子环境
+......
+```
+
+### 5 错误码定义
 
 | 序号 | 返回码 | 返回码描述 |
 | ---- | ---- | ---- |

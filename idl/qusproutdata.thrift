@@ -4,9 +4,16 @@ include "ecode.thrift"
 
 //执行指令的方式
 enum ExecCmdType {
+    //默认值
     ExecTypeDefault = 0,
+
+    //单cpu执行
     ExecTypeCpuSingle = 1,
+
+    //多cpu的mpi执行
     ExecTypeCpuMpi = 2,
+
+    //单gpu执行（暂时不支持）
     ExecTypeGpuSingle = 3
 }
 
@@ -103,7 +110,7 @@ struct Result {
     2: required list<Outcome> outcomeSet
 }
 
-//任务初始化信息
+//初始化量子环境
 struct InitQubitsReq {
     //任务id
     1: required string id
@@ -117,7 +124,7 @@ struct InitQubitsReq {
     //执行指令的方式
     4: optional ExecCmdType exec_type
 
-    //mpi执行的host列表
+    //执行的host列表
     5: optional list<string> hosts
 }
 
@@ -126,7 +133,7 @@ struct InitQubitsResp {
     1: required ecode.BaseCode base
 }
 
-//发送任务
+//添加量子指令
 struct SendCircuitCmdReq {
     //任务id
     1: required string id
@@ -143,7 +150,7 @@ struct SendCircuitCmdResp {
     1: required ecode.BaseCode base
 }
 
-//取消任务
+//释放量子环境
 struct CancelCmdReq {
     //任务id
     1: required string id
@@ -191,7 +198,7 @@ struct GetProbOfOutcomeResp {
     2: optional double pro_outcome
 }
 
-//获取所有qubit的概率
+//获取组合概率
 struct GetProbOfAllOutcomReq {
     //任务id
     1: required string id
@@ -306,7 +313,7 @@ struct GetExpecPauliSumReq {
     2: required list<PauliOperType> oper_type_list
 
     //回归系数
-    3: optional list<double> term_coeff_list
+    3: required list<double> term_coeff_list
 }
 
 struct GetExpecPauliSumResp {
