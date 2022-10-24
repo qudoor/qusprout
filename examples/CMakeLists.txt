@@ -19,3 +19,4 @@ endif()
 
 #添加子模块
 add_subdirectory(grover)
+add_subdirectory(bellpair)

@@ -312,6 +312,15 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
         return;
     }
 
+    auto qubitnum = taskhandle->getQubits();
+    auto maxindex = 1 << qubitnum;
+    if (0 == qubitnum || req.index < 0 || req.index >= maxindex)
+    {
+        LOG(ERROR) << "getProbAmp index is invaild(qubitnum:" << qubitnum << ",index:" << req.index << ").";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    }
+
     std::lock_guard<std::mutex> guard(taskhandle->m_mutex);
     taskhandle->m_client.getProbAmp(resp, req);
 }
@@ -332,6 +341,14 @@ void CTaskManager::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfO
         //任务不存在
         LOG(ERROR) << "getProbOfOutcome task is not exist(taskid:" << req.id << ").";
         setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        return;
+    }
+
+    auto qubitnum = taskhandle->getQubits();
+    if (req.qubit < 0 || req.qubit >= qubitnum)
+    {
+        LOG(ERROR) << "getProbOfOutcome qubit is invaild(qubitnum:" << qubitnum << ",qubit:" << req.qubit << ").";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
         return;
     }
 
@@ -356,6 +373,17 @@ void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
         LOG(ERROR) << "getProbOfAllOutcome task is not exist(taskid:" << req.id << ").";
         setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
+    }
+
+    auto qubitnum = taskhandle->getQubits();
+    for (auto target : req.targets)
+    {
+        if (target < 0 || target >= qubitnum)
+        {
+            LOG(ERROR) << "getProbOfAllOutcome qubit is invaild(qubitnum:" << qubitnum << ",target:" << target << ").";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
     }
 
     std::lock_guard<std::mutex> guard(taskhandle->m_mutex);
@@ -478,6 +506,17 @@ void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
         return;
     }
 
+    auto qubitnum = taskhandle->getQubits();
+    for (auto pauli : req.pauli_prod)
+    {
+        if (pauli.target < 0 || pauli.target >= qubitnum)
+        {
+            LOG(ERROR) << "getExpecPauliProd target is invaild(qubitnum:" << qubitnum << ",target:" << pauli.target << ").";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
+    }
+
     std::lock_guard<std::mutex> guard(taskhandle->m_mutex);
     taskhandle->m_client.getExpecPauliProd(resp, req);
 }
@@ -533,6 +572,17 @@ void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
         LOG(ERROR) << "measureQubits task is not exist(taskid:" << req.id << ").";
         setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
+    }
+
+    auto qubitnum = taskhandle->getQubits();
+    for (auto target : req.qubits)
+    {
+        if (target < 0 || target >= qubitnum)
+        {
+            LOG(ERROR) << "measureQubits qubit is invaild(qubitnum:" << qubitnum << ",target:" << target << ").";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
     }
 
     taskhandle->measureQubits(resp, req);
@@ -628,6 +678,17 @@ void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
         LOG(ERROR) << "resetQubits task is not exist(taskid:" << req.id << ").";
         setBase(resp.base, ErrCode::type::COM_NOT_INIT);
         return;
+    }
+
+    auto qubitnum = taskhandle->getQubits();
+    for (auto target : req.qubits)
+    {
+        if (target < 0 || target >= qubitnum)
+        {
+            LOG(ERROR) << "resetQubits qubit is invaild(qubitnum:" << qubitnum << ",target:" << target << ").";
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            return;
+        }
     }
 
     std::lock_guard<std::mutex> guard(taskhandle->m_mutex);
