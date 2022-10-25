@@ -1,13 +1,35 @@
-FROM ubuntu_server_qusprout:latest
+FROM qusprout_ubuntu:1.0.0 as builder
 
-ENV QUSPROUT_VERSION=0.1.9
-COPY ./service_qusprout.sh ./start_qusprout.sh ./build-v${QUSPROUT_VERSION}.tar.gz /tmp/install/
+MAINTAINER liubo@qudoor.cn
 
-RUN cd /tmp/install \
-    && ./service_qusprout.sh version ${QUSPROUT_VERSION} \
-    && rm -rf /tmp/install/build-v${QUSPROUT_VERSION}.tar.gz
+ARG DATE
+ARG work_dir=/app
+ARG GIT_USERNAME=liubo
+ARG GIT_PASSWD=lb\$198622
 
-ENTRYPOINT ["sh", "/tmp/install/start_qusprout.sh"]
+WORKDIR ${work_dir}
 
+RUN git config --global http.lowSpeedLimit 0 && git config --global http.lowSpeedTime 999999 && git config --global http.postBuffer 5242880 \
+    && git clone http://${GIT_USERNAME}:"${GIT_PASSWD}"@192.168.170.196/qudoor/qusprout.git /app/qusprout \
+	&& cd /app/qusprout/thirdparty && chmod +x *.sh && ./install_QuEST.sh && cd /app/qusprout/thirdparty && rm -rf QuEST-3.5.0 \
+	&& cd /app/qusprout && chmod +x *.sh && ./build_qusprout.sh version 1.0 && ./service_qusprout.sh version 1.0 \
+	&& rm -rf /app/qusprout
+	
+FROM ubuntu:22.10
+MAINTAINER liubo <liubo@qudoor.cn>
 
+WORKDIR /app
 
+RUN mkdir -p /usr/local/bin && mkdir -p /usr/local/etc/qusprout
+	
+COPY --from=builder /usr/local/bin/qusprout-master /usr/local/bin/
+COPY --from=builder /usr/local/bin/qusprout-slave /usr/local/bin/
+COPY --from=builder /usr/local/bin/qusprout-work /usr/local/bin/
+COPY --from=builder /usr/local/etc/qusprout/qusprout-master.yaml /usr/local/etc/qusprout/
+COPY --from=builder /usr/local/etc/qusprout/qusprout-slave.yaml /usr/local/etc/qusprout/
+COPY --from=builder /usr/local/etc/qusprout/qusprout-work.yaml /usr/local/etc/qusprout/
+COPY start_qusprout.sh /usr/local/bin/
+
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64
+
+ENTRYPOINT ["sh", "/usr/local/bin/start_qusprout.sh"]
