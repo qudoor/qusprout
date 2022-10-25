@@ -24,14 +24,8 @@ public:
     //日志名称前缀
     std::string m_logNamePrefix{"master"};
 
-    //是否打印
-    int m_verbose{0};
-
     //定时清理任务的间隔，单位：秒
     int m_cleanTaskInterval{30};
-
-    //任务超时时长，单位：秒
-    int m_taskTimeOutDuration{3600};
 
     //机器资源超时时长，单位：秒
     int m_resourceTimeOutDuration{30};
