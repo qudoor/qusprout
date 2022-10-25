@@ -1,8 +1,8 @@
-## QuSprout
+## QuSprout量子计算模拟平台
 
-[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://developer.queco.cn/qutrunk_api/)
+[![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](docs/ThriftApi.md)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/queco-quantum/qutrunk/archive/refs/heads/main.zip)
+[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/queco-quantum/qusprout/archive/refs/heads/main.zip)
 
 
 ### **概述**
@@ -23,7 +23,7 @@
   1. 启动 Master 服务后，Master 会等待接收 Slave 服务发送的注册信息，包括 Slave 服务器的主机信息（主机名，版本等）和资源（内存，GPU 等）信息，Master 会维护所有注册的 Slave 服务器资源信息。
   2. 当 Master 服务接收到来自 QuTrunk 量子编程框架的量子线路的初始化请求时，会先检查是否有足够的资源来运行该量子线路（通过计算 qubits 所需的内存）。
   3. 如果资源要求满足，Master 会按照一定的算法从维护的slave服务器资源列表中选取一个slave服务器来运行该量子算法，并与该slave服务器建立 RPC 连接后向该服务器发送量子线路初始化请求，然后将量子线路加入到任务列表，Master 会维护一个任务列表管理所有的量子线路请求。
-  4. Master 会定时清理一些长时间没有更新的任务，具体超时配置在master配置文件中，更多配置相关的内容请参考[配置文件](./Config.md)
+  4. Master 会定时清理一些长时间没有更新的任务，具体超时配置在master配置文件中，更多配置相关的内容请参考[配置文件](./docs/Config.md)
 
 ##### Slave Service:
 
@@ -85,9 +85,10 @@
 
 ### **文档**
 ---
-* [QuSprout API](http://developer.queco.cn/qutrunk_api/)
-* [QuSprout Config](http://developer.queco.cn/qutrunk_api/)
-* [QuSprout Docker](http://developer.queco.cn/qutrunk_api/)
+* [QuSprout API](./docs/ThriftApi.md)
+* [QuSprout Config](./docs/Config.md)
+* [QuSprout Metrics](./docs/Metrics.md)
+* [QuSprout Docker](./docs/Docker.md)
 
 
 ### **如何参与开发**
