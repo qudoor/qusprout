@@ -1,5 +1,5 @@
 
-# QuSprout的prometheus监控配置文档
+# QuSprout的Api接口文档
 ## 1 概述
 文档对QuSprout的接口的定义、字段的描述、示例等进行了详细的说明。
 
