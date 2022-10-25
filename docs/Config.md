@@ -1,8 +1,9 @@
-# QuSproutp配置文件文档
+# QuSprout配置文件文档
 ## 1 概述
 文档对组成QuSprout的master，slave，work服务的配置文件进行了详细的说明。
+
 ## 2 配置文件说明
-#### 2.1 master配置文件
+### 2.1 master配置文件
 配置文件名：
 qusprout-master.yaml
 
@@ -45,7 +46,7 @@ qusprout-master.yaml
 |8.1  |listenHttpPort  |int  |9093  |http监听的端口  |
 |8.2  |httpThreadNum  |int  |5  |处理http接口的线程数  |
 
-#### 2.2 slaver配置文件
+### 2.2 slaver配置文件
 配置文件名：
 qusprout-slave.yaml
 
@@ -87,7 +88,7 @@ qusprout-slave.yaml
 |8.3  |clientRecvTimeout  |int  |300000  |接收资源的数据超时时间，单位：毫秒  |
 
 
-#### 2.3 work配置文件
+### 2.3 work配置文件
 配置文件名：
 qusprout-work.yaml
 
