@@ -1465,30 +1465,43 @@ void CmdExecutor::CR(const Cmd& cmd)
 
 void CmdExecutor::iSwap(const Cmd& cmd)
 {
-    if (cmd.rotation.size() != 1 || cmd.targets.size() != 2) {
+    if (cmd.targets.size() != 2) {
         return;
     }
 
-    auto theta = cmd.rotation[0];
     if (cmd.inverse) {
-        theta = -theta;
+        ComplexMatrix4 m = {
+            .real = {
+                {1, 0, 0, 0},
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
+                {0, 0, 0, 1}
+            },
+            .imag = {
+                {0, 0, 0, 0},
+                {0, 0, -1, 0},
+                {0, -1, 0, 0},
+                {0, 0, 0, 0}
+            }
+        };
+        applyMatrix4(m_qureg, cmd.targets[0], cmd.targets[1], m);
+    } else {
+        ComplexMatrix4 m = {
+            .real = {
+                {1, 0, 0, 0},
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
+                {0, 0, 0, 1}
+            },
+            .imag = {
+                {0, 0, 0, 0},
+                {0, 0, 1, 0},
+                {0, 1, 0, 0},
+                {0, 0, 0, 0}
+            }
+        };
+        applyMatrix4(m_qureg, cmd.targets[0], cmd.targets[1], m);
     }
-
-    ComplexMatrix4 m = {
-        .real = {
-            {1, 0, 0, 0},
-            {0, cos(theta), 0, 0},
-            {0, 0, cos(theta), 0},
-            {0, 0, 0, 1}
-        },
-        .imag = {
-            {0, 0, 0, 0},
-            {0, 0, -sin(theta), 0},
-            {0, -sin(theta), 0, 0},
-            {0, 0, 0, 0}
-        }
-    };
-    applyMatrix4(m_qureg, cmd.targets[0], cmd.targets[1], m);
 }
 
 void CmdExecutor::id(const Cmd& cmd)

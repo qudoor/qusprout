@@ -11,7 +11,6 @@ rpc:
   listenSysPort: 9092
 task:
   cleanTaskInterval: 150
-  taskTimeOutDuration: 300
   cleanTaskTimeout:
     - taskState: 0
       timeout: 300

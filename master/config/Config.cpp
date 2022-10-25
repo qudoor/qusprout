@@ -48,13 +48,6 @@ int CConfig::praseConfig(const std::string& configFile)
             m_logNamePrefix = handle["log"]["logNamePrefix"].as<std::string>();
     }
 
-    if (handle["common"].IsDefined())
-    {
-        if (handle["common"]["verbose"].IsDefined())
-            m_verbose = handle["common"]["verbose"].as<int>();
-    }
-
-    
     if (handle["rpc"].IsDefined())
     {
         if (handle["rpc"]["listenAddr"].IsDefined())
@@ -77,9 +70,6 @@ int CConfig::praseConfig(const std::string& configFile)
     {
         if (handle["task"]["cleanTaskInterval"].IsDefined())
             m_cleanTaskInterval = handle["task"]["cleanTaskInterval"].as<int>();
-
-        if (handle["task"]["taskTimeOutDuration"].IsDefined())
-            m_taskTimeOutDuration = handle["task"]["taskTimeOutDuration"].as<int>();
 
         if (handle["task"]["cleanTaskTimeout"].IsDefined())
         {
@@ -183,9 +173,6 @@ std::string CConfig::getPrintStr()
         << ",logNamePrefix:" << m_logNamePrefix
         << "];"
 
-        << "common[verbose:" << m_verbose
-        << "];"
-
         << "rpc[listenPort:" << m_listenPort
         << ",listenAddr:" << m_listenAddr
         << ",sendTimeout:" << m_sendTimeout
@@ -193,8 +180,7 @@ std::string CConfig::getPrintStr()
         << ",listenSysPort:" << m_listenSysPort
         << "];"
 
-        << "task[cleanTaskInterval:" << m_cleanTaskInterval
-        << ",taskTimeOutDuration:" << m_taskTimeOutDuration;
+        << "task[cleanTaskInterval:" << m_cleanTaskInterval;
     for (auto iter = m_cleanTaskTimeout.begin(); iter != m_cleanTaskTimeout.end(); ++iter)
     {
         os << ",taskState:" << iter->first << ",timeout:" << iter->second;

@@ -22,9 +22,6 @@ public:
     //日志名称前缀
     std::string m_logNamePrefix{"master"};
 
-    //是否打印
-    int m_verbose{0};
-
     //进程名称
     std::string m_processName;
 

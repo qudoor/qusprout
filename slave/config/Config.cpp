@@ -29,9 +29,6 @@ int CConfig::praseConfig(const std::string& configFile)
 
     if (handle["common"].IsDefined())
     {
-        if (handle["common"]["verbose"].IsDefined())
-            m_verbose = handle["common"]["verbose"].as<int>();
-
         if (handle["common"]["processName"].IsDefined())
             m_processName = handle["common"]["processName"].as<std::string>();
     }
@@ -118,8 +115,7 @@ std::string CConfig::getPrintStr()
         << ",logNamePrefix:" << m_logNamePrefix
         << "];"
 
-        << "common[verbose:" << m_verbose
-        << ",processName:" << m_processName
+        << "common[processName:" << m_processName
         << "];"
 
         << "rpc[listenPort:" << m_listenPort
