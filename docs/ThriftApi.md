@@ -774,7 +774,7 @@ client->cancelCmd(cancelresp, cancelreq);
 | 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
 | ---- | ---- | ---- | ---- | ---- |
 |1 |id  |string   |y  |任务id，同一任务保持一致 |
-|2 |pauli_prod  |object   |y  |期望值信息 |
+|2 |pauli_prod  |arrary   |y  |期望值信息 |
 |2.1 |oper_type  |enum   |y  |泡利算子操作类型 0:I 1:x 2:Y 3:Z |
 |2.2 |target  |iny   |y  |目标比特位，取值范围：[0, qubitnum) |
 
@@ -876,8 +876,8 @@ client->getExpecPauliProd(pauliprodresp, pauliprodreq);
 | 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
 | ---- | ---- | ---- | ---- | ---- |
 |1 |id  |string   |y  |任务id，同一任务保持一致 |
-|2.1 |oper_type_list  |enum   |y  |泡利算子操作类型，注意：oper_type_list的数量和qubitnum*term_coeff_list的数量相等 0:I 1:x 2:Y 3:Z |
-|2.2 |term_coeff_list  |int   |y  |回归系数 |
+|2.1 |oper_type_list  |arrary-enum   |y  |泡利算子操作类型，注意：oper_type_list的数量和qubitnum*term_coeff_list的数量相等 0:I 1:x 2:Y 3:Z |
+|2.2 |term_coeff_list  |arrary-int   |y  |回归系数 |
 
 响应说明：
 | 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
