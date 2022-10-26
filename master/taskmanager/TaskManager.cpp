@@ -312,6 +312,13 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
         return;
     }
 
+    if (taskhandle->m_taskinfo.density)
+    {
+        LOG(ERROR) << "getProbAmp is not invaild operator of density(index:" << req.index << ").";
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        return;
+    }
+
     auto qubitnum = taskhandle->getQubits();
     auto maxindex = 1 << qubitnum;
     if (0 == qubitnum || req.index < 0 || req.index >= maxindex)
