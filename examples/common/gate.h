@@ -40,9 +40,11 @@ public:
     bool init(const int qubitnum, const bool density = false, const std::string& ip = "127.0.0.1", const int port = 9091);
 
 public:
+    bool createQCircuit();
     bool createPlusState();
     bool getProbAmp(const int index, double& amp);
     bool run(const int shots, Result& result);
+     bool releaseQCircuit();
 
 public:
     bool hGate(const std::vector<int>& targets);
@@ -51,9 +53,7 @@ public:
     bool cnotGate(const std::vector<int>& controls, const std::vector<int>& targets);
     bool measureGate(const std::vector<int>& targets);
 
-private:
-    bool createQCircuit();
-    bool releaseQCircuit();
+    bool endAdd();
 
 private:
     int m_qubitnum{0};
