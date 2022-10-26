@@ -11,7 +11,7 @@ qusprout-master.yaml
 /usr/local/etc/qusprout
 
 配置参数说明：
-| 序号 | 配置项 | 值类型  | 默认值 | 说明 |
+| <div style="width:40px">序号</div> | <div style="width:200px">配置项</div> | <div style="width:60px">值类型</div>  | <div style="width:400px">默认值</div> | <div style="width:300px">说明</div> |
 | ---- | ---- | ---- | ---- | ---- |
 |1  |log  |object  |-  |日志配置  |
 |1.1  |logLevel  |int  |0  |日志级别 0：info 1：warning 2：error 3：fatal  |
@@ -25,8 +25,8 @@ qusprout-master.yaml
 |3  |task  |object  |-  |任务配置  |
 |3.1  |cleanTaskInterval  |int  |150  |任务定时清理的时间间隔，单位：秒  |
 |3.2  |cleanTaskTimeout  |arrary  |-  |任务各个状态的超时时间  |
-|3.2.*.1  |taskState  |int  |-  |任务的状态，0：initial, 1：initialized, 2:queued, 3:running, 4:done, 5:error  |
-|3.2.*.2  |timeout  |int  |-  |任务各个状态的超时时间，单位：秒  |
+|3.2.1  |taskState  |int  |-  |任务的状态，0：initial, 1：initialized, 2:queued, 3:running, 4:done, 5:error  |
+|3.2.2  |timeout  |int  |-  |任务各个状态的超时时间，单位：秒  |
 |4  |resource  |object  |-  |资源配置  |
 |4.1  |resourceTimeOutDuration  |int  |150  |slave资源超时时间，单位：秒  |
 |4.2  |resourceHeartInterval  |int  |20  |slave资源定时清理的时间间隔，单位：秒  |
@@ -54,7 +54,7 @@ qusprout-slave.yaml
 /usr/local/etc/qusprout
 
 配置参数说明：
-| 序号 | 配置项 | 值类型  | 默认值 | 说明 |
+| <div style="width:40px">序号</div> | <div style="width:200px">配置项</div> | <div style="width:60px">值类型</div>  | <div style="width:500px">默认值</div> | <div style="width:300px">说明</div> |
 | ---- | ---- | ---- | ---- | ---- |
 |1  |log  |object  |-  |日志配置  |
 |1.1  |logLevel  |int  |0  |日志级别 0：info 1：warning 2：error 3：fatal  |
@@ -96,7 +96,7 @@ qusprout-work.yaml
 /usr/local/etc/qusprout
 
 配置参数说明：
-| 序号 | 配置项 | 值类型  | 默认值 | 说明 |
+| <div style="width:40px">序号</div> | <div style="width:200px">配置项</div> | <div style="width:60px">值类型</div>  | <div style="width:500px">默认值</div> | <div style="width:300px">说明</div> |
 | ---- | ---- | ---- | ---- | ---- |
 |1  |log  |object  |-  |日志配置  |
 |1.1  |loglevel  |int  |0  |日志级别 0：info 1：warning 2：error 3：fatal  |
