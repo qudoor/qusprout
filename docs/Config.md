@@ -41,7 +41,7 @@ qusprout-master.yaml
 |6.4  |qurootHeartInterval  |int  |3  |和QuRoot的心跳间隔  |
 |7  |cap  |object  |-  |QuSprout能力  |
 |7.1  |deviceType  |string  |cpu  |支持的设备类型  |
-|7.2  |supGate  |string  |h,measure,p,cp,r,rx,ry,rz,rxx,ryy,rzz,x,y,z,s,t,sdg,tdg,sqrtx,sqrtswap,swap,cnot,cx,cy,cz,u3,u2,u1,crx,cry,crz,x1,y1,z1,cu1,cu3,u,cu,cr,iswap,id,ch,sqrtxdg,csqrtx,cswap,ph  |支持的量子门操作  |
+|7.2  |supGate  |string  |h,measure,p,cp,r,rx,ry,rz,rxx,ryy,rzz,x,y,z,s,t,sdg,tdg,sqrtx,<br>sqrtswap,swap,cnot,cx,cy,cz,u3,u2,u1,crx,cry,crz,x1,y1,z1,<br>cu1,cu3,u,cu,cr,iswap,id,ch,sqrtxdg,csqrtx,cswap,ph  |支持的量子门操作  |
 |8  |http  |object  |-  |QuSprout的http的api  |
 |8.1  |listenHttpPort  |int  |9093  |http监听的端口  |
 |8.2  |httpThreadNum  |int  |5  |处理http接口的线程数  |
