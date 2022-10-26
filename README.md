@@ -28,7 +28,7 @@
 ##### Slave Service:
 
   1. 启动 Slave 服务后，Slave 会向 Master 服务注册信息，包括主机信息（主机名，版本等）和资源（内存，GPU 等）信息。
-  2. 当 Slave 接收到来自 Master 的初始化量子线路后，会再当前的slave服务器上随机选择一个开用的端口开启一个work服务，并建立RPC连接。
+  2. 当 Slave 接收到来自 Master 的初始化量子线路后，会在当前的slave服务器上随机选择一个可用的端口开启一个work服务，并建立RPC连接。
   3. Slave 服务同样维护一份和 Master 一样的量子线路任务请求列表。
 
 ##### Work Service:
