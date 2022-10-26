@@ -78,6 +78,19 @@ bool CGate::init(const int qubitnum, const bool density, const std::string& ip, 
     return createQCircuit();
 }
 
+bool CGate::createQCircuit()
+{
+    InitQubitsReq initreq;
+    initreq.__set_id(m_taskid);
+    initreq.__set_qubits(m_qubitnum);
+    initreq.__set_density(m_density);
+    initreq.__set_exec_type(ExecCmdType::type::ExecTypeCpuSingle);
+    InitQubitsResp initresp;
+    CALL_WITH_TRY_SERVICE(m_client->initQubits(initresp, initreq), initreq);
+    ASSERT_CODE(initresp.base.code, initresp.base.msg);
+    return true;
+}
+
 bool CGate::createPlusState()
 {
     std::vector<int> targets;
@@ -112,6 +125,21 @@ bool CGate::run(const int shots, Result& result)
     result.__set_measureSet(runresp.result.measureSet);
     result.__set_outcomeSet(runresp.result.outcomeSet);
     m_isrelease = true;
+    return true;
+}
+
+bool CGate::releaseQCircuit()
+{
+    if (m_isrelease)
+    {
+        return true;
+    }
+    CancelCmdReq cancelreq;
+    cancelreq.__set_id(m_taskid);
+    CancelCmdResp cancelresp;
+    CALL_WITH_TRY_SERVICE(m_client->cancelCmd(cancelresp, cancelreq), cancelreq);
+    ASSERT_CODE(cancelresp.base.code, cancelresp.base.msg);
+	m_isrelease = true;
     return true;
 }
 
@@ -286,31 +314,14 @@ bool CGate::measureGate(const std::vector<int>& targets)
     return true;
 }
 
-bool CGate::createQCircuit()
+bool CGate::endAdd()
 {
-    InitQubitsReq initreq;
-    initreq.__set_id(m_taskid);
-    initreq.__set_qubits(m_qubitnum);
-    initreq.__set_density(m_density);
-    initreq.__set_exec_type(ExecCmdType::type::ExecTypeCpuSingle);
-    InitQubitsResp initresp;
-    CALL_WITH_TRY_SERVICE(m_client->initQubits(initresp, initreq), initreq);
-    ASSERT_CODE(initresp.base.code, initresp.base.msg);
+    std::ostringstream os("");
+    SendCircuitCmdReq cmdreq;
+    cmdreq.__set_id(m_taskid);
+    cmdreq.__set_final(true);
+    SendCircuitCmdResp cmdresp;
+    CALL_WITH_TRY_SERVICE(m_client->sendCircuitCmd(cmdresp, cmdreq), cmdreq);
+    ASSERT_CODE(cmdresp.base.code, cmdresp.base.msg);
     return true;
 }
-
-bool CGate::releaseQCircuit()
-{
-    if (m_isrelease)
-    {
-        return true;
-    }
-    CancelCmdReq cancelreq;
-    cancelreq.__set_id(m_taskid);
-    CancelCmdResp cancelresp;
-    CALL_WITH_TRY_SERVICE(m_client->cancelCmd(cancelresp, cancelreq), cancelreq);
-    ASSERT_CODE(cancelresp.base.code, cancelresp.base.msg);
-	m_isrelease = true;
-    return true;
-}
-
