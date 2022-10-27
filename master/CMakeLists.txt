@@ -72,7 +72,11 @@ ENDIF ()
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 #添加链接库,相同于指定-l参数
-target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libhv_static.a;libprometheus-cpp-core.a;pthread)
+IF (APPLE)
+	target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;hv;libprometheus-cpp-core.a;pthread)
+ELSE ()
+	target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libhv_static.a;libprometheus-cpp-core.a;pthread)
+ENDIF ()
 
 #安装
 INSTALL(TARGETS ${PROJECT_NAME}

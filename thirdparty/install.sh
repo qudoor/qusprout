@@ -225,9 +225,9 @@ if [ ! -f "/usr/local/lib/libthrift.a" ]; then
     tar -zxvf thrift-0.16.0.tar.gz
     cd ./thrift-0.16.0
     if [ ${OS} == "Darwin" ]; then
-        sed -i '.bak' 's/if(BUILD_JAVA)/if(false)/g' CMakeLists.txt
-        sed -i '.bak' 's/if(BUILD_JAVASCRIPT)/if(false)/g' CMakeLists.txt
-        sed -i '.bak' 's/if(BUILD_NODEJS)/if(false)/g' CMakeLists.txt
+        sed -i '' 's/if(BUILD_JAVA)/if(false)/g' CMakeLists.txt
+        sed -i '' 's/if(BUILD_JAVASCRIPT)/if(false)/g' CMakeLists.txt
+        sed -i '' 's/if(BUILD_NODEJS)/if(false)/g' CMakeLists.txt
     else
         sed -i 's/if(BUILD_JAVA)/if(false)/g' CMakeLists.txt
         sed -i 's/if(BUILD_JAVASCRIPT)/if(false)/g' CMakeLists.txt
@@ -284,8 +284,8 @@ if [ ! -f "/usr/local/lib/libglog.a" ] && [ ! -f "/usr/local/lib64/libglog.a" ];
     cd glog-0.6.0
     patch -p0 < ../logging.cc.patch 
     if [ ${OS} == "Darwin" ]; then
-        sed -i '.bak' 's/option (BUILD_SHARED_LIBS "Build shared libraries" ON)/option (BUILD_SHARED_LIBS "Build shared libraries" OFF)/g' CMakeLists.txt
-        sed -i '.bak' 's/option (WITH_GTEST "Use Google Test" ON)/option (WITH_GTEST "Use Google Test" OFF)/g' CMakeLists.txt
+        sed -i '' 's/option (BUILD_SHARED_LIBS "Build shared libraries" ON)/option (BUILD_SHARED_LIBS "Build shared libraries" OFF)/g' CMakeLists.txt
+        sed -i '' 's/option (WITH_GTEST "Use Google Test" ON)/option (WITH_GTEST "Use Google Test" OFF)/g' CMakeLists.txt
     else
         sed -i 's/option (BUILD_SHARED_LIBS "Build shared libraries" ON)/option (BUILD_SHARED_LIBS "Build shared libraries" OFF)/g' CMakeLists.txt
         sed -i 's/option (WITH_GTEST "Use Google Test" ON)/option (WITH_GTEST "Use Google Test" OFF)/g' CMakeLists.txt
@@ -314,7 +314,7 @@ if [ ! -f "/usr/local/lib/libyaml-cpp.a" ] && [ ! -f "/usr/local/lib64/libyaml-c
     tar -zxvf yaml-cpp-yaml-cpp-0.7.0.tar.gz
     cd yaml-cpp-yaml-cpp-0.7.0
     if [ ${OS} == "Darwin" ]; then
-        sed -i '.bak' 's/include(CTest)/#include(CTest)/g' CMakeLists.txt
+        sed -i '' 's/include(CTest)/#include(CTest)/g' CMakeLists.txt
     else
         sed -i 's/include(CTest)/#include(CTest)/g' CMakeLists.txt
     fi
@@ -397,9 +397,9 @@ rm -rf QuEST-3.5.0
 tar -zxvf QuEST-3.5.0.tar.gz
 cd QuEST-3.5.0/QuEST
 if [ ${OS} == "Darwin" ]; then
-    sed -i '.bak' 's/option(DISTRIBUTED "Whether the program will be run in distributed mode using MPI. Set to 1 to enable" 0)/option(DISTRIBUTED "Whether the program will be run in distributed mode using MPI. Set to 1 to enable" 1)/g' CMakeLists.txt
-    sed -i '.bak' 's/set(BUILD_SHARED_LIBS TRUE CACHE BOOL "Whether to build a dynamic library")/set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Whether to build a dynamic library")/g' CMakeLists.txt
-    sed -i 's/find_package(MPI REQUIRED)/#find_package(MPI REQUIRED)/g' CMakeLists.txt
+    sed -i '' 's/option(DISTRIBUTED "Whether the program will be run in distributed mode using MPI. Set to 1 to enable" 0)/option(DISTRIBUTED "Whether the program will be run in distributed mode using MPI. Set to 1 to enable" 1)/g' CMakeLists.txt
+    sed -i '' 's/set(BUILD_SHARED_LIBS TRUE CACHE BOOL "Whether to build a dynamic library")/set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Whether to build a dynamic library")/g' CMakeLists.txt
+    sed -i '' 's/find_package(MPI REQUIRED)/#find_package(MPI REQUIRED)/g' CMakeLists.txt
 else
     sed -i 's/option(DISTRIBUTED "Whether the program will be run in distributed mode using MPI. Set to 1 to enable" 0)/option(DISTRIBUTED "Whether the program will be run in distributed mode using MPI. Set to 1 to enable" 1)/g' CMakeLists.txt
     sed -i 's/set(BUILD_SHARED_LIBS TRUE CACHE BOOL "Whether to build a dynamic library")/set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Whether to build a dynamic library")/g' CMakeLists.txt
@@ -432,7 +432,7 @@ if [ ! -f "/usr/local/lib/libgtest.a" ] && [ ! -f "/usr/local/lib64/libgtest.a" 
     tar -zxvf googletest-release-1.10.0.tar.gz
     cd ./googletest-release-1.10.0
     if [ ${OS} == "Darwin" ]; then
-        sed -i '.bak' 's/int dummy;/int dummy = 0;/g' googletest/src/gtest-death-test.cc
+        sed -i '' 's/int dummy;/int dummy = 0;/g' googletest/src/gtest-death-test.cc
     else
         sed -i 's/int dummy;/int dummy = 0;/g' googletest/src/gtest-death-test.cc
     fi
@@ -481,10 +481,10 @@ if [ ! -f "/usr/local/lib/libprometheus-cpp-core.a" ] && [ ! -f "/usr/local/lib6
     tar -zxvf prometheus-cpp-1.0.1.tar.gz 
     cd prometheus-cpp-1.0.1
     if [ ${OS} == "Darwin" ]; then
-        sed -i '.bak' 's/option(ENABLE_PULL "Build prometheus-cpp pull library" ON)/option(ENABLE_PULL "Build prometheus-cpp pull library" OFF)/g' CMakeLists.txt
-        sed -i '.bak' 's/option(ENABLE_PUSH "Build prometheus-cpp push library" ON)/option(ENABLE_PUSH "Build prometheus-cpp push library" OFF)/g' CMakeLists.txt
-        sed -i '.bak' 's/option(ENABLE_COMPRESSION "Enable gzip compression" ON)/option(ENABLE_COMPRESSION "Enable gzip compression" OFF)/g' CMakeLists.txt
-        sed -i '.bak' 's/option(ENABLE_TESTING "Build tests" ON)/option(ENABLE_TESTING "Build tests" OFF)/g' CMakeLists.txt
+        sed -i '' 's/option(ENABLE_PULL "Build prometheus-cpp pull library" ON)/option(ENABLE_PULL "Build prometheus-cpp pull library" OFF)/g' CMakeLists.txt
+        sed -i '' 's/option(ENABLE_PUSH "Build prometheus-cpp push library" ON)/option(ENABLE_PUSH "Build prometheus-cpp push library" OFF)/g' CMakeLists.txt
+        sed -i '' 's/option(ENABLE_COMPRESSION "Enable gzip compression" ON)/option(ENABLE_COMPRESSION "Enable gzip compression" OFF)/g' CMakeLists.txt
+        sed -i '' 's/option(ENABLE_TESTING "Build tests" ON)/option(ENABLE_TESTING "Build tests" OFF)/g' CMakeLists.txt
     else
         sed -i 's/option(ENABLE_PULL "Build prometheus-cpp pull library" ON)/option(ENABLE_PULL "Build prometheus-cpp pull library" OFF)/g' CMakeLists.txt
         sed -i 's/option(ENABLE_PUSH "Build prometheus-cpp push library" ON)/option(ENABLE_PUSH "Build prometheus-cpp push library" OFF)/g' CMakeLists.txt
