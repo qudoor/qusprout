@@ -202,6 +202,19 @@ public:
 
     //获取所有任务在每台机器上所占用的资源
     void getAllUseResourceBytes(std::map<std::string, ResourceData>& resources);
+
+    //模拟器初始化
+    void initSimulator(InitQubitsResp& resp, const InitQubitsReq& req, std::shared_ptr<CTask> task);
+
+    //创建和执行子进程
+    int createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childId);
+
+    //获取执行子进程的参数
+    void getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
+
+    //获取执行单个子进程的参数
+    void getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
+
 private:
     //查找任务
     std::shared_ptr<CTask> getTask(const std::string& id, const bool isupdatetime = true);

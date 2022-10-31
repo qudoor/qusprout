@@ -72,50 +72,6 @@ void CMasterServer::startServer()
     }
 }
 
-void CMasterServer::startSysServer()
-{
-    try
-    {
-        //资源接口初始化
-        ::std::shared_ptr<CMasterServerHandler> resourcehandler(new CMasterServerHandler());
-        ::std::shared_ptr<TProcessor> resourceprocessor(new MasterServerProcessor(resourcehandler));
-        
-        //网络、协议等初始化
-        ::std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(SINGLETON(CConfig)->m_listenSysPort, SINGLETON(CConfig)->m_sendTimeout, SINGLETON(CConfig)->m_recvTimeout));
-        ::std::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-        ::std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
-
-        //注册接口
-        ::std::shared_ptr<TMultiplexedProcessor> multiProcessor(new TMultiplexedProcessor());
-        multiProcessor->registerProcessor("MasterServer", resourceprocessor);
-
-        //定义server
-        ::std::shared_ptr<TThreadedServer> server(new TThreadedServer(multiProcessor, serverTransport, transportFactory, protocolFactory));
-        m_sysServer = server;
-
-        LOG(INFO) << "start sys rpc server.";
-
-        //启动服务
-        m_isStop = true;
-        while(m_isStop)
-        {
-            server->serve();
-            LOG(ERROR) << "rpc server exit.";
-        }
-        LOG(ERROR) << "sys rpc server exited.";
-    }
-    catch(const TTransportException& e)
-    {
-        LOG(ERROR) << "startSysServer exception(err:" << e.what() << ").";
-        return;
-    }
-    catch(...)
-    {
-        LOG(ERROR) << "startSysServer other exception.";
-        return;
-    }
-}
-
 void CMasterServer::stopServer()
 {
     m_isStop = false;
@@ -125,10 +81,5 @@ void CMasterServer::stopServer()
         m_server = nullptr;
     }
 
-    if (m_sysServer != nullptr)
-    {
-        m_sysServer->stop();
-        m_sysServer = nullptr;
-    }
     LOG(ERROR) << "rpc server is exited.";
 }

@@ -6,11 +6,10 @@
 #include "interface/ecode_constants.h"
 #include "taskmanager/TaskManager.h"
 
-CResource::CResource(const RegisterReq& req)
+CResource::CResource()
 {
     m_createtime = getCurrMs();
     m_updatetime = m_createtime;
-    m_resource = req;
 }
 
 void CResource::updateResource(const RegisterReq& req)
@@ -78,94 +77,39 @@ CResourceManager::~CResourceManager()
 {
 }
 
-//处理机器注册接口
-void CResourceManager::registerResource(RegisterResp& resp, const RegisterReq& req)
+//Init local resource info
+bool CResourceManager::init()
 {
-    if (req.resource_id == "" ||
-        req.rpc.addr == "" ||
-        req.rpc.port == 0 ||
-        req.device.resource.cpu_total_memory == 0)
+    auto handle = std::make_shared<CResource>();
+    if (!handle)
+        retrun false;
+
+    int ret = SINGLETON(CSystemHandle)->getMachineSysInfo(handle->m_resource.machine);
+    if (ret != 0)
     {
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-        LOG(ERROR) << "register is invaild praram(" << getPrint(req) << ").";
-        return;
+        LOG(ERROR) << "getMachineSysInfo failed(ret:" << ret << ").";
+        return false; 
     }
 
+    ret = SINGLETON(CSystemHandle)->getMemUseInfo(handle->m_resource.resource);
+    if (ret != 0)
     {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        auto iter  = m_resourceList.find(req.resource_id);
-        if (iter != m_resourceList.end())
-        {
-            iter->second->updateResource(req);
-        }
-        else
-        {
-            auto handle = std::make_shared<CResource>(req);
-            m_resourceList[req.resource_id] = handle;
-        }
+        LOG(ERROR) << "getMemUseInfo failed(ret:" << ret << ").";
+        return false;
     }
 
-    setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    m_resourceList[handle->m_resource.machine.addr] = handle;
 }
 
-//处理机器注销接口
-void CResourceManager::unRegister(UnRegisterResp& resp, const UnRegisterReq& req)
-{
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        auto iter  = m_resourceList.find(req.resource_id);
-        if (iter != m_resourceList.end())
-        {
-            //清理当前机器资源时，必须释放所有该机器的任务
-            iter->second->cleanResourceOfTask();
-            m_resourceList.erase(iter);
-            LOG(INFO) << "unRegister(" << getPrint(req) << ").";
-        }
-    }
-
-    setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    return;
-}
-
-//处理机器心跳接口
-void CResourceManager::heartbeat(HeartbeatResp& resp, const HeartbeatReq& req)
-{
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        auto iter  = m_resourceList.find(req.resource_id);
-        if (iter == m_resourceList.end())
-        {
-            //机器未注册
-            setBase(resp.base, ErrCode::type::COM_NOT_REGISTER);
-            LOG(ERROR) << "resource is not register(" << getPrint(req) << ").";
-            return;
-        }
-        iter->second->updateResource(req);
-    }
-
-    setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    return;
-}
-
-ErrCode::type CResourceManager::getResource(const InitQubitsReq& req, std::string& resourceid, RpcConnectInfo& addr, std::vector<std::string>& hosts, ResourceData& resourcebytes)
+ErrCode::type CResourceManager::getResource(const InitQubitsReq& req, std::string& resourceid, ResourceData& resourcebytes)
 {
     std::map<std::string, ResourceData> resources;
     SINGLETON(CTaskManager)->getAllUseResourceBytes(resources);
-
-    if (ExecCmdType::type::ExecTypeGpuSingle == req.exec_type)
-    {
-        return getSignalGpuResource(req, resources, resourceid, addr, hosts, resourcebytes);
-    }
-
-    if (ExecCmdType::type::ExecTypeCpuMpi == req.exec_type)
-    {
-        return getMpiCpuResource(req, resources, resourceid, addr, hosts, resourcebytes);
-    }
     
-    return getSignalCpuResource(req, resources, resourceid, addr, hosts, resourcebytes);
+    return getSignalCpuResource(req, resources, resourceid, resourcebytes);
 }
 
-ErrCode::type CResourceManager::getSignalGpuResource(const InitQubitsReq& req, const std::map<std::string, ResourceData>& useresource, std::string& resourceid, RpcConnectInfo& addr, std::vector<std::string>& hosts, ResourceData& resourcebytes)
+ErrCode::type CResourceManager::getSignalCpuResource(const InitQubitsReq& req, const std::map<std::string, ResourceData>& useresource, std::string& resourceid, ResourceData& resourcebytes)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     size_t ressize = m_resourceList.size();
@@ -178,43 +122,18 @@ ErrCode::type CResourceManager::getSignalGpuResource(const InitQubitsReq& req, c
 
     long long int singlebytes = calcSingleBytes(req.qubits, req.density);
     std::vector<std::string> cpuhosts;
-    if (req.hosts.size() > 0)
+    for (auto& temp : m_resourceList)
     {
-        auto iter = m_resourceList.find(req.hosts[0]);
-        if (iter != m_resourceList.end())
+        long long cpumemory = temp.second->m_resource.device.resource.cpu_total_memory;
+        auto addr = temp.second->m_resource.machine.addr;
+        auto finditer = useresource.find(addr);
+        if (finditer != useresource.end())
         {
-            long long cpumemory = iter->second->m_resource.device.resource.cpu_total_memory;
-            long long gpumemory = iter->second->m_resource.device.resource.gpu_total_memory;
-            auto addr = iter->second->getAddr();
-            auto finditer = useresource.find(addr);
-            if (finditer != useresource.end())
-            {
-                cpumemory -= finditer->second.cpubytes;
-                gpumemory -= finditer->second.gpubytes;
-            }
-            if (cpumemory >= singlebytes && gpumemory >= singlebytes)
-            {
-                cpuhosts.push_back(addr);
-            }
+            cpumemory -= finditer->second.cpubytes;
         }
-    }
-    else
-    {
-        for (auto& temp : m_resourceList)
+        if (cpumemory >= singlebytes)
         {
-            long long cpumemory = temp.second->m_resource.device.resource.cpu_total_memory;
-            long long gpumemory = temp.second->m_resource.device.resource.gpu_total_memory;
-            auto addr = temp.second->getAddr();
-            auto finditer = useresource.find(addr);
-            if (finditer != useresource.end())
-            {
-                cpumemory -= finditer->second.cpubytes;
-                gpumemory -= finditer->second.gpubytes;
-            }
-            if (cpumemory >= singlebytes && gpumemory >= singlebytes)
-            {
-                cpuhosts.push_back(addr);
-            }
+            cpuhosts.push_back(addr);
         }
     }
 
@@ -226,156 +145,10 @@ ErrCode::type CResourceManager::getSignalGpuResource(const InitQubitsReq& req, c
     }
 
     resourcebytes.cpubytes = singlebytes;
-    resourcebytes.gpubytes = 0;
     auto index = m_index++%cpusize;
     auto host = cpuhosts[index];
-    resourceid = m_resourceList[host]->m_resource.resource_id;
-    m_resourceList[host]->getAddr(addr);
-    hosts.push_back(host);
-    return ErrCode::type::COM_SUCCESS;
-}
+    resourceid = m_resourceList[host]->m_resource.machine.addr;
 
-ErrCode::type CResourceManager::getMpiCpuResource(const InitQubitsReq& req, const std::map<std::string, ResourceData>& useresource, std::string& resourceid, RpcConnectInfo& addr, std::vector<std::string>& hosts, ResourceData& resourcebytes)
-{
-    std::lock_guard<std::mutex> guard(m_mutex);
-    size_t ressize = m_resourceList.size();
-    if (ressize == 0)
-    {
-        //无可用资源
-        LOG(ERROR) << "no resource is available(taskId:" << req.id << ").";
-        return ErrCode::type::COM_NOT_RESOURCE;
-    }
-
-    int numranks = 0;
-    long long int mpibytes = 0;
-    std::vector<std::string> mpicpuhosts;
-    if (req.hosts.size() > 0)
-    {
-        numranks = req.hosts.size();
-        mpibytes = calcMpiBytes(req.qubits, req.density, numranks);
-        for (auto& temp : req.hosts)
-        {
-            auto iter = m_resourceList.find(temp);
-            if (iter != m_resourceList.end())
-            {
-                long long cpumemory = iter->second->m_resource.device.resource.cpu_total_memory;
-                auto addr = iter->second->getAddr();
-                auto finditer = useresource.find(addr);
-                if (finditer != useresource.end())
-                {
-                    cpumemory -= finditer->second.cpubytes;
-                }
-                if (cpumemory >= mpibytes)
-                {
-                    mpicpuhosts.push_back(addr);
-                }
-            }
-        }
-    }
-    else
-    {
-        numranks = getNumRanks(req.qubits);
-        mpibytes = calcMpiBytes(req.qubits, req.density, numranks);
-        for (auto& temp : m_resourceList)
-        {
-            long long cpumemory = temp.second->m_resource.device.resource.cpu_total_memory;
-            auto addr = temp.second->getAddr();
-            auto finditer = useresource.find(addr);
-            if (finditer != useresource.end())
-            {
-                cpumemory -= finditer->second.cpubytes;
-            }
-            if (cpumemory >= mpibytes)
-            {
-                mpicpuhosts.push_back(addr);
-            }
-        }
-    }
-
-    size_t mpisize = mpicpuhosts.size();
-    if (0 == mpisize && mpisize < (size_t)numranks)
-    {
-        LOG(ERROR) << "resource memory is not enough(taskId:" << req.id << ").";
-        return ErrCode::type::COM_MEM_NOT_ENOUGH;
-    }
-
-    resourcebytes.cpubytes = mpibytes;
-    resourcebytes.gpubytes = 0;
-    int index = m_index++%mpisize;
-    auto host = mpicpuhosts[index];
-    resourceid = m_resourceList[host]->m_resource.resource_id;
-    m_resourceList[host]->getAddr(addr);
-    for (int i = 0; i < numranks; ++i)
-    {
-        int j = index++%mpisize;
-        hosts.push_back(mpicpuhosts[j]);
-    }
-    return ErrCode::type::COM_SUCCESS;
-}
-
-ErrCode::type CResourceManager::getSignalCpuResource(const InitQubitsReq& req, const std::map<std::string, ResourceData>& useresource, std::string& resourceid, RpcConnectInfo& addr, std::vector<std::string>& hosts, ResourceData& resourcebytes)
-{
-    std::lock_guard<std::mutex> guard(m_mutex);
-    size_t ressize = m_resourceList.size();
-    if (ressize == 0)
-    {
-        //无可用资源
-        LOG(ERROR) << "no resource is available(taskId:" << req.id << ").";
-        return ErrCode::type::COM_NOT_RESOURCE;
-    }
-
-    long long int singlebytes = calcSingleBytes(req.qubits, req.density);
-    std::vector<std::string> cpuhosts;
-    if (req.hosts.size() > 0)
-    {
-        auto iter = m_resourceList.find(req.hosts[0]);
-        if (iter != m_resourceList.end())
-        {
-            long long cpumemory = iter->second->m_resource.device.resource.cpu_total_memory;
-            auto addr = iter->second->getAddr();
-            auto finditer = useresource.find(addr);
-            if (finditer != useresource.end())
-            {
-                cpumemory -= finditer->second.cpubytes;
-            }
-            if (cpumemory >= singlebytes)
-            {
-                cpuhosts.push_back(addr);
-            }
-        }
-    }
-    else
-    {
-        for (auto& temp : m_resourceList)
-        {
-            long long cpumemory = temp.second->m_resource.device.resource.cpu_total_memory;
-            auto addr = temp.second->getAddr();
-            auto finditer = useresource.find(addr);
-            if (finditer != useresource.end())
-            {
-                cpumemory -= finditer->second.cpubytes;
-            }
-            if (cpumemory >= singlebytes)
-            {
-                cpuhosts.push_back(addr);
-            }
-        }
-    }
-
-    size_t cpusize = cpuhosts.size();
-    if (0 == cpusize)
-    {
-        LOG(ERROR) << "resource memory is not enough(taskId:" << req.id << ").";
-        return ErrCode::type::COM_MEM_NOT_ENOUGH;
-    }
-
-    resourcebytes.cpubytes = singlebytes;
-    resourcebytes.gpubytes = 0;
-    auto index = m_index++%cpusize;
-    auto host = cpuhosts[index];
-    resourceid = m_resourceList[host]->m_resource.resource_id;
-    m_resourceList[host]->getAddr(addr);
-    hosts.push_back(host);
     return ErrCode::type::COM_SUCCESS;
 }
 

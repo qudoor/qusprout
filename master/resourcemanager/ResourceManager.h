@@ -12,6 +12,13 @@
 #include "interface/resource_types.h"
 #include "interface/qusproutdata_types.h"
 #include "interface/qurootresource_types.h"
+#include "../common/SystemHandle.h"
+
+//资源信息
+typedef struct DeviceResourceDetail {
+    MachineSysInfo machine;
+    MemUseInfo resource;
+} DeviceResDetail;
 
 //机器资源
 class CResource
@@ -51,7 +58,7 @@ public:
     long long int m_updatetime{0};
 
     //资源信息
-    RegisterReq m_resource;
+    DeviceResDetail m_resource;
 };
 
 class CResourceManager

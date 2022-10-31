@@ -186,6 +186,7 @@ std::string CTask::getStateStr()
     return getTaskStr(m_state);
 }
 
+
 CTaskManager::CTaskManager()
 {
 
@@ -213,11 +214,9 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
         return;
     }
 
-    RpcConnectInfo addr;
     std::string resourceid = "";
     ResourceData resourcebytes;
-    std::vector<std::string> hosts;
-    ErrCode::type retcode = SINGLETON(CResourceManager)->getResource(req, resourceid, addr, hosts, resourcebytes);
+    ErrCode::type retcode = SINGLETON(CResourceManager)->getResource(req, resourceid, resourcebytes);
     if (retcode != ErrCode::type::COM_SUCCESS)
     {
         LOG(ERROR) << "initEnv resource is not enough(taskid:" << req.id << ").";
@@ -226,9 +225,8 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     }
 
     InitQubitsReq reqtemp(req);
-    reqtemp.__set_hosts(hosts);
     std::shared_ptr<CTask> taskhandle = std::make_shared<CTask>();
-    int ret = taskhandle->init(reqtemp, addr, resourceid, resourcebytes);
+    int ret = taskhandle->init(reqtemp, resourceid, resourcebytes);
     if (ret != 0)
     {
         setBase(resp.base, ErrCode::type::COM_OTHRE);
@@ -242,7 +240,7 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
         return;
     }
 
-    taskhandle->initQubits(resp);
+    initSimulator(taskhandle, resp, req);
 }
 
 void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
@@ -908,4 +906,191 @@ void CTaskManager::getAllUseResourceBytes(std::map<std::string, ResourceData>& r
             resources[host] += task->m_resourcebytes;
         }
     }
+}
+
+
+//模拟器初始化
+void CTaskManager::initSimulator(InitQubitsResp& resp, const InitQubitsReq& req, std::shared_ptr<CTask> task)
+{
+    //1.获取一个随机端口
+    int port = getLocalPort();
+
+    //2.获取启动子进程的参数
+    std::vector<std::string> param;
+    getParam(req, port, param);
+
+    //3.转换参数结构
+    std::ostringstream os("");
+    size_t argc = param.size();
+    char** argv = new char*[argc + 1];
+    size_t i = 0;
+    for (; i < argc; ++i)
+    {
+        argv[i] = (char*)param[i].data();
+        os << param[i] << " ";
+    }
+    argv[i] = NULL;
+
+    //4.创建子进程
+    pid_t childid = -1;
+    int ret = createSubProcess(req, argv, childid);
+    delete [] argv;
+    if (ret != 0)
+    {
+        LOG(ERROR) << "createSubProcess failed(taskid:" << req.id << ",param:" << os.str() << ").";
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        return;
+    }
+    LOG(INFO) << "createSubProcess success(taskid:" << req.id << ",param:" << os.str() << ").";
+
+    //5.创建work的客户端,等待子线程rpc启动成功(sleeptime*10为1秒)
+    const int sleeptime = 100;
+    int count = SINGLETON(CConfig)->m_waitRpcTimeout*(10);
+    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
+    {
+        count = SINGLETON(CConfig)->m_waitMpiRpcTimeout*(10);
+    }
+
+    while(count > 0)
+    {
+        ret = task->client.init("127.0.0.1", port);
+        if (0 == ret)
+        {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleeptime));
+        --count;
+    }
+    if (ret != 0)
+    {
+        LOG(ERROR) << "sub process start rpc failed(taskid:" << req.id << ",port:" << port<< ").";
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        kill(childid, SIGKILL);
+        return;
+    }
+
+    task->client.initQubits(resp, req);
+    if (resp.base.code != ErrCode::type::COM_SUCCESS)
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        m_taskList.erase(req.id);
+    }
+    
+    return;
+}
+
+//创建和执行子进程
+int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childId)
+{
+    //2.创建子进程
+    int ret = -1;
+    childId = -1;
+    sigset_t mask;
+    posix_spawnattr_t attr;
+    posix_spawn_file_actions_t fact;
+    ret = posix_spawnattr_init(&attr);
+    if (ret != 0)
+    {
+        LOG(ERROR) << "posix_spawnattr_init failed(id:" << req.id << ",err:" << strerror(errno) << ").";
+        return -1;
+    }
+
+    bool destroyattr = false;
+    bool destroyfact = false;
+    do
+    {
+        ret = posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETSIGMASK);
+        if (ret != 0)
+        {
+            LOG(ERROR) << "posix_spawnattr_setflags failed(id:" << req.id << ",err:" << strerror(errno) << ").";
+            destroyattr = true;
+            break;
+        }
+
+        sigfillset(&mask);
+        ret = posix_spawnattr_setsigmask(&attr, &mask);
+        if (ret != 0)
+        {
+            LOG(ERROR) << "posix_spawnattr_setsigmask failed(id:" << req.id << ",err:" << strerror(errno) << ").";
+            destroyattr = true;
+            break;
+        }
+
+        ret = posix_spawn_file_actions_init(&fact);
+        if (ret != 0)
+        {
+            LOG(ERROR) << "posix_spawnattr_setsigmask failed(id:" << req.id << ",err:" << strerror(errno) << ").";
+            destroyattr = true;
+            break;
+        }
+
+        std::string pathname = SINGLETON(CConfig)->m_workBinPath + "/" + SINGLETON(CConfig)->m_workBinName;
+        if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
+        {
+            pathname = "/usr/local/bin/mpiexec";
+        }
+        ret = posix_spawn(&childId, pathname.c_str(), &fact, &attr, argv, environ);
+        if (ret != 0)
+        {
+            LOG(ERROR) << "posix_spawn failed(id:" << req.id << ",pathname:" << pathname << ",err:" << strerror(errno) << ").";
+            destroyattr = true;
+            destroyfact = true;
+            break;
+        }
+    } while (false);
+    
+    if (true == destroyattr)
+    {
+        ret = posix_spawnattr_destroy(&attr);
+        if (ret != 0)
+        {
+            LOG(ERROR) << "posix_spawnattr_destroy failed(id:" << req.id << ",err:" << strerror(errno) << ").";
+        }
+    }
+
+    if (true == destroyfact)
+    {
+        ret = posix_spawn_file_actions_destroy(&fact);
+        if (ret != 0)
+        {
+            LOG(ERROR) << "posix_spawn_file_actions_destroy failed(id:" << req.id << ",err:" << strerror(errno) << ").";
+        }
+    }
+
+    if (true == destroyattr || true == destroyfact)
+    {
+        return -2;
+    }
+
+    LOG(INFO) << "create sub process success(id:" << req.id << ",childpid:" << childId << ").";
+
+    return 0;
+}
+
+//获取cpu执行子进程的参数
+void CTaskManager::getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param)
+{
+    // work执行的参数
+    getSingleParam(req, port, param);
+}
+
+//获取cpu执行单个子进程的参数
+void CTaskManager::getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param)
+{
+    std::ostringstream os("");
+    //1.执行文件完整路径+文件名
+    std::string temp = SINGLETON(CConfig)->m_workBinPath + "/" + SINGLETON(CConfig)->m_workBinName;
+    param.push_back(temp);
+
+    //2.rpc端口
+    param.push_back("-p");
+    os.str("");
+    os << port;
+    param.push_back(os.str());
+
+    //3.配置文件完整路径+文件名
+     param.push_back("-f");
+    os.str("");
+    os << SINGLETON(CConfig)->m_workConfigPath << "/" << SINGLETON(CConfig)->m_workConfigName;
+    param.push_back(os.str());
 }

@@ -95,12 +95,13 @@ int main(int argc, char **argv)
 		std::thread httpthd(std::bind(&CHttpServer::start, SINGLETON(CHttpServer)));
 		httpthd.detach(); 
 
-		//7.启动定时器
+		//7.初始化本地资源信息
+		SINGLETON(CResourceManager)->init();
+
+		//8.启动定时器
 		SINGLETON(CTimerHandle)->init();
 
-		//8.启动rpc服务
-		std::thread rpcthd(std::bind(&CMasterServer::startSysServer, SINGLETON(CMasterServer)));
-		rpcthd.detach(); 
+		//9.启动rpc服务
 		SINGLETON(CMasterServer)->startServer();
     }
     catch(const std::exception& e)
