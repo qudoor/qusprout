@@ -7,7 +7,6 @@
 #include <thrift/concurrency/ThreadManager.h>
 #include <transport/TTransportException.h>
 #include "QuSproutServerHandle.h"
-#include "MasterServerHandle.h"
 #include "RpcServer.h"
 #include "config/Config.h"
 #include "common/qulog.h"

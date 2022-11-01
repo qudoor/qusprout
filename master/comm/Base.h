@@ -49,9 +49,6 @@ public:
     CBase();
     virtual ~CBase();
 
-    //设置rpc返回值
-    void setBase(BaseCode& base, const ErrCode::type& code);
-
     //获取本机随机可用端口
     int getLocalPort();
 
@@ -74,12 +71,15 @@ public:
 
 //打印rpc的结构
 template <typename T>
-inline std::string CBase<T>::getPrint(const T& req)
+inline std::string CBase::getPrint(const T& req)
 {
     std::stringstream os("");
     req.printTo(os);
     return os.str();
 }
+
+//设置rpc返回值
+void setBase(BaseCode& base, const ErrCode::type& code);
 
 class ResourceData 
 {

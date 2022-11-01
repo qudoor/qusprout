@@ -1,5 +1,16 @@
 #include <sys/time.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <errno.h>
+#include <unistd.h>
+#include <chrono>
 #include "Base.h"
+#include "common/qulog.h"
+
 
 CBase::CBase()
 {
@@ -171,7 +182,7 @@ bool CBase::isNeedReConnectCode(const apache::thrift::transport::TTransportExcep
     return false;
 }
 
-void CBase::setBase(BaseCode& base, const ErrCode::type& code)
+void setBase(BaseCode& base, const ErrCode::type& code)
 {
     base.__set_code(code);
     auto ptr = g_ecode_constants.ErrMsg.find(code);

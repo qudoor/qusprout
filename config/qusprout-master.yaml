@@ -26,9 +26,6 @@ task:
       timeout: 300
     - taskState: 6
       timeout: 1
-resource:
-  resourceTimeOutDuration: 120
-  resourceHeartInterval: 20
 client:
   clientConnTimeout: 300000
   clientSendTimeout: 300000
@@ -44,3 +41,10 @@ cap:
 http:
   listenHttpPort: 9093
   httpThreadNum: 5
+work:
+  workBinPath: /usr/local/bin
+  workBinName: qusprout-work
+  workConfigPath: /usr/local/etc/qusprout
+  workConfigName: qusprout-work.yaml
+  waitRpcTimeout: 120
+  waitMpiRpcTimeout: 300

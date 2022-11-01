@@ -22,5 +22,4 @@ void CTaskTimer::start()
 
 void CTaskTimer::stop()
 {
-    //SINGLETON(CTaskManager)->cleanAllTask();
 }

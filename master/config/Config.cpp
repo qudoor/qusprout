@@ -91,15 +91,6 @@ int CConfig::praseConfig(const std::string& configFile)
         }
     }
 
-    if (handle["resource"].IsDefined())
-    {
-        if (handle["resource"]["resourceTimeOutDuration"].IsDefined())
-            m_resourceTimeOutDuration = handle["resource"]["resourceTimeOutDuration"].as<int>();
-
-        if (handle["resource"]["cleanResourceInterval"].IsDefined())
-            m_cleanResourceInterval = handle["resource"]["cleanResourceInterval"].as<int>();
-    }
-
     if (handle["client"].IsDefined())
     {
         if (handle["client"]["clientConnTimeout"].IsDefined())
@@ -160,6 +151,27 @@ int CConfig::praseConfig(const std::string& configFile)
             m_httpThreadNum = handle["http"]["httpThreadNum"].as<int>();
     }
 
+    if (handle["work"].IsDefined())
+    {
+        if (handle["work"]["workBinPath"].IsDefined())
+            m_workBinPath = handle["work"]["workBinPath"].as<std::string>();
+
+        if (handle["work"]["workBinName"].IsDefined())
+            m_workBinName = handle["work"]["workBinName"].as<std::string>();
+
+        if (handle["work"]["workConfigPath"].IsDefined())
+            m_workConfigPath = handle["work"]["workConfigPath"].as<std::string>();
+        
+        if (handle["work"]["workConfigName"].IsDefined())
+            m_workConfigName = handle["work"]["workConfigName"].as<std::string>();
+
+        if (handle["work"]["waitRpcTimeout"].IsDefined())
+            m_waitRpcTimeout = handle["work"]["waitRpcTimeout"].as<int>();
+
+        if (handle["work"]["waitMpiRpcTimeout"].IsDefined())
+            m_waitMpiRpcTimeout = handle["work"]["waitMpiRpcTimeout"].as<int>();
+    }
+    
     return 0;
 }
 
@@ -186,10 +198,6 @@ std::string CConfig::getPrintStr()
         os << ",taskState:" << iter->first << ",timeout:" << iter->second;
     }
     os << "];"
-
-        << "resource[resourceTimeOutDuration:" << m_resourceTimeOutDuration
-        << ",cleanResourceInterval:" << m_cleanResourceInterval
-        << "];"
 
         << "client[clientConnTimeout:" << m_clientConnTimeout
         << ",clientSendTimeout:" << m_clientSendTimeout

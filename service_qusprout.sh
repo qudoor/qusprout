@@ -101,10 +101,10 @@ install() {
 
 print_help() {
 	echo "Usage Example: "
-	echo "$0 version 1.0.0 qusprout-master|qusprout-slave|qusprout-work -- install the .so file"
-	echo "$0 restart qusprout-master|qusprout-slave|qusprout-work -- restrat server"
-	echo "$0 start qusprout-master|qusprout-slave|qusprout-work -- start server"
-	echo "$0 stop qusprout-master|qusprout-slave|qusprout-work -- stop server"
+	echo "$0 version 1.0.0 qusprout-master|qusprout-work -- install the .so file"
+	echo "$0 restart qusprout-master|qusprout-work -- restrat server"
+	echo "$0 start qusprout-master|qusprout-work -- start server"
+	echo "$0 stop qusprout-master|qusprout-work -- stop server"
 }
 
 case $1 in

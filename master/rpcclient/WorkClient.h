@@ -1,8 +1,9 @@
-#ifndef __H__WORKCLIENT__H__
-#define __H__WORKCLIENT__H__
+#ifndef __H__SLAVECLIENT__H__
+#define __H__SLAVECLIENT__H__
 
 #include <string>
 #include <memory>
+#include <mutex>
 #include <transport/TBufferTransports.h>
 #include <transport/TTransportException.h>
 #include <transport/TServerSocket.h>
@@ -19,6 +20,9 @@ class CWorkClient : public CBase
 public:
     CWorkClient();
     virtual ~CWorkClient();
+
+    //判断是否初始化客户端
+    bool isInit();
 
     //初始化客户端
     int init(const std::string& addr, const int port);
@@ -85,11 +89,12 @@ public:
 
 private:
     //重新初始化客户端
-    int reInit(const bool isprint = true);
-   
+    int reInit();
+
 private:
     std::string m_addr{""};
     int m_port{0};
+    bool m_isInit{false};
     std::shared_ptr<QuSproutServerClient> m_client{nullptr};
     std::shared_ptr<TTransport> m_transport{nullptr};
 };

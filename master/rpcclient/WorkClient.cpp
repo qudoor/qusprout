@@ -1,27 +1,27 @@
 #include <transport/TSocket.h>
 #include <protocol/TBinaryProtocol.h>
 #include <protocol/TMultiplexedProtocol.h>
-#include "SlaveClient.h"
+#include "WorkClient.h"
 #include "common/qulog.h"
 #include "config/Config.h"
 #include "common/Singleton.h"
 
-CSlaveClient::CSlaveClient()
+CWorkClient::CWorkClient()
 {
 
 }
 
-CSlaveClient::~CSlaveClient()
+CWorkClient::~CWorkClient()
 {
     close();
 }
 
-bool CSlaveClient::isInit()
+bool CWorkClient::isInit()
 {
     return m_isInit;
 }
 
-int CSlaveClient::init(const std::string& addr, const int port)
+int CWorkClient::init(const std::string& addr, const int port)
 {
     m_addr = addr;
     m_port = port;
@@ -39,7 +39,7 @@ int CSlaveClient::init(const std::string& addr, const int port)
     return ret;
 }
 
-void CSlaveClient::close()
+void CWorkClient::close()
 {
     if (m_transport != nullptr)
     {
@@ -49,7 +49,7 @@ void CSlaveClient::close()
 }
 
 //重新初始化客户端
-int CSlaveClient::reInit()
+int CWorkClient::reInit()
 {
     try
     {
@@ -80,7 +80,7 @@ int CSlaveClient::reInit()
 }
 
 //qubit初始化
-void CSlaveClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
+void CWorkClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
     LOG(INFO) << "request initQubits(req:" << getPrint(req) << ").";
 
@@ -94,7 +94,7 @@ void CSlaveClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 }
 
 //发送任务
-void CSlaveClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
+void CWorkClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
 {
     if (!isInit())
     {
@@ -106,7 +106,7 @@ void CSlaveClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
 }
 
 //取消任务
-void CSlaveClient::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
+void CWorkClient::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 {
     LOG(INFO) << "request cancelCmd(req:" << getPrint(req) << ").";
 
@@ -121,7 +121,7 @@ void CSlaveClient::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 }
 
 //获取振幅
-void CSlaveClient::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
+void CWorkClient::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
 {
     if (!isInit())
     {
@@ -133,7 +133,7 @@ void CSlaveClient::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
 }
 
 //获取当前qubit的概率
-void CSlaveClient::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req)
+void CWorkClient::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req)
 {
     if (!isInit())
     {
@@ -145,7 +145,7 @@ void CSlaveClient::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfO
 }
 
 //获取所有qubit的概率
-void CSlaveClient::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req)
+void CWorkClient::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req)
 {
     if (!isInit())
     {
@@ -157,7 +157,7 @@ void CSlaveClient::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
 }
 
 //获取所有的计算结果
-void CSlaveClient::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
+void CWorkClient::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
 {
     if (!isInit())
     {
@@ -169,7 +169,7 @@ void CSlaveClient::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
 }
 
 //执行任务
-void CSlaveClient::run(RunCircuitResp& resp, const RunCircuitReq& req)
+void CWorkClient::run(RunCircuitResp& resp, const RunCircuitReq& req)
 {
     if (!isInit())
     {
@@ -181,7 +181,7 @@ void CSlaveClient::run(RunCircuitResp& resp, const RunCircuitReq& req)
 }
 
 //对部分量子比特应用量子傅立叶变换
-void CSlaveClient::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
+void CWorkClient::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
 {
     if (!isInit())
     {
@@ -193,7 +193,7 @@ void CSlaveClient::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
 }
 
 //对所有量子比特应用量子傅立叶变换
-void CSlaveClient::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req)
+void CWorkClient::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req)
 {
     if (!isInit())
     {
@@ -205,7 +205,7 @@ void CSlaveClient::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& r
 }
 
 //获取泡利算子乘积的期望值
-void CSlaveClient::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req)
+void CWorkClient::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req)
 {
     if (!isInit())
     {
@@ -217,7 +217,7 @@ void CSlaveClient::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
 }
 
 //获取泡利算子乘积之和的期望值
-void CSlaveClient::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req)
+void CWorkClient::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPauliSumReq& req)
 {
     if (!isInit())
     {
@@ -229,7 +229,7 @@ void CSlaveClient::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
 }
 
 //获取测量结果
-void CSlaveClient::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
+void CWorkClient::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
 {
     if (!isInit())
     {
@@ -241,7 +241,7 @@ void CSlaveClient::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
 }
 
 //注册一些自定义量子门，单次任务有效
-void CSlaveClient::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req)
+void CWorkClient::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const AddCustomGateByMatrixReq& req)
 {
     if (!isInit())
     {
@@ -253,7 +253,7 @@ void CSlaveClient::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const 
 }
 
 //添加量子门操作
-void CSlaveClient::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req)
+void CWorkClient::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq& req)
 {
     if (!isInit())
     {
@@ -265,7 +265,7 @@ void CSlaveClient::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq
 }
 
 //追加量子比特到当前的量子电路
-void CSlaveClient::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req)
+void CWorkClient::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& req)
 {
     if (!isInit())
     {
@@ -277,7 +277,7 @@ void CSlaveClient::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& r
 }
 
 //重置指定的qubits
-void CSlaveClient::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
+void CWorkClient::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
 {
     if (!isInit())
     {
@@ -289,7 +289,7 @@ void CSlaveClient::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
 }
 
 //获取当前量子状态向量
-void CSlaveClient::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req)
+void CWorkClient::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetStateOfAllQubitsReq& req)
 {
     if (!isInit())
     {
@@ -301,7 +301,7 @@ void CSlaveClient::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetS
 }
 
 //获取当前所有可能状态组合的概率
-void CSlaveClient::getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req)
+void CWorkClient::getProbabilities(GetProbabilitiesResp& resp, const GetProbabilitiesReq& req)
 {
     if (!isInit())
     {

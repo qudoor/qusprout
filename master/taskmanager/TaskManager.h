@@ -9,7 +9,7 @@
 #include "interface/QuSproutServer.h"
 #include "interface/qusproutdata_types.h"
 #include "interface/resource_types.h"
-#include "rpcclient/SlaveClient.h"
+#include "rpcclient/WorkClient.h"
 #include "comm/Base.h"
 
 //任务状态
@@ -43,7 +43,7 @@ class CTask
 {
 public:
     //初始化对象
-    int init(const InitQubitsReq& req, const RpcConnectInfo& addr, const std::string& resourceid, const ResourceData& resourcebytes);
+    int init(const InitQubitsReq& req, const std::string& resourceid, const ResourceData& resourcebytes);
 
     //qubit初始化
     void initQubits(InitQubitsResp& resp);
@@ -97,14 +97,11 @@ public:
     //任务执行句柄
     InitQubitsReq m_taskinfo;
 
-    //对应机器ip或者地址
-    RpcConnectInfo m_addr;
-
     //rpc客户端id
     std::string m_resourceid{""};
 
     //连接slaver的rpc客户端
-    CSlaveClient m_client;
+    CWorkClient m_client;
 
     //任务状态
     TaskState m_state{TASK_STATE_INITIAL};
@@ -197,9 +194,6 @@ public:
     //清空任务
     void cleanAllTask();
 
-    //清理指定资源的任务
-    void cleanResourceOfTask(const std::string& resourceid);
-
     //获取所有任务在每台机器上所占用的资源
     void getAllUseResourceBytes(std::map<std::string, ResourceData>& resources);
 
@@ -210,10 +204,13 @@ public:
     int createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childId);
 
     //获取执行子进程的参数
-    void getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
+    void getParam(const InitQubitsReq& req, const int port, std::shared_ptr<CTask> task, std::vector<std::string>& param);
 
     //获取执行单个子进程的参数
     void getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
+
+    //获取启动mpi的进程数
+    int getNumRanks(const int numQubits, const int hostSize);
 
 private:
     //查找任务

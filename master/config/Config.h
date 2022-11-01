@@ -27,12 +27,6 @@ public:
     //定时清理任务的间隔，单位：秒
     int m_cleanTaskInterval{30};
 
-    //机器资源超时时长，单位：秒
-    int m_resourceTimeOutDuration{30};
-
-    //定时清理机器资源的间隔，单位：秒
-    int m_cleanResourceInterval{30};
-
     //rpc的地址
     std::string m_listenAddr{""};
 
@@ -80,6 +74,24 @@ public:
 
     //任务清理超时时间，单位：秒
     std::map<int, int> m_cleanTaskTimeout;
+
+    //work的执行文件全路径
+    std::string m_workBinPath{""};
+
+    //work的执行文件名称
+    std::string m_workBinName{""};
+
+    //work的执行配置文件路径
+    std::string m_workConfigPath{""};
+
+    //work的执行配置文件名称
+    std::string m_workConfigName{""};
+
+    //等待work的rpc启动的超时时间，单位：秒
+    int m_waitRpcTimeout{0};
+
+    //等待work的mpi方式rpc启动的超时时间，单位：秒
+    int m_waitMpiRpcTimeout{0};
 };
 
 #endif

@@ -22,13 +22,10 @@ CTimerHandle::~CTimerHandle()
 
 void CTimerHandle::init()
 {
-    //1.初始化定时器（机器清理定时器/任务清理定时器）
-    auto restimer = std::make_shared<CResourceTimer>(SINGLETON(CConfig)->m_cleanResourceInterval);
-    restimer->init();
+    //1.初始化定时器（任务清理定时器）
     auto tasktimer = std::make_shared<CTaskTimer>(SINGLETON(CConfig)->m_cleanTaskInterval);
     tasktimer->init();
     SINGLETON(CTimer)->start();
-    SINGLETON(CTimerManager)->addTimer(restimer);
     SINGLETON(CTimerManager)->addTimer(tasktimer);
     if (1 == SINGLETON(CConfig)->m_qurootEnable)
     {
