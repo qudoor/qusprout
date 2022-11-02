@@ -198,7 +198,8 @@ CTaskManager::~CTaskManager()
 
 void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
-    if (req.id.empty() || req.qubits <= 0)
+    if (req.id.empty() || req.qubits <= 0 ||
+        req.exec_type == ExecCmdType::type::ExecTypeGpuSingle)
     {
         LOG(ERROR) << "initQubits is invaild param(taskid:" << req.id << ",qubits:" << req.qubits << ",exec_type:" << req.exec_type << ").";
         setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
@@ -854,7 +855,7 @@ void CTaskManager::cleanAllTask()
 
     std::lock_guard<std::mutex> guard(m_mutex);
     auto iter = m_taskList.begin();
-    while (iter != m_taskList.end())
+    for (; iter != m_taskList.end(); ++iter)
     {
         CancelCmdResp resp;
         CancelCmdReq req;

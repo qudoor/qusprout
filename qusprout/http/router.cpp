@@ -79,6 +79,10 @@ int CHandler::router(HttpRequest* req, HttpResponse* resp)
         {
             releaseEnv(req, resp);
         }
+        else if (headreq->cmd == CMD_STR_GETTASK)
+        {
+            getTask(req, resp);
+        }
         else if (headreq->cmd == CMD_STR_GETMEASURE)
         {
             getMeasure(req, resp);
