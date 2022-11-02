@@ -87,10 +87,10 @@ public:
     //quwork的执行配置文件名称
     std::string m_quworkConfigName{""};
 
-    //等待work的rpc启动的超时时间，单位：秒
+    //等待quwork的rpc启动的超时时间，单位：秒
     int m_waitRpcTimeout{0};
 
-    //等待work的mpi方式rpc启动的超时时间，单位：秒
+    //等待quwork的mpi方式rpc启动的超时时间，单位：秒
     int m_waitMpiRpcTimeout{0};
 };
 

@@ -9,39 +9,32 @@
 ---
 * QuSprout 是启科量子自主研发的一款免费、开源的量子计算模拟后端，用户在 QuTrunk 量子编程框架生成量子线路后, 如果需要更高的运行效率，需要连接到 QuSprout 计算后端来进行模拟计算。
 * QuSprout 支持多个量子线路的任务管理、资源管理和并行计算。
-* QuSprout 使用 C++ 作为宿主语言，支持在 Linux, MacOS X 上编译部署。
-* QuSprout 提供了 Master，Slave，Work 服务模块来支持量子计算的模拟：
-    * Master 服务通过 RPC 与 QuTrunk 量子编程框架连接，主要负责量子线路的任务管理、Slave 服务器的资源管理。
-    * Slave 服务通过 RPC 与 Master服务连接，主要负责向 Master 服务注册服务器资源、量子线路任务管理、启动 Work 服务。
-    * Work 服务主要负责量子线路的计算并返回计算结果。
+* QuSprout 使用 C++ 作为宿主语言，支持在 Linux 上编译部署。
+* QuSprout 提供了 qusprout，quwork 服务模块来支持量子计算的模拟：
+    * qusprout 服务通过 RPC 与 QuTrunk 量子编程框架连接，主要负责量子线路的任务管理、quwork 服务的启动等。
+    * quwork 服务主要负责量子线路的计算并返回计算结果。
 
 
 ### **服务模块**
 ---
-##### Master Service:
+##### qusprout:
 
-  1. 启动 Master 服务后，Master 会等待接收 Slave 服务发送的注册信息，包括 Slave 服务器的主机信息（主机名，版本等）和资源（内存，GPU 等）信息，Master 会维护所有注册的 Slave 服务器资源信息。
-  2. 当 Master 服务接收到来自 QuTrunk 量子编程框架的量子线路的初始化请求时，会先检查是否有足够的资源来运行该量子线路（通过计算 qubits 所需的内存）。
-  3. 如果资源要求满足，Master 会按照一定的算法从维护的slave服务器资源列表中选取一个slave服务器来运行该量子算法，并与该slave服务器建立 RPC 连接后向该服务器发送量子线路初始化请求，然后将量子线路加入到任务列表，Master 会维护一个任务列表管理所有的量子线路请求。
-  4. Master 会定时清理一些长时间没有更新的任务，具体超时配置在master配置文件中，更多配置相关的内容请参考[配置文件](./docs/Config.md)
+  1. qusprout 服务启动后，会先收集本机设备信息，包括主机信息(主机名，发布版本等)和资源信息(总内存，未使用内存等)，并开启RPC服务，监听来自 QuTrunk 量子编程框架发送的量子线路操作事件。
+  2. 当 qusprout 接收到来自 QuTrunk 量子线路的初始化请求时，会先检查是否有足够的资源来运行该量子线路（通过计算量子线路的qubits 所需的内存）。
+  3. 如果资源要求满足，qusprout 会将量子线路加入到任务列表，qusprout 会维护一个任务列表来管理所有的量子线路请求。然后开启 quwork 服务，并将量子线路的初始化请求发送到 quwork 服务。
+  4. qusprout 会定时清理一些长时间没有更新的任务，具体超时配置在 qusprout 服务配置文件中，更多配置相关的内容请参考[配置文件](./docs/Config.md)
 
-##### Slave Service:
+##### quwork:
 
-  1. 启动 Slave 服务后，Slave 会向 Master 服务注册信息，包括主机信息（主机名，版本等）和资源（内存，GPU 等）信息。
-  2. 当 Slave 接收到来自 Master 的初始化量子线路后，会在当前的slave服务器上随机选择一个可用的端口开启一个work服务，并建立RPC连接。
-  3. Slave 服务同样维护一份和 Master 一样的量子线路任务请求列表。
-
-##### Work Service:
-
-  1. Work 服务实现了量子线路中各种门的操作，包括 *H, CH, P, CP, R, CR, Rx, Ry, Rz, Rxx, Ryy, Rzz, X, Y, Z, S, T, Sdg, Tdg, SqrtX, CSqrtX, SqrtSwap, Swap, CSwap, CNot, MCX, CY, MCZ, U1, U2, U3, U, CU, ISwap, SqrtXdg, PH*
-  2. Work 服务的各种门操作是基于QuEST量子模拟计算平台的基础上改进和演化的。
+  1. quwork 服务实现了量子线路中各种门的操作，包括 *H, CH, P, CP, R, CR, Rx, Ry, Rz, Rxx, Ryy, Rzz, X, Y, Z, S, T, Sdg, Tdg, SqrtX, CSqrtX, SqrtSwap, Swap, CSwap, CNot, MCX, CY, MCZ, U1, U2, U3, U, CU, ISwap, SqrtXdg, PH*
+  2. quwork 服务的各种门操作是基于QuEST量子模拟计算平台的基础上改进和演化的。
 
 
 ### 编译，安装，启动服务
 ---
 ##### 编译:
 
-1. QuSprout 根目录下的thirdparty目录里面包含了所有编译和运行QuSprout的第三方库，该目录下的install.sh脚本可以一键安装所有的依赖库:
+1. QuSprout 根目录下的thirdparty目录里面包含了所有编译和运行 QuSprout 的第三方库，该目录下的install.sh脚本可以一键安装所有的依赖库:
    ```Shell
     chmod a+x install.sh
     ./install.sh
@@ -71,16 +64,12 @@
 
 ##### 启动：
 
-1. 安装完成后，需要启动 Master，Slave 服务。
-2. 启动 Master 服务：
+1. 安装完成后，需要启动 qusprout 服务。
+2. 启动 qusprout 服务：
     ```Shell
-    service_qusprout.sh start qusprout-master
+    service_qusprout.sh start qusprout
     ```
-3. 启动 Slave 服务：
-    ```Shell
-    service_qusprout.sh start qusprout-slave
-    ```
-4. service_qusprout 支持两外两个参数 stop，restart，分别对应于停止和重启相应的服务。
+3. service_qusprout 支持另外两个参数 stop，restart，分别对应于停止和重启服务。
 
 
 ### **文档**
