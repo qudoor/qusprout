@@ -1085,7 +1085,19 @@ void CTaskManager::getSingleParam(const InitQubitsReq& req, const int port, std:
     os << SINGLETON(CConfig)->m_quworkConfigPath << "/" << SINGLETON(CConfig)->m_quworkConfigName;
     param.push_back(os.str());
 
-    //4. 执行指令的方式
+    //4.qubit数量
+    param.push_back("-q");
+    os.str("");
+    os << req.qubits;
+    param.push_back(os.str());
+
+    //5.密度矩阵
+    param.push_back("-d");
+    os.str("");
+    os << req.density;
+    param.push_back(os.str());
+
+    //6. 执行指令的方式
     param.push_back("-m");
     os.str("");
     os << (int)req.exec_type;

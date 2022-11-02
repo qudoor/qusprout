@@ -37,7 +37,7 @@ using namespace std;
 
 void ParseOpt(int argc, char **argv) 
 {
-    const char *optstring = "p:f:m:";
+    const char *optstring = "p:q:f:s:d:m:i:";
 
     int opt = getopt(argc, argv, optstring);
     while (opt != -1) 
@@ -48,10 +48,22 @@ void ParseOpt(int argc, char **argv)
             SINGLETON(CmdParams)->port = atoi(optarg);
         }
 
+        //qubits
+        if (opt == 'q') 
+        {
+             SINGLETON(CmdParams)->qubits = atoi(optarg);
+        }
+
         //config path
         if (opt == 'f') 
         {
             SINGLETON(CmdParams)->config = optarg;
+        }
+
+        //density
+        if (opt == 'd') 
+        {
+            SINGLETON(CmdParams)->density = atoi(optarg);
         }
 
         //mpi
