@@ -46,8 +46,8 @@ qusprout.yaml
 |8.2  |quworkBinName  |string  |quwork  |work进程的二进制文件名  |
 |8.3  |quworkConfigPath  |string  |/usr/local/etc/qusprout  |work进程的执行配置文件路径  |
 |8.4  |quworkConfigName  |string  |quwork.yaml  |work进程的执行配置文件名  |
-|8.5  |waitRpcTimeout  |int  |120  |等待work以非MPI方式执行操作的超时时间  |
-|8.6  |waitMpiRpcTimeout  |int  |300  |等待work以MPI方式执行操作的超时时间  |
+|8.5  |waitRpcTimeout  |int  |60  |等待work以非MPI方式执行操作的超时时间  |
+|8.6  |waitMpiRpcTimeout  |int  |120  |等待work以MPI方式执行操作的超时时间  |
 
 ### 2.2 quwork服务配置文件
 配置文件名：

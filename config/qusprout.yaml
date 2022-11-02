@@ -46,5 +46,5 @@ quwork:
   quworkBinName: quwork
   quworkConfigPath: /usr/local/etc/qusprout
   quworkConfigName: quwork.yaml
-  waitRpcTimeout: 120
-  waitMpiRpcTimeout: 300
+  waitRpcTimeout: 60
+  waitMpiRpcTimeout: 120

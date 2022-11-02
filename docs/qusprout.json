@@ -1328,32 +1328,7 @@
           },
           "unit": "ms"
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "{qubits=\"10\", resourceid=\"myubuntu\"}"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -2277,6 +2252,6 @@
   "timezone": "browser",
   "title": "qusprout",
   "uid": "9y68BHG4y",
-  "version": 10,
+  "version": 11,
   "weekStart": ""
 }

@@ -67,7 +67,7 @@ int CQuWorkClient::reInit()
     }
     catch(const TTransportException& e)
     {
-        LOG(ERROR) << "init exception(err:" << e.what() << ").";
+        //LOG(ERROR) << "init exception(err:" << e.what() << ").";
         return -1;
     }
     catch(...)
