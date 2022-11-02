@@ -93,7 +93,7 @@ public:
     //任务执行句柄
     InitQubitsReq m_taskinfo;
 
-    //连接slaver的rpc客户端
+    //连接quwork的rpc客户端
     CQuWorkClient m_client;
 
     //任务状态
