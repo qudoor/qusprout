@@ -212,33 +212,43 @@
               },
               {
                 "id": "displayName",
-                "value": "资源下的每个机器的状态"
+                "value": "机器的状态"
               },
               {
                 "id": "mappings",
                 "value": [
                   {
                     "options": {
-                      "from": 0,
+                      "0": {
+                        "color": "dark-red",
+                        "index": 1,
+                        "text": "离线"
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "from": 1,
                       "result": {
+                        "color": "green",
                         "index": 0,
                         "text": "在线"
                       },
-                      "to": 60
+                      "to": 9999999999
                     },
                     "type": "range"
                   },
                   {
                     "options": {
-                      "from": 60,
+                      "match": "null+nan",
                       "result": {
                         "color": "dark-red",
-                        "index": 1,
+                        "index": 2,
                         "text": "离线"
-                      },
-                      "to": 9999999999
+                      }
                     },
-                    "type": "range"
+                    "type": "special"
                   }
                 ]
               }
@@ -308,7 +318,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "资源下机器的地址"
+                "value": "主机地址"
               },
               {
                 "id": "unit",
@@ -337,112 +347,6 @@
               {
                 "id": "custom.displayMode",
                 "value": "color-background"
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #D"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "string"
-              },
-              {
-                "id": "displayName",
-                "value": "显卡类型"
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "0": {
-                        "index": 0,
-                        "text": "-"
-                      },
-                      "1": {
-                        "index": 1,
-                        "text": "英伟达"
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #E"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "bytes"
-              },
-              {
-                "id": "displayName",
-                "value": "显卡总内存"
-              },
-              {
-                "id": "custom.displayMode",
-                "value": "color-background"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Value #F"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "none"
-              },
-              {
-                "id": "displayName",
-                "value": "资源的状态"
-              },
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "from": 0,
-                      "result": {
-                        "index": 0,
-                        "text": "在线"
-                      },
-                      "to": 60
-                    },
-                    "type": "range"
-                  },
-                  {
-                    "options": {
-                      "from": 60,
-                      "result": {
-                        "color": "dark-red",
-                        "index": 1,
-                        "text": "离线"
-                      },
-                      "to": 9999999999
-                    },
-                    "type": "range"
-                  }
-                ]
               },
               {
                 "id": "custom.displayMode",
@@ -486,23 +390,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "time() - sum by(instance, resourceid) (qusprout_resource_curr_state{instance=~\"$instance\"})",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "interval": "",
-          "legendFormat": "资源更新时间",
-          "range": false,
-          "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Qs6m6rM4k"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "time() - sum by(instance, resourceid, addr) (qusprout_resource_curr_updatetime{instance=~\"$instance\"})",
+          "expr": "sum by(instance, addr) (qusprout_resource_curr_updatetime{instance=~\"$instance\"})",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -518,7 +406,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(instance, resourceid, addr) (qusprout_resource_curr_cpu_all_memory{instance=~\"$instance\"})",
+          "expr": "sum by(instance, addr) (qusprout_resource_curr_cpu_all_memory{instance=~\"$instance\"})",
           "format": "table",
           "hide": false,
           "instant": true,
@@ -533,46 +421,16 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(instance, resourceid, addr) (qusprout_resource_curr_cpu_free_memory{instance=~\"$instance\"})",
+          "expr": "sum by(instance, addr) (qusprout_resource_curr_cpu_free_memory{instance=~\"$instance\"})",
           "format": "table",
           "hide": false,
           "instant": true,
           "legendFormat": "资源cpu可用内存",
           "range": false,
           "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Qs6m6rM4k"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "sum by(instance, resourceid, addr) (qusprout_resource_curr_gpu_type{instance=~\"$instance\"})",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "显卡类型",
-          "range": false,
-          "refId": "D"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "Qs6m6rM4k"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "sum by(instance, resourceid, addr) (qusprout_resource_curr_gpu_all_memory{instance=~\"$instance\"})",
-          "format": "table",
-          "hide": false,
-          "instant": true,
-          "legendFormat": "显卡总内存",
-          "range": false,
-          "refId": "E"
         }
       ],
-      "title": "当前的资源",
+      "title": "当前机器信息",
       "transformations": [
         {
           "id": "filterFieldsByName",
@@ -1198,7 +1056,7 @@
             "uid": "Qs6m6rM4k"
           },
           "editorMode": "builder",
-          "expr": "sum by(resourceid, qubits) (increase(qusprout_task_count{instance=~\"$instance\"}[1h]))",
+          "expr": "sum by(qubits) (increase(qusprout_task_count{instance=~\"$instance\"}[1h]))",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1301,7 +1159,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "sum by(resourceid, qubits) (increase(qusprout_task_count{instance=~\"$instance\"}[24h]))",
+          "expr": "sum by(qubits) (increase(qusprout_task_count{instance=~\"$instance\"}[24h]))",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -1401,7 +1259,7 @@
             "uid": "qAQUANG4k"
           },
           "editorMode": "builder",
-          "expr": "sum by(resourceid, qubits) (qusprout_task_duration_ms_sum{instance=~\"$instance\"}) / sum by(resourceid, qubits) (qusprout_task_duration_ms_count{instance=~\"$instance\"})",
+          "expr": "sum by(qubits) (qusprout_task_duration_ms_sum{instance=~\"$instance\"}) / sum by(qubits) (qusprout_task_duration_ms_count{instance=~\"$instance\"})",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1523,7 +1381,7 @@
             "uid": "qAQUANG4k"
           },
           "editorMode": "builder",
-          "expr": "histogram_quantile(0.95, sum by(resourceid, qubits, le) (rate(qusprout_task_duration_ms_bucket{instance=~\"$instance\"}[1m])))",
+          "expr": "histogram_quantile(0.95, sum by(qubits, le) (rate(qusprout_task_duration_ms_bucket{instance=~\"$instance\"}[1m])))",
           "hide": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1626,7 +1484,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "sum by(resourceid, qubits, state) (increase(qusprout_task_state{instance=~\"$instance\"}[5m]))",
+          "expr": "sum by(qubits, state) (increase(qusprout_task_state{instance=~\"$instance\"}[5m]))",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -1732,7 +1590,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "sum by(resourceid, qubits, state) (increase(qusprout_task_state{instance=~\"$instance\"}[1h]))",
+          "expr": "sum by(qubits, state) (increase(qusprout_task_state{instance=~\"$instance\"}[1h]))",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -1838,7 +1696,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "sum by(resourceid, qubits, state) (increase(qusprout_task_state{instance=~\"$instance\"}[24h]))",
+          "expr": "sum by(qubits, state) (increase(qusprout_task_state{instance=~\"$instance\"}[24h]))",
           "format": "time_series",
           "hide": false,
           "instant": false,
@@ -2412,13 +2270,13 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "qusprout",
   "uid": "9y68BHG4y",
-  "version": 9,
+  "version": 10,
   "weekStart": ""
 }
