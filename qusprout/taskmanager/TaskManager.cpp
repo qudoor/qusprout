@@ -198,9 +198,7 @@ CTaskManager::~CTaskManager()
 
 void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
-    if (req.id.empty() || req.qubits <= 0 ||
-        req.exec_type == ExecCmdType::type::ExecTypeCpuMpi ||
-        req.exec_type == ExecCmdType::type::ExecTypeGpuSingle)
+    if (req.id.empty() || req.qubits <= 0)
     {
         LOG(ERROR) << "initQubits is invaild param(taskid:" << req.id << ",qubits:" << req.qubits << ",exec_type:" << req.exec_type << ").";
         setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
