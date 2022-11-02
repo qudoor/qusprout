@@ -8,7 +8,6 @@
 #include "interface/ecode_constants.h"
 #include "interface/QuSproutServer.h"
 #include "interface/qusproutdata_types.h"
-#include "interface/resource_types.h"
 #include "rpcclient/QuWorkClient.h"
 #include "comm/Base.h"
 
@@ -43,16 +42,13 @@ class CTask
 {
 public:
     //初始化对象
-    int init(const InitQubitsReq& req, const std::string& resourceid, const ResourceData& resourcebytes);
+    int init(const InitQubitsReq& req, const int port, const pid_t childid, const ResourceData& resourcebytes);
 
     //qubit初始化
     void initQubits(InitQubitsResp& resp);
 
     //获取任务状态
     inline TaskState getTaskState() { return m_state; }
-
-    //获取任务对应的资源id
-    inline std::string getResourceId() { return m_resourceid; }
 
     //获取任务id
     inline std::string getTaskId() { return m_taskinfo.id; }
@@ -97,10 +93,7 @@ public:
     //任务执行句柄
     InitQubitsReq m_taskinfo;
 
-    //rpc客户端id
-    std::string m_resourceid{""};
-
-    //连接quwork的rpc客户端
+    //连接slaver的rpc客户端
     CQuWorkClient m_client;
 
     //任务状态
@@ -120,6 +113,9 @@ public:
 
     //任务需要的资源大小，单位：byte
     ResourceData m_resourcebytes;
+
+    //子进程id
+    pid_t m_childid{0};
 };
 
 class CTaskManager : public CBase
@@ -195,29 +191,28 @@ public:
     void cleanAllTask();
 
     //获取所有任务在每台机器上所占用的资源
-    void getAllUseResourceBytes(std::map<std::string, ResourceData>& resources);
+    void getAllUseResourceBytes(ResourceData& resources);
 
-    //模拟器初始化
-    void initSimulator(InitQubitsResp& resp, const InitQubitsReq& req, std::shared_ptr<CTask> task);
-
-    //创建和执行子进程
-    int createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childId);
-
-    //获取执行子进程的参数
-    void getParam(const InitQubitsReq& req, const int port, std::shared_ptr<CTask> task, std::vector<std::string>& param);
-
-    //获取执行单个子进程的参数
-    void getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
-
-    //获取启动mpi的进程数
-    int getNumRanks(const int numQubits, const int hostSize);
-
+    //开机清理task
+    int killAllTask();
 private:
     //查找任务
     std::shared_ptr<CTask> getTask(const std::string& id, const bool isupdatetime = true);
 
     //添加任务
     int addTask(const std::string& id, std::shared_ptr<CTask> task);
+
+    //初始化进程
+    int initSubProcess(const InitQubitsReq& req, pid_t& childid, int& port);
+
+    //创建和执行子进程
+    int createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childid);
+
+    //获取cpu执行子进程的参数
+    void getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
+
+    ////获取cpu执行单个子进程的参数
+    void getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
 
 private:
     std::mutex m_mutex;

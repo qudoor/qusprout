@@ -1,4 +1,3 @@
-#include <sys/time.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -7,10 +6,11 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
+#include <thread>
 #include <chrono>
+#include <string.h>
+#include <sys/time.h>
 #include "Base.h"
-#include "common/qulog.h"
-
 
 CBase::CBase()
 {
@@ -162,12 +162,6 @@ bool CBase::waitListenFinish(const int port, const int milliseconds)
     return istrue;
 }
 
-//判断传入字符串是否全数字
-bool CBase::isDigitStr(char* str)
-{
-    return (strspn(str, "0123456789") == strlen(str));
-}
-
 //tpc是否需要重连
 bool CBase::isNeedReConnectCode(const apache::thrift::transport::TTransportException& e)
 {
@@ -182,13 +176,25 @@ bool CBase::isNeedReConnectCode(const apache::thrift::transport::TTransportExcep
     return false;
 }
 
-void setBase(BaseCode& base, const ErrCode::type& code)
+//判断传入字符串是否全数字
+bool CBase::isDigitStr(char* str)
 {
-    base.__set_code(code);
-    auto ptr = g_ecode_constants.ErrMsg.find(code);
-    base.__set_msg(ptr->second);
+    return (strspn(str, "0123456789") == strlen(str));
 }
 
+void setBase(BaseCode& base, const ErrCode::type& code, const std::string& msg)
+{
+    base.__set_code(code);
+    if (msg.empty())
+    {
+        auto ptr = g_ecode_constants.ErrMsg.find(code);
+        base.__set_msg(ptr->second);
+    }
+    else
+    {
+        base.__set_msg(msg);
+    }
+}
 
 void ResourceData::reset()
 {

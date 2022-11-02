@@ -11,7 +11,7 @@
 #include <prometheus/registry.h>
 #include <prometheus/text_serializer.h>
 #include "interface/ecode_types.h"
-#include "interface/resource_types.h"
+#include "common/SystemHandle.h"
 
 class CTaskStateMetrics
 {
@@ -50,17 +50,8 @@ public:
     //资源的可用内存
     prometheus::Family<prometheus::Gauge>& m_currRsFreeMemory;
 
-    //资源的显存类型
-    prometheus::Family<prometheus::Gauge>& m_currRsGpuType;
-
-    //资源的总显存
-    prometheus::Family<prometheus::Gauge>& m_currRsGpuAllMemory;
-
     //资源的更新时间
     prometheus::Family<prometheus::Gauge>& m_currRsUpdatetime;
-
-    //资源的状态
-    prometheus::Family<prometheus::Gauge>& m_currRsState;
 
     //进程启动时间
     prometheus::Family<prometheus::Gauge>& m_currStartTime;
@@ -74,13 +65,12 @@ public:
 
     int init();
 
-    void addTaskEscapeTime(const std::string& resourceid, const std::string& qubits, const double ms);
-    void addTaskCount(const std::string& resourceid, const std::string& qubits);
+    void addTaskEscapeTime(const std::string& qubits, const double ms);
+    void addTaskCount(const std::string& qubits);
     void addInterfaceEscapeTime(const std::string& interfacename, const double ms);
     void addCodeCount(const std::string& interfacename, const std::string& code);
-    void addTaskState(const std::string& resourceid, const std::string& qubits, const std::string& state);
-    void addResource(const std::string& resourceid, const DeviceResourceDetail& resource);
-    void clearResource(const std::string& resourceid);
+    void addTaskState(const std::string& qubits, const std::string& state);
+    void addResource(const MachineSysInfo& sys, const MemUseInfo& mem);
     void updateStarttime(const int currtime);
 
     void addCurrTaskState(const CTaskStateMetrics& key);

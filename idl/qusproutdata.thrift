@@ -10,13 +10,12 @@ enum ExecCmdType {
     //单cpu执行
     ExecTypeCpuSingle = 1,
 
-    //多cpu的mpi执行
+    //多cpu的mpi执行（暂时不开放）
     ExecTypeCpuMpi = 2,
 
     //单gpu执行（暂时不支持）
     ExecTypeGpuSingle = 3
 }
-
 
 //振幅数据
 struct Amplitude {

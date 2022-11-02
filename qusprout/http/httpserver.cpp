@@ -65,10 +65,9 @@ void CHttpServer::start()
 
 void CHttpServer::stop()
 {
-    m_server->stop();
-
     if (nullptr != m_server)
     {
+        m_server->stop();
         delete m_server;
         m_server = nullptr;
     }

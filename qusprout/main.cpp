@@ -2,6 +2,7 @@
 #include <thread>
 #include <functional>
 #include <signal.h>
+#include <sys/wait.h>
 #include "common/qulog.h"
 #include "config/Config.h"
 #include "common/Singleton.h"
@@ -30,6 +31,30 @@ void exitProcess(int sign)
 	LOG(ERROR) << "recv exit signal(sign:" << sign << ").";
     stop();
 	exit(0);
+}
+
+//子进程退出资源释放
+void releaseChldProcess(int sign)
+{
+	int status = -1;
+	pid_t pid = -1;
+	while ((pid = waitpid(0, &status, WNOHANG)) > 0) 
+	{
+        if (WIFEXITED(status)) 
+		{
+            std::cerr << "process exited normal(pid:" << pid << ",status:" << WEXITSTATUS(status) << ")." << std::endl;
+        } 
+		else if (WIFSIGNALED(status)) 
+		{
+			std::cerr << "process exited exception(pid:" << pid << ",status:" << WEXITSTATUS(status) << ")." << std::endl;
+        }
+		else
+		{
+			std::cerr << "process exited exception(pid:" << pid << ")." << std::endl;
+		}
+    }
+
+	return;
 }
 
 //注册信号
@@ -81,38 +106,47 @@ int main(int argc, char **argv)
 		registerSignal(SIGINT, exitProcess);
 		//和任何控制字符无关,用kill函数发送,与SIGKILL的不同: SIGTERM可以被阻塞,忽略,捕获,也就是说可以进行信号处理程序,那么这样就可以让进程很好的终止,允许清理和关闭文件
 		registerSignal(SIGTERM, exitProcess);
+		//子进程结束时, 父进程会收到这个信号.
+		registerSignal(SIGCHLD, releaseChldProcess);
 
-		//5.初始化监控指标
+		//5.清理旧的进程
+		SINGLETON(CTaskManager)->killAllTask();
+		
+		//6.初始化监控指标
 		SINGLETON(CMetrics)->init();
 		SINGLETON(CMetrics)->updateStarttime(time(NULL));
 
-		//6.启动http服务
-		ret = SINGLETON(CHttpServer)->init();
+		//7.获取资源
+		ret = SINGLETON(CResourceManager)->init();
 		if (ret != 0)
 		{
 			return -2;
 		}
+
+		//8.启动http服务
+		ret = SINGLETON(CHttpServer)->init();
+		if (ret != 0)
+		{
+			return -3;
+		}
 		std::thread httpthd(std::bind(&CHttpServer::start, SINGLETON(CHttpServer)));
 		httpthd.detach(); 
 
-		//7.初始化本地资源信息
-		SINGLETON(CResourceManager)->init();
-
-		//8.启动定时器
+		//9.启动定时器
 		SINGLETON(CTimerHandle)->init();
 
-		//9.启动rpc服务
+		//10.启动rpc服务
 		SINGLETON(CQuSproutServer)->startServer();
     }
     catch(const std::exception& e)
     {
         LOG(ERROR) << "main exception(err:" << e.what() << ").";
-		return -2;
+		return -4;
     }
 	catch(...)
     {
         LOG(ERROR) << "main other exception.";
-		return -3;
+		return -5;
     }
 
 	stop();

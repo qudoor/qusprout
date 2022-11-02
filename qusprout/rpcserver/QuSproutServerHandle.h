@@ -1,5 +1,5 @@
-#ifndef __H__QUWORKRSERVERHANDLE__H__
-#define __H__QUWORKRSERVERHANDLE__H__
+#ifndef __H__QUSPROUTSERVERHANDLE__H__
+#define __H__QUSPROUTSERVERHANDLE__H__
 
 #include "interface/QuSproutServer.h"
 #include "interface/qusproutdata_types.h"

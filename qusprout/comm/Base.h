@@ -7,6 +7,7 @@
 #include <transport/TTransportException.h>
 #include "interface/ecode_constants.h"
 #include "interface/ecode_types.h"
+#include "common/qulog.h"
 
 #define CALL_WITH_SERVICE(CALL, req) \
 int retry = 3; \
@@ -63,23 +64,19 @@ public:
 
     //判断传入字符串是否全数字
     bool isDigitStr(char* str);
-
-    //打印rpc的结构
-    template <typename T>
-    std::string getPrint(const T& req);
 };
+
+//设置rpc返回值
+void setBase(BaseCode& base, const ErrCode::type& code, const std::string& msg = "");
 
 //打印rpc的结构
 template <typename T>
-inline std::string CBase::getPrint(const T& req)
+inline std::string getPrint(const T& req)
 {
     std::stringstream os("");
     req.printTo(os);
     return os.str();
 }
-
-//设置rpc返回值
-void setBase(BaseCode& base, const ErrCode::type& code);
 
 class ResourceData 
 {

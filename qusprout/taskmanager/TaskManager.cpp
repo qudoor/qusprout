@@ -1,12 +1,5 @@
 #include <sstream>
-#include <sys/types.h>
-#include <unistd.h>
-#include <errno.h>
-#include <signal.h>
-#include <thread>
-#include <chrono>
 #include <spawn.h>
-#include <string.h>
 #include "config/Config.h"
 #include "common/qulog.h"
 #include "common/Singleton.h"
@@ -14,6 +7,8 @@
 #include "TaskManager.h"
 #include "comm/SelfStruct.h"
 #include "metrics/metrics.h"
+
+extern char **environ;
 
 std::string getTaskStr(const TaskState& state)
 {
@@ -37,16 +32,21 @@ std::string getTaskStr(const TaskState& state)
     return "";
 }
 
-int CTask::init(const InitQubitsReq& req, const std::string& resourceid, const ResourceData& resourcebytes)
+int CTask::init(const InitQubitsReq& req, const int port, const pid_t childid, const ResourceData& resourcebytes)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
-    
+    int ret = m_client.init("127.0.0.1", port);
+    if (ret != 0)
+    {
+        return -1;
+    }
+
     m_createtime = getCurrMs();
     m_updatetime = m_createtime;
     m_taskinfo = req;
     m_state = TASK_STATE_INITIAL;
-    m_resourceid = resourceid;
     m_resourcebytes = resourcebytes;
+    m_childid = childid;
 
     return 0;
 }
@@ -68,7 +68,7 @@ void CTask::initQubits(InitQubitsResp& resp)
 
     std::ostringstream os("");
     os << getQubits();
-    SINGLETON(CMetrics)->addTaskCount(getResourceId(), os.str());
+    SINGLETON(CMetrics)->addTaskCount(os.str());
 }
 
 void CTask::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
@@ -106,8 +106,8 @@ void CTask::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 
     std::ostringstream os("");
     os << m_taskinfo.qubits;
-    SINGLETON(CMetrics)->addTaskState(m_resourceid, os.str(), getTaskStr(m_state));
-    SINGLETON(CMetrics)->addTaskEscapeTime(m_resourceid, os.str(), getEscapeTime());
+    SINGLETON(CMetrics)->addTaskState(os.str(), getTaskStr(m_state));
+    SINGLETON(CMetrics)->addTaskEscapeTime(os.str(), getEscapeTime());
 }
 
 void CTask::run(RunCircuitResp& resp, const RunCircuitReq& req)
@@ -186,7 +186,6 @@ std::string CTask::getStateStr()
     return getTaskStr(m_state);
 }
 
-
 CTaskManager::CTaskManager()
 {
 
@@ -199,9 +198,11 @@ CTaskManager::~CTaskManager()
 
 void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
-    if (req.id.empty() || req.qubits <= 0)
+    if (req.id.empty() || req.qubits <= 0 ||
+        req.exec_type == ExecCmdType::type::ExecTypeCpuMpi ||
+        req.exec_type == ExecCmdType::type::ExecTypeGpuSingle)
     {
-        LOG(ERROR) << "initQubits is invaild param(taskid:" << req.id << ").";
+        LOG(ERROR) << "initQubits is invaild param(taskid:" << req.id << ",qubits:" << req.qubits << ",exec_type:" << req.exec_type << ").";
         setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
         return;
     }
@@ -214,9 +215,8 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
         return;
     }
 
-    std::string resourceid = "";
     ResourceData resourcebytes;
-    ErrCode::type retcode = SINGLETON(CResourceManager)->getResource(req, resourceid, resourcebytes);
+    ErrCode::type retcode = SINGLETON(CResourceManager)->getResource(req, resourcebytes);
     if (retcode != ErrCode::type::COM_SUCCESS)
     {
         LOG(ERROR) << "initEnv resource is not enough(taskid:" << req.id << ").";
@@ -224,12 +224,38 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
         return;
     }
 
-    InitQubitsReq reqtemp(req);
-    std::shared_ptr<CTask> taskhandle = std::make_shared<CTask>();
-    int ret = taskhandle->init(reqtemp, resourceid, resourcebytes);
+    int port = 0;
+    pid_t childid = -1;
+    int ret = initSubProcess(req, childid, port);
     if (ret != 0)
     {
         setBase(resp.base, ErrCode::type::COM_OTHRE);
+        return;
+    }
+
+    //5.创建work的客户端,等待子线程rpc启动成功(sleeptime*10为1秒)
+    const int sleeptime = 100;
+    int count = SINGLETON(CConfig)->m_waitRpcTimeout*(10);
+    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
+    {
+        count = SINGLETON(CConfig)->m_waitMpiRpcTimeout*(10);
+    }
+    std::shared_ptr<CTask> taskhandle = std::make_shared<CTask>();
+    while(count > 0)
+    {
+        ret = taskhandle->init(req, port, childid, resourcebytes);
+        if (0 == ret)
+        {
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(sleeptime));
+        --count;
+    }
+    if (ret != 0)
+    {
+        LOG(ERROR) << "sub process start rpc failed(taskid:" << req.id << ",port:" << port<< ").";
+        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        kill(childid, SIGKILL);
         return;
     }
 
@@ -240,7 +266,13 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
         return;
     }
 
-    initSimulator(resp, req, taskhandle);
+    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
+    {
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+        return;
+    }
+
+    taskhandle->initQubits(resp);
 }
 
 void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req)
@@ -869,26 +901,30 @@ int CTaskManager::addTask(const std::string& id, std::shared_ptr<CTask> task)
     return 0;
 }
 
-void CTaskManager::getAllUseResourceBytes(std::map<std::string, ResourceData>& resources)
+void CTaskManager::getAllUseResourceBytes(ResourceData& resources)
 {
     std::lock_guard<std::mutex> guard(m_mutex);
     auto iter = m_taskList.begin();
     for (; iter != m_taskList.end(); ++iter)
     {
-        auto& task = iter->second;
-        resources[task->m_resourceid] += task->m_resourcebytes;
+        resources += iter->second->m_resourcebytes;
     }
 }
 
-//模拟器初始化
-void CTaskManager::initSimulator(InitQubitsResp& resp, const InitQubitsReq& req, std::shared_ptr<CTask> task)
+//开机清理task
+int CTaskManager::killAllTask()
+{
+    return  killTask(SINGLETON(CConfig)->m_quworkBinName);
+}
+
+int CTaskManager::initSubProcess(const InitQubitsReq& req, pid_t& childid, int& port)
 {
     //1.获取一个随机端口
-    int port = getLocalPort();
+    port = getLocalPort();
 
     //2.获取启动子进程的参数
     std::vector<std::string> param;
-    getParam(req, port, task, param);
+    getParam(req, port, param);
 
     //3.转换参数结构
     std::ostringstream os("");
@@ -903,58 +939,23 @@ void CTaskManager::initSimulator(InitQubitsResp& resp, const InitQubitsReq& req,
     argv[i] = NULL;
 
     //4.创建子进程
-    pid_t childid = -1;
     int ret = createSubProcess(req, argv, childid);
     delete [] argv;
     if (ret != 0)
     {
         LOG(ERROR) << "createSubProcess failed(taskid:" << req.id << ",param:" << os.str() << ").";
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
-        return;
+        return -1;
     }
     LOG(INFO) << "createSubProcess success(taskid:" << req.id << ",param:" << os.str() << ").";
 
-    //5.创建quwork的客户端,等待子线程rpc启动成功(sleeptime*10为1秒)
-    const int sleeptime = 100;
-    int count = SINGLETON(CConfig)->m_waitRpcTimeout*(10);
-    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
-    {
-        count = SINGLETON(CConfig)->m_waitMpiRpcTimeout*(10);
-    }
-    while(count > 0)
-    {
-        ret = task->m_client.init("127.0.0.1", port);
-        if (0 == ret)
-        {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(sleeptime));
-        --count;
-    }
-    if (ret != 0)
-    {
-        LOG(ERROR) << "sub process start rpc failed(taskid:" << req.id << ",port:" << port<< ").";
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
-        kill(childid, SIGKILL);
-        return;
-    }
-
-    task->m_client.initQubits(resp, req);
-    if (resp.base.code != ErrCode::type::COM_SUCCESS)
-    {
-        std::lock_guard<std::mutex> guard(m_mutex);
-        m_taskList.erase(req.id);
-    }
-    
-    return;
+    return 0;
 }
 
-//创建和执行子进程
-int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childId)
+int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childid)
 {
     //2.创建子进程
     int ret = -1;
-    childId = -1;
+    childid = -1;
     sigset_t mask;
     posix_spawnattr_t attr;
     posix_spawn_file_actions_t fact;
@@ -999,7 +1000,7 @@ int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, 
         {
             pathname = "/usr/local/bin/mpiexec";
         }
-        ret = posix_spawn(&childId, pathname.c_str(), &fact, &attr, argv, environ);
+        ret = posix_spawn(&childid, pathname.c_str(), &fact, &attr, argv, environ);
         if (ret != 0)
         {
             LOG(ERROR) << "posix_spawn failed(id:" << req.id << ",pathname:" << pathname << ",err:" << strerror(errno) << ").";
@@ -1032,40 +1033,56 @@ int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, 
         return -2;
     }
 
-    LOG(INFO) << "create sub process success(id:" << req.id << ",childpid:" << childId << ").";
+    LOG(INFO) << "create sub process success(id:" << req.id << ",childpid:" << childid << ").";
 
     return 0;
 }
-
 //获取cpu执行子进程的参数
-void CTaskManager::getParam(const InitQubitsReq& req, const int port, std::shared_ptr<CTask> task, std::vector<std::string>& param)
+void CTaskManager::getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param)
 {
-    size_t hostsize = 1;
-    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type && hostsize > 0)
+    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
     {
+        int hostsize = (int)req.hosts.size();
         std::ostringstream os("");
         //1.mpi命令
         param.push_back("/usr/local/bin/mpiexec");
 
         //2.执行进程数量
         param.push_back("-n");
-        int prosize = getNumRanks(req.qubits, hostsize);
+        int numranks = SINGLETON(CResourceManager)->getNumRanks(req.qubits, hostsize);
         os.str("");
-        os << prosize;
+        os << numranks;
         param.push_back(os.str());
 
         //3.mpi执行的机器列表
-        param.push_back("-hosts");
         os.str("");
-        os << task->m_resourceid;
+        param.push_back("-hosts");
+        if (0 == hostsize)
+        {
+            os << SINGLETON(CResourceManager)->getAddr();
+        }
+        else
+        {
+            auto iter = req.hosts.begin();
+            for (; iter != req.hosts.end(); ++iter)
+            {
+                if (iter == req.hosts.begin())
+                {
+                    os << *iter;
+                }
+                else
+                {
+                    os << "," << *iter;
+                }
+            }
+        }
         param.push_back(os.str());
     }
 
-    // 4. quwork执行的参数
+    //4.quwork执行的参数
     getSingleParam(req, port, param);
 }
 
-//获取cpu执行单个子进程的参数
 void CTaskManager::getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param)
 {
     std::ostringstream os("");
@@ -1102,32 +1119,4 @@ void CTaskManager::getSingleParam(const InitQubitsReq& req, const int port, std:
     os.str("");
     os << (int)req.exec_type;
     param.push_back(os.str());
-}
-
-//获取启动mpi的进程数
-int CTaskManager::getNumRanks(const int numQubits, const int hostSize)
-{
-    //只有一台机器就只开一个进程
-    if (1 == hostSize)
-    {
-        return 1;
-    }
-
-    //取小于等于并且离hostSize最近的2的n次方
-    long unsigned int numranks = 1;
-    long unsigned int newnumranks = 1;
-    while(newnumranks <= (long unsigned int)hostSize)
-    {
-        numranks = newnumranks;
-        newnumranks *= 2;
-    }
-    
-    //qubit太小的时候取2的numQubits次方作为进程数
-    long unsigned int numAmps = (1UL<<numQubits);
-    if (numAmps < numranks)
-    {
-        numranks = numAmps;
-    }
-
-    return (int)numranks;
 }

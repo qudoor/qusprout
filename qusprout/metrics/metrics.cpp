@@ -52,28 +52,10 @@ m_currRsFreeMemory(
     .Help("qusprout_resource_curr_cpu_free_memory gauge")
     .Register(*registry)
 ),
-m_currRsGpuType(
-    prometheus::BuildGauge()
-    .Name("qusprout_resource_curr_gpu_type")
-    .Help("qusprout_resource_curr_gpu_type gauge")
-    .Register(*registry)
-),
-m_currRsGpuAllMemory(
-    prometheus::BuildGauge()
-    .Name("qusprout_resource_curr_gpu_all_memory")
-    .Help("qusprout_resource_curr_gpu_all_memory gauge")
-    .Register(*registry)
-),
 m_currRsUpdatetime(
     prometheus::BuildGauge()
     .Name("qusprout_resource_curr_updatetime")
     .Help("qusprout_resource_curr_updatetime gauge")
-    .Register(*registry)
-),
-m_currRsState(
-    prometheus::BuildGauge()
-    .Name("qusprout_resource_curr_state")
-    .Help("qusprout_resource_curr_state gauge")
     .Register(*registry)
 ),
 m_currStartTime(
@@ -107,13 +89,12 @@ int CMetrics::init()
     return 0;
 }
 
-void CMetrics::addTaskEscapeTime(const std::string& resourceid, const std::string& qubits, const double ms)
+void CMetrics::addTaskEscapeTime(const std::string& qubits, const double ms)
 {
-    if (!resourceid.empty() && !qubits.empty())
+    if (!qubits.empty())
     {
         auto& histogram = m_metrics->m_taskEscapeTime.Add(
             {
-                {"resourceid", resourceid},
                 {"qubits", qubits}
             },
             prometheus::Histogram::BucketBoundaries{ 5.00, 10.00, 50.00, 100.00, 250.00, 500.00, 1000.00, 2000.00, 3000.00, 5000.00, 10000.00, 20000.00, 30000.00 }
@@ -123,11 +104,10 @@ void CMetrics::addTaskEscapeTime(const std::string& resourceid, const std::strin
     }
 }
 
-void CMetrics::addTaskCount(const std::string& resourceid, const std::string& qubits)
+void CMetrics::addTaskCount(const std::string& qubits)
 {
     auto& count = m_metrics->m_taskCount.Add(
         {
-            {"resourceid", resourceid},
             {"qubits", qubits}
         }
     );
@@ -159,11 +139,10 @@ void CMetrics::addCodeCount(const std::string& interfacename, const std::string&
     count.Increment();
 }
 
-void CMetrics::addTaskState(const std::string& resourceid, const std::string& qubits, const std::string& state)
+void CMetrics::addTaskState(const std::string& qubits, const std::string& state)
 {
     auto& count = m_metrics->m_taskState.Add(
         {
-            {"resourceid", resourceid},
             {"qubits", qubits},
             {"state", state}
         }
@@ -187,98 +166,43 @@ void CMetrics::addCurrTaskState(const CTaskStateMetrics& key)
     }
 }
 
-void CMetrics::addResource(const std::string& resourceid, const DeviceResourceDetail& resource)
+void CMetrics::addResource(const MachineSysInfo& sys, const MemUseInfo& mem)
 {
-    auto& machine = resource.machine;
-    auto& resourceinfo = resource.resource;
-
-    double cpuallmemory = resourceinfo.cpu_total_memory;
-    double cpufreememory = resourceinfo.cpu_free_memory;
-    double gputype = resourceinfo.gpu_type;
-    double gpuallmemory = resourceinfo.gpu_total_memory;
-
     //资源的总内存
     auto& allcpumemorygauge = m_metrics->m_currRsAllMemory.Add(
         {
-            {"resourceid", resourceid},
-            {"addr", machine.addr},
-            {"sysname", machine.sys_name},
-            {"sysrelease", machine.sys_release},
-            {"sysversion", machine.sys_version},
-            {"sysmachine", machine.sys_machine}
+            {"addr", sys.addr},
+            {"sysname", sys.sys_name},
+            {"sysrelease", sys.sys_release},
+            {"sysversion", sys.sys_version},
+            {"sysmachine", sys.sys_machine}
         }
     );
-    allcpumemorygauge.Set(cpuallmemory);
+    allcpumemorygauge.Set(mem.totalRam);
         
     //资源的可用内存
     auto& freecpumemorygauge = m_metrics->m_currRsFreeMemory.Add(
         {
-            {"resourceid", resourceid},
-            {"addr", machine.addr},
-            {"sysname", machine.sys_name},
-            {"sysrelease", machine.sys_release},
-            {"sysversion", machine.sys_version},
-            {"sysmachine", machine.sys_machine}
+            {"addr", sys.addr},
+            {"sysname", sys.sys_name},
+            {"sysrelease", sys.sys_release},
+            {"sysversion", sys.sys_version},
+            {"sysmachine", sys.sys_machine}
         }
     );
-    freecpumemorygauge.Set(cpufreememory);
-
-    //资源的显存类型
-    auto& gputypegauge = m_metrics->m_currRsGpuType.Add(
-        {
-            {"resourceid", resourceid},
-            {"addr", machine.addr},
-            {"sysname", machine.sys_name},
-            {"sysrelease", machine.sys_release},
-            {"sysversion", machine.sys_version},
-            {"sysmachine", machine.sys_machine}
-        }
-    );
-    gputypegauge.Set(gputype);
-
-    //资源的总显存
-    auto& allgpumemorygauge = m_metrics->m_currRsGpuAllMemory.Add(
-        {
-            {"resourceid", resourceid},
-            {"addr", machine.addr},
-            {"sysname", machine.sys_name},
-            {"sysrelease", machine.sys_release},
-            {"sysversion", machine.sys_version},
-            {"sysmachine", machine.sys_machine}
-        }
-    );
-    allgpumemorygauge.Set(gpuallmemory);
+    freecpumemorygauge.Set(mem.freeRam);
 
     //资源的启动时间
     auto& starttimegauge = m_metrics->m_currRsUpdatetime.Add(
         {
-            {"resourceid", resourceid},
-            {"addr", machine.addr},
-            {"sysname", machine.sys_name},
-            {"sysrelease", machine.sys_release},
-            {"sysversion", machine.sys_version},
-            {"sysmachine", machine.sys_machine}
+            {"addr", sys.addr},
+            {"sysname", sys.sys_name},
+            {"sysrelease", sys.sys_release},
+            {"sysversion", sys.sys_version},
+            {"sysmachine", sys.sys_machine}
         }
     );
     starttimegauge.SetToCurrentTime();
-
-    //资源的状态
-    auto& stategauge = m_metrics->m_currRsState.Add(
-        {
-            {"resourceid", resourceid}
-        }
-    );
-    stategauge.SetToCurrentTime();
-}
-
-void CMetrics::clearResource(const std::string& resourceid)
-{
-    auto& stategauge = m_metrics->m_currRsState.Add(
-        {
-            {"resourceid", resourceid}
-        }
-    );
-    stategauge.Set(0);
 }
 
 void CMetrics::updateStarttime(const int currtime)
@@ -300,10 +224,7 @@ std::string CMetrics::getMetricsStr()
     auto currstatemetrics = m_metrics->m_currTaskState.Collect();
     auto rsallmrmorymetrics = m_metrics->m_currRsAllMemory.Collect();
     auto rsfreememorymetrics = m_metrics->m_currRsFreeMemory.Collect();
-    auto rsgputypemetrics = m_metrics->m_currRsGpuType.Collect();
-    auto rsgpuallmemorymetrics = m_metrics->m_currRsGpuAllMemory.Collect();
     auto rsstarttimemetrics = m_metrics->m_currRsUpdatetime.Collect();
-    auto rsstatemetrics = m_metrics->m_currRsState.Collect();
     auto starttimemetrics = m_metrics->m_currStartTime.Collect();
 
     taskescapemetrics.insert(taskescapemetrics.end(), countmetrics.begin(), countmetrics.end());
@@ -313,10 +234,7 @@ std::string CMetrics::getMetricsStr()
     taskescapemetrics.insert(taskescapemetrics.end(), currstatemetrics.begin(), currstatemetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), rsallmrmorymetrics.begin(), rsallmrmorymetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), rsfreememorymetrics.begin(), rsfreememorymetrics.end());
-    taskescapemetrics.insert(taskescapemetrics.end(), rsgputypemetrics.begin(), rsgputypemetrics.end());
-    taskescapemetrics.insert(taskescapemetrics.end(), rsgpuallmemorymetrics.begin(), rsgpuallmemorymetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), rsstarttimemetrics.begin(), rsstarttimemetrics.end());
-    taskescapemetrics.insert(taskescapemetrics.end(), rsstatemetrics.begin(), rsstatemetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), starttimemetrics.begin(), starttimemetrics.end());
 
     const auto serializer = prometheus::TextSerializer{};

@@ -225,6 +225,14 @@ std::string CConfig::getPrintStr()
         << ",httpThreadNum:" << m_httpThreadNum
         << "];"
 
+        << "quwork[quworkBinPath:" << m_quworkBinPath
+        << ",quworkBinName:" << m_quworkBinName
+        << ",quworkConfigPath:" << m_quworkConfigPath
+        << ",quworkConfigName:" << m_quworkConfigName
+        << ",waitRpcTimeout:" << m_waitRpcTimeout
+        << ",waitMpiRpcTimeout:" << m_waitMpiRpcTimeout
+        << "];"
+
         << "}.";
 
     return os.str();

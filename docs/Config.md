@@ -41,6 +41,13 @@ qusprout.yaml
 |7  |http  |object  |-  |QuSprout的http的api  |
 |7.1  |listenHttpPort  |int  |9093  |http监听的端口  |
 |7.2  |httpThreadNum  |int  |5  |处理http接口的线程数  |
+|8  |quwork  |object  |-  |work进程配置  |
+|8.1  |quworkBinPath  |string  |/usr/local/bin |work进程的二进制文件路径  |
+|8.2  |quworkBinName  |string  |quwork  |work进程的二进制文件名  |
+|8.3  |quworkConfigPath  |string  |/usr/local/etc/qusprout  |work进程的执行配置文件路径  |
+|8.4  |quworkConfigName  |string  |quwork.yaml  |work进程的执行配置文件名  |
+|8.5  |waitRpcTimeout  |int  |120  |等待work以非MPI方式执行操作的超时时间  |
+|8.6  |waitMpiRpcTimeout  |int  |300  |等待work以MPI方式执行操作的超时时间  |
 
 ### 2.2 quwork服务配置文件
 配置文件名：

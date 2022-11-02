@@ -7,7 +7,6 @@
 #include <algorithm>
 #include "../config/Config.h"
 #include <algorithm>
-#include "../../common/utility.h"
 #include "../../common/Singleton.h"
 #include "../common/QuESTIniter.h"
 #include "../../common/qulog.h"

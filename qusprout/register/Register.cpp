@@ -29,7 +29,7 @@ int CRegister::resourceRegister()
     }
     m_resourceid = sys.addr;
 
-    //向qusprout注册
+    //向quroot注册
     ResourceRegisterReq req;
     ResourceRegisterResp resp;
     req.__set_resource_id(m_resourceid);

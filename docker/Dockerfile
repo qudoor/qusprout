@@ -26,8 +26,8 @@ COPY --from=builder /usr/local/bin/qusprout /usr/local/bin/
 COPY --from=builder /usr/local/bin/quwork /usr/local/bin/
 COPY --from=builder /usr/local/etc/qusprout/qusprout.yaml /usr/local/etc/qusprout/
 COPY --from=builder /usr/local/etc/qusprout/quwork.yaml /usr/local/etc/qusprout/
-COPY start_qusprout.sh /usr/local/bin/
+
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64
 
-ENTRYPOINT ["sh", "/usr/local/bin/start_qusprout.sh"]
+ENTRYPOINT ["sh", "/usr/local/bin/qusprout", "-c", "/usr/local/etc/qusprout/qusprout.yaml"]
