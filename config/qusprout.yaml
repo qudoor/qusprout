@@ -8,7 +8,6 @@ rpc:
   listenPort: 9091
   sendTimeout: 0
   recvTimeout: 0
-  listenSysPort: 9092
 task:
   cleanTaskInterval: 150
   cleanTaskTimeout:

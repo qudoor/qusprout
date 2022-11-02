@@ -265,12 +265,6 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
         return;
     }
 
-    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
-    {
-        setBase(resp.base, ErrCode::type::COM_SUCCESS);
-        return;
-    }
-
     taskhandle->initQubits(resp);
 }
 

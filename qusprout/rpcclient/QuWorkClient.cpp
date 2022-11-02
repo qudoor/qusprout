@@ -84,8 +84,15 @@ void CQuWorkClient::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
     LOG(INFO) << "request initQubits(req:" << getPrint(req) << ").";
 
-    CALL_WITH_SERVICE(m_client->initQubits(resp, req), req);
-    if (resp.base.code == ErrCode::COM_SUCCESS)
+    if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
+    {
+        setBase(resp.base, ErrCode::type::COM_SUCCESS);
+    }
+    else
+    {
+        CALL_WITH_SERVICE(m_client->initQubits(resp, req), req);
+    }
+    if (resp.base.code == ErrCode::type::COM_SUCCESS)
     {
         m_isInit = true;
     }

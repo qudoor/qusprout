@@ -3,3 +3,4 @@ cmake_minimum_required(VERSION 3.7)
 
 #添加子模块
 add_subdirectory(testgate)
+add_subdirectory(testhttpapi)
