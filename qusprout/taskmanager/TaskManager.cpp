@@ -920,7 +920,10 @@ int CTaskManager::killAllTask()
 int CTaskManager::initSubProcess(const InitQubitsReq& req, pid_t& childid, int& port)
 {
     //1.获取一个随机端口
-    port = getLocalPort();
+    {
+        std::lock_guard<std::mutex> guard(m_mutex);
+        port = getLocalPort();
+    }
 
     //2.获取启动子进程的参数
     std::vector<std::string> param;
