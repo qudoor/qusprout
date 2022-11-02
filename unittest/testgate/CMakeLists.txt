@@ -5,11 +5,11 @@ cmake_minimum_required(VERSION 3.7)
 project(testgate)
 
 #生成rpc接口
-execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/../../work/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../../idl/ecode.thrift)
-execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/../../work/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../../idl/qusproutdata.thrift)
-execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/../../work/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../../idl/qusprout.thrift)
-if(EXISTS ${PROJECT_SOURCE_DIR}/../../work/interface/QuSproutServer_server.skeleton.cpp)
-    execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/../../work/interface/QuSproutServer_server.skeleton.cpp)
+execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/../../quwork/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../../idl/ecode.thrift)
+execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/../../quwork/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../../idl/qusproutdata.thrift)
+execute_process(COMMAND thrift -r -out ${PROJECT_SOURCE_DIR}/../../quwork/interface/ --gen cpp ${PROJECT_SOURCE_DIR}/../../idl/qusprout.thrift)
+if(EXISTS ${PROJECT_SOURCE_DIR}/../../quwork/interface/QuSproutServer_server.skeleton.cpp)
+    execute_process(COMMAND rm -rf ${PROJECT_SOURCE_DIR}/../../quwork/interface/QuSproutServer_server.skeleton.cpp)
 endif()
 
 #set设置普通变量，缓存变量或环境变量
@@ -45,15 +45,15 @@ endif ()
 #使用 GLOB 命令使用通配符模式匹配查找文件
 file(GLOB SRC_LIST
 	"${PROJECT_SOURCE_DIR}/../../common/*.cpp"
-	"${PROJECT_SOURCE_DIR}/../../work/common/*.cpp"
-	"${PROJECT_SOURCE_DIR}/../../work/command/*.cpp"
-	"${PROJECT_SOURCE_DIR}/../../work/config/*.cpp"
-	"${PROJECT_SOURCE_DIR}/../../work/interface/*.cpp"
+	"${PROJECT_SOURCE_DIR}/../../quwork/common/*.cpp"
+	"${PROJECT_SOURCE_DIR}/../../quwork/command/*.cpp"
+	"${PROJECT_SOURCE_DIR}/../../quwork/config/*.cpp"
+	"${PROJECT_SOURCE_DIR}/../../quwork/interface/*.cpp"
 	"*.cpp"
 )
 
 #头文件搜索路径，路径之间用空格分隔，相当于指定-I参数
-include_directories(${PROJECT_SOURCE_DIR}/../../include ${PROJECT_SOURCE_DIR}/../.. ${PROJECT_SOURCE_DIR}/../../work ${PROJECT_SOURCE_DIR} /usr/include /usr/local/include /usr/local/include/thrift)
+include_directories(${PROJECT_SOURCE_DIR}/../../include ${PROJECT_SOURCE_DIR}/../.. ${PROJECT_SOURCE_DIR}/../../quwork ${PROJECT_SOURCE_DIR} /usr/include /usr/local/include /usr/local/include/thrift)
 
 #动态链接库或静态链接库的搜索路径，相当于-L参数
 IF (APPLE)

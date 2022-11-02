@@ -1,12 +1,9 @@
 #!/bin/bash
 
-master_path=/usr/local/bin/qusprout-master
-slave_path=/usr/local/bin/qusprout-slave
+qusprout_path=/usr/local/bin/qusprout
 
-master_yaml=/usr/local/etc/qusprout/qusprout-master.yaml
-slave_yaml=/usr/local/etc/qusprout/qusprout-slave.yaml
+qusprout_yaml=/usr/local/etc/qusprout/qusprout.yaml
 
-nohup $master_path -c $master_yaml &
-nohup $slave_path -c $slave_yaml &
+nohup $qusprout_path -c $qusprout_yaml &
 
 /bin/bash

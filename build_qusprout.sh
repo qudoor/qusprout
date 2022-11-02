@@ -10,15 +10,15 @@ build_path=$src_root/build
 install_path=$src_root/install
 
 #服务名称
-service_binfile_array=('qusprout-master' 'qusprout-work')
+service_binfile_array=('qusprout' 'quwork')
 
 #编译方法：1:cmake, 2:makefile
 service_build_method_array=(1 1)
 
 #编译目录
 service_src_path_array=( \
-    "${src_root}/master" \
-    "${src_root}/work"
+    "${src_root}/qusprout" \
+    "${src_root}/quwork"
 )
 
 #编译单个服务
@@ -123,7 +123,7 @@ build() {
 print_help() {
 	echo "Usage Example: "
 	echo "  $0 version 1.0.0 --Build all as version 1.0"
-    	echo "  $0 version 1.0.0 qusprout-master|qusprout-work  --Build one service as version 1.0"
+    	echo "  $0 version 1.0.0 qusprout|quwork  --Build one service as version 1.0"
 }
 
 case $1 in

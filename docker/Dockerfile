@@ -22,12 +22,10 @@ WORKDIR /app
 
 RUN mkdir -p /usr/local/bin && mkdir -p /usr/local/etc/qusprout
 	
-COPY --from=builder /usr/local/bin/qusprout-master /usr/local/bin/
-COPY --from=builder /usr/local/bin/qusprout-slave /usr/local/bin/
-COPY --from=builder /usr/local/bin/qusprout-work /usr/local/bin/
-COPY --from=builder /usr/local/etc/qusprout/qusprout-master.yaml /usr/local/etc/qusprout/
-COPY --from=builder /usr/local/etc/qusprout/qusprout-slave.yaml /usr/local/etc/qusprout/
-COPY --from=builder /usr/local/etc/qusprout/qusprout-work.yaml /usr/local/etc/qusprout/
+COPY --from=builder /usr/local/bin/qusprout /usr/local/bin/
+COPY --from=builder /usr/local/bin/quwork /usr/local/bin/
+COPY --from=builder /usr/local/etc/qusprout/qusprout.yaml /usr/local/etc/qusprout/
+COPY --from=builder /usr/local/etc/qusprout/quwork.yaml /usr/local/etc/qusprout/
 COPY start_qusprout.sh /usr/local/bin/
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app:/usr/lib:/usr/lib64:/usr/local/lib:/usr/local/lib64
