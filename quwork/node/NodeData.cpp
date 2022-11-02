@@ -1,11 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
-
 #include "mpi.h"
-
-#include "../../common/qulog.h"
-
+#include "common/qulog.h"
 #include "NodeData.h"
 
 NodeData::NodeData()

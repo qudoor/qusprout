@@ -5,7 +5,7 @@
 #include <iostream>
 #include <thread>
 #include <sstream>
-
+#include <signal.h>
 #include <thrift/server/TThreadedServer.h>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TThreadPoolServer.h>
@@ -14,18 +14,15 @@
 #include <thrift/processor/TMultiplexedProcessor.h>
 #include <thrift/concurrency/ThreadFactory.h>
 #include <thrift/concurrency/ThreadManager.h>
-
-#include "../command/executor.h"
-#include "../config/Config.h"
-
-#include "../../common/general.h"
-#include "../../common/Singleton.h"
-#include "../../common/qulog.h"
-
-#include "../common/QuESTIniter.h"
+#include "command/executor.h"
+#include "config/Config.h"
+#include "common/general.h"
+#include "common/Singleton.h"
+#include "common/qulog.h"
+#include "common/QuESTIniter.h"
 #include "WorkServerHandler.h"
-#include "../node/WorkNodeHandler.h"
-#include "../common/CmdParams.h"
+#include "node/WorkNodeHandler.h"
+#include "common/CmdParams.h"
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;

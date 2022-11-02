@@ -1,8 +1,7 @@
 #include <iostream>
 #include <string>
-#include "../config/Config.h"
-#include "../../common/Singleton.h"
-
+#include "config/Config.h"
+#include "common/Singleton.h"
 #include "QuESTIniter.h"
 
 CQuESTIniter::CQuESTIniter()

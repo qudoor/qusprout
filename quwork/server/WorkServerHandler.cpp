@@ -1,13 +1,11 @@
 #include <iostream>
 #include <sstream>
-
-#include "../../common/Singleton.h"
-#include "../../common/qulog.h"
-#include "../interface/ecode_constants.h"
-#include "../common/QuESTIniter.h"
-
+#include "common/Singleton.h"
+#include "common/qulog.h"
+#include "interface/ecode_constants.h"
+#include "common/QuESTIniter.h"
 #include "WorkServerHandler.h"
-#include "../common/CmdParams.h"
+#include "common/CmdParams.h"
 
 CWorkServerHandler::CWorkServerHandler()
 {

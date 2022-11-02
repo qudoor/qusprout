@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "../interface/qusproutdata_types.h"
+#include "interface/qusproutdata_types.h"
 
 const int PACKSIZE = 1024 * 1024;
 

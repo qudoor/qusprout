@@ -1,11 +1,9 @@
 #include <iostream>
 #include <sstream>
-
-#include "../../common/Singleton.h"
-#include "../../common/qulog.h"
+#include "common/Singleton.h"
+#include "common/qulog.h"
 #include "mpi.h"
-
-#include "../common/QuESTIniter.h"
+#include "common/QuESTIniter.h"
 #include "WorkNodeHandler.h"
 
 CWorkNodeHandler::CWorkNodeHandler()

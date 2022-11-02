@@ -5,8 +5,8 @@
 #include <mutex>
 #include <atomic>
 #include "QuEST.h"
-#include "../../common/general.h"
-#include "../interface/qusproutdata_types.h"
+#include "common/general.h"
+#include "interface/qusproutdata_types.h"
 
 BEGIN_NAMESPACE(QS)
 

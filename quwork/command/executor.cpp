@@ -1,16 +1,15 @@
-#include "executor.h"
 #include <iostream>
 #include <string>
 #include <math.h>
 #include <time.h>
 #include <fstream>
 #include <algorithm>
-#include "../config/Config.h"
-#include <algorithm>
-#include "../../common/Singleton.h"
-#include "../common/QuESTIniter.h"
-#include "../../common/qulog.h"
+#include "config/Config.h"
+#include "common/Singleton.h"
+#include "common/QuESTIniter.h"
+#include "common/qulog.h"
 #include "mpi.h"
+#include "executor.h"
 
 using namespace QS;
 using namespace std;

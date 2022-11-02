@@ -9,10 +9,9 @@
 #include <thrift/processor/TMultiplexedProcessor.h>
 #include <thrift/concurrency/ThreadFactory.h>
 #include <thrift/concurrency/ThreadManager.h>
-
-#include "../interface/QuSproutServer.h"
-#include "../command/executor.h"
-#include "../node/WorkNodeHandler.h"
+#include "interface/QuSproutServer.h"
+#include "command/executor.h"
+#include "node/WorkNodeHandler.h"
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;

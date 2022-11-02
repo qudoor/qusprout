@@ -1,8 +1,8 @@
 #ifndef WorkNodeHandler_H
 #define WorkNodeHandler_H
 
-#include "../node/NodeData.h"
-#include "../command/executor.h"
+#include "node/NodeData.h"
+#include "command/executor.h"
 
 class CWorkNodeHandler
 {
