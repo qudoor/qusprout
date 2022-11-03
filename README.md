@@ -36,17 +36,17 @@
 
 1. QuSprout 根目录下的thirdparty目录里面包含了所有编译和运行 QuSprout 的第三方库，该目录下的install.sh脚本可以一键安装所有的依赖库:
    ```Shell
-    chmod a+x install.sh
-    ./install.sh
+    sudo chmod a+x install.sh
+    sudo ./install.sh
     ```
 1. QuSprout 根目录下有个 build_qusprout.sh 脚本文件，这个脚本文件是用来对 QuSprout 进行编译的。
 2. 赋予编译脚本执行权限：
     ```Shell
-    chmod a+x build_qusprout.sh
+    sudo chmod a+x build_qusprout.sh
     ```
 3. 执行编译脚本，0.1.11是需要编译的版本号:
     ```Shell
-    ./build_qusprout.sh version 0.1.11
+    sudo ./build_qusprout.sh version 0.1.11
     ```
 
 ##### 安装：
@@ -55,11 +55,11 @@
 2. QuSprout 根目录下有个 service_qusprout.sh 脚本文件，这个脚本文件是用来对 QuSprout 进行安装部署的。
 3. 赋予部署脚本执行权限：
     ```Shell
-    chmod a+x service_qusprout.sh
+    sudo chmod a+x service_qusprout.sh
     ```
 4. 执行部署脚本, 执行时会在当前目前下查找 build_v0.1.11.tar.gz 编译文件，0.1.11 是要安装部署的版本号。 
     ```Shell
-    ./service_qusprout.sh version 0.1.11
+    sudo ./service_qusprout.sh version 0.1.11
     ```
 
 ##### 启动：
@@ -67,7 +67,7 @@
 1. 安装完成后，需要启动 qusprout 服务。
 2. 启动 qusprout 服务：
     ```Shell
-    ./service_qusprout.sh start qusprout
+    sudo ./service_qusprout.sh start qusprout
     ```
 3. service_qusprout 支持另外两个参数 stop，restart，分别对应于停止和重启服务。
 
