@@ -55,6 +55,9 @@ bool CTestAddGateCmd::run(const int qubitnum)
     rnt = m_handle.getMeasure(targets, getresp);
     ASSERT_RNT(rnt);
 
+    rnt = m_handle.endAdd();
+    ASSERT_RNT(rnt);
+    
     for (auto measure : getresp.measures)
     {
         std::cout << "result(qubitnum:" << m_qubitnum << ",target:"<< measure.target << ",value:" << measure.value << ")." << std::endl;

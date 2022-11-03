@@ -47,6 +47,9 @@ bool CTestGetEPauliSum::run(const int qubitnum)
     rnt = m_handle.getEPauliSum(opertypes, terms, expect);
     ASSERT_RNT(rnt);
 
+    rnt = m_handle.endAdd();
+    ASSERT_RNT(rnt);
+    
     std::cout << "result(qubitnum:" << m_qubitnum << ",expect:"<< expect << ")." << std::endl;
     
     return true;
