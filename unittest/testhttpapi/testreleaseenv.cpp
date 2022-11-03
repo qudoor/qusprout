@@ -54,6 +54,9 @@ bool CTestReleaseEnv::run(const int qubitnum)
     rnt = m_handle.getMeasure(targets, getresp);
     ASSERT_RNT(rnt);
 
+    rnt = m_handle.endAdd();
+    ASSERT_RNT(rnt);
+    
     rnt = m_handle.releaseQCircuit();
     ASSERT_RNT(rnt);
 

@@ -120,6 +120,9 @@ bool CTestGetAmp::run(const int qubitnum)
 
         std::cout << "prob of state |"<< operindexs << "> = " << std::setprecision(14) << amp << std::endl;
     }
-    
+
+    rnt = m_handle.endAdd();
+    ASSERT_RNT(rnt);
+        
     return true;
 }

@@ -69,5 +69,8 @@ bool CTestGetState::run(const int qubitnum)
         std::cout << "result(qubitnum:" << m_qubitnum << ",target:"<< measure.target << ",value:" << measure.value << ")." << std::endl;
     }
     
+    rnt = m_handle.endAdd();
+    ASSERT_RNT(rnt);
+    
     return true;
 }

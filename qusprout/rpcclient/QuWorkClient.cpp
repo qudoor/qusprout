@@ -1,3 +1,6 @@
+#include <ctime>
+#include <thread>
+#include <functional>
 #include <transport/TSocket.h>
 #include <protocol/TBinaryProtocol.h>
 #include <protocol/TMultiplexedProtocol.h>
@@ -34,6 +37,7 @@ int CQuWorkClient::init(const std::string& addr, const int port)
             break;
         }
         --retry;
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     } while(retry > 0);
 
     return ret;
