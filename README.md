@@ -46,7 +46,7 @@
     ```
 3. 执行编译脚本，0.1.11是需要编译的版本号:
     ```Shell
-    build_qusprout.sh version 0.1.11
+    ./build_qusprout.sh version 0.1.11
     ```
 
 ##### 安装：
@@ -59,7 +59,7 @@
     ```
 4. 执行部署脚本, 执行时会在当前目前下查找 build_v0.1.11.tar.gz 编译文件，0.1.11 是要安装部署的版本号。 
     ```Shell
-    service_qusprout.sh version 0.1.11
+    ./service_qusprout.sh version 0.1.11
     ```
 
 ##### 启动：
@@ -67,7 +67,7 @@
 1. 安装完成后，需要启动 qusprout 服务。
 2. 启动 qusprout 服务：
     ```Shell
-    service_qusprout.sh start qusprout
+    ./service_qusprout.sh start qusprout
     ```
 3. service_qusprout 支持另外两个参数 stop，restart，分别对应于停止和重启服务。
 
