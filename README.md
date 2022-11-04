@@ -39,12 +39,13 @@
     sudo chmod a+x install.sh
     sudo ./install.sh
     ```
-1. QuSprout 根目录下有个 build_qusprout.sh 脚本文件，这个脚本文件是用来对 QuSprout 进行编译的。
-2. 赋予编译脚本执行权限：
+    **Noted： CentOS上需要使用root权限执行**
+2. QuSprout 根目录下有个 build_qusprout.sh 脚本文件，这个脚本文件是用来对 QuSprout 进行编译的。
+3. 赋予编译脚本执行权限：
     ```Shell
     sudo chmod a+x build_qusprout.sh
     ```
-3. 执行编译脚本，0.1.11是需要编译的版本号:
+4. 执行编译脚本，0.1.11是需要编译的版本号:
     ```Shell
     sudo ./build_qusprout.sh version 0.1.11
     ```
