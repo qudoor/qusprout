@@ -134,12 +134,18 @@ bool CGate::releaseQCircuit()
     {
         return true;
     }
-    CancelCmdReq cancelreq;
-    cancelreq.__set_id(m_taskid);
-    CancelCmdResp cancelresp;
-    CALL_WITH_TRY_SERVICE(m_client->cancelCmd(cancelresp, cancelreq), cancelreq);
-    ASSERT_CODE(cancelresp.base.code, cancelresp.base.msg);
+
+    if (m_client)
+    {
+        CancelCmdReq cancelreq;
+        cancelreq.__set_id(m_taskid);
+        CancelCmdResp cancelresp;
+        CALL_WITH_TRY_SERVICE(m_client->cancelCmd(cancelresp, cancelreq), cancelreq);
+        ASSERT_CODE(cancelresp.base.code, cancelresp.base.msg);
+    }
+    
 	m_isrelease = true;
+    
     return true;
 }
 

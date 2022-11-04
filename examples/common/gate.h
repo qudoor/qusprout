@@ -60,7 +60,7 @@ private:
     bool m_density{false};
     std::string m_taskid{""};
     std::atomic_long m_index{0};
-    std::shared_ptr<QuSproutServerClient> m_client;
+    std::shared_ptr<QuSproutServerClient> m_client{nullptr};
     std::shared_ptr<TTransport> m_transport{nullptr};
     bool m_isrelease{false};
 };

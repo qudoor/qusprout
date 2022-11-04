@@ -246,8 +246,6 @@ void CmdExecutor::run(Result& result, int32_t shots) {
         run_times -= 1;
     }
 
-    SINGLETON(CQuESTIniter)->finalize();
-
     sort(m_result.outcomeSet.begin(), m_result.outcomeSet.end(), [](const Outcome& a, const Outcome& b) {return a.bitstr.compare(b.bitstr) < 0;});
     result = m_result;
     return;
