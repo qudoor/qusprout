@@ -109,7 +109,10 @@ void CTask::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req, const Cancel
         }
         else
         {
-            m_state = TASK_STATE_ERROR;
+            if (TASK_STATE_DONE != m_state)
+            {
+                m_state = TASK_STATE_ERROR;
+            }
         }
         if (m_client.isInit())
         {
