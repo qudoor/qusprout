@@ -456,9 +456,9 @@ fi
 #libhv安装
 if [ ! -f "/usr/local/lib/libhv_static.a" ]; then
     echo "begin install libhv"
-    rm -rf libhv-master
-    unzip libhv-master.zip
-    cd libhv-master
+    rm -rf libhv-v1.2.6
+    unzip libhv-v1.2.6.zip
+    cd libhv-v1.2.6
     mkdir build
     cd build
     cmake ..
