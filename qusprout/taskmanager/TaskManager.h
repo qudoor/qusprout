@@ -36,6 +36,19 @@ enum TaskState
     TASK_STATE_TIMEOUT = 6
 };
 
+//任务取消方式
+enum CancelTaskMethod
+{
+    //正常取消
+    CANCEL_TASK_NORMAL = 0,
+
+    //超时取消
+    CANCEL_TASK_TIMEOUT = 1,
+
+    //异常清理取消
+    CANCEL_TASK_CLEAN = 2,
+};
+
 std::string getTaskStr(const TaskState& state);
 
 class CTask
@@ -60,7 +73,7 @@ public:
     void sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& req);
 
     //取消任务
-    void cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req);
+    void cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req, const CancelTaskMethod method = CANCEL_TASK_NORMAL);
 
     //执行任务
     void run(RunCircuitResp& resp, const RunCircuitReq& req);

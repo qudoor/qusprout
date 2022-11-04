@@ -88,14 +88,28 @@ void CTask::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmdReq& re
     return;
 }
 
-void CTask::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
+void CTask::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req, const CancelTaskMethod method)
 {
     {
         std::lock_guard<std::mutex> guard(m_mutex);
         setBase(resp.base, ErrCode::type::COM_SUCCESS);
-        if (TASK_STATE_DONE != m_state && TASK_STATE_ERROR != m_state)
+        if (CANCEL_TASK_TIMEOUT == method)
         {
-            m_state = TASK_STATE_TIMEOUT;
+            if (TASK_STATE_DONE != m_state && TASK_STATE_ERROR != m_state)
+            {
+                m_state = TASK_STATE_TIMEOUT;
+            }
+        }
+        else if (CANCEL_TASK_NORMAL == method)
+        {
+            if (TASK_STATE_ERROR != m_state)
+            {
+                m_state = TASK_STATE_DONE;
+            }
+        }
+        else
+        {
+            m_state = TASK_STATE_ERROR;
         }
         if (m_client.isInit())
         {
@@ -819,7 +833,7 @@ void CTaskManager::cleanTask()
                 CancelCmdReq req;
                 auto taskid = iter->second->getTaskId();
                 req.__set_id(taskid);
-                iter->second->cancelCmd(resp, req);
+                iter->second->cancelCmd(resp, req, CANCEL_TASK_TIMEOUT);
 
                 metrices.m_state[iter->second->getStateStr()] += 1;
                 LOG(INFO) << "cleanTask(taskid:" << taskid << ").";
@@ -855,7 +869,7 @@ void CTaskManager::cleanAllTask()
         CancelCmdReq req;
         auto taskid = iter->second->getTaskId();
         req.__set_id(taskid);
-        iter->second->cancelCmd(resp, req);
+        iter->second->cancelCmd(resp, req, CANCEL_TASK_CLEAN);
 
         LOG(INFO) << "cleanAllTask(taskid:" << taskid << ").";
     }
