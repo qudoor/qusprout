@@ -8,7 +8,7 @@
 ### **概述**
 ---
 * QuSprout 是启科量子自主研发的一款免费、开源的量子计算模拟后端，用户在 QuTrunk 量子编程框架生成量子线路后, 如果需要更高的运行效率，需要连接到 QuSprout 计算后端来进行模拟计算。
-* QuSprout 支持多个量子线路的任务管理、资源管理和并行计算。
+* QuSprout 支持多个量子线路的任务管理、单机MPI多进程并行计算。
 * QuSprout 使用 C++ 作为宿主语言，支持在 Linux 上编译部署。
 * QuSprout 提供了 qusprout，quwork 服务模块来支持量子计算的模拟：
     * qusprout 服务通过 RPC 与 QuTrunk 量子编程框架连接，主要负责量子线路的任务管理、quwork 服务的启动等。
@@ -45,22 +45,22 @@
     ```Shell
     sudo chmod a+x build_qusprout.sh
     ```
-4. 执行编译脚本，0.1.11是需要编译的版本号:
+4. 执行编译脚本，0.1.12是需要编译的版本号:
     ```Shell
-    sudo ./build_qusprout.sh version 0.1.11
+    sudo ./build_qusprout.sh version 0.1.12
     ```
 
 ##### 安装：
 
-1. 编译完成后，会在当前目前下生成 build_v0.1.11.tar.gz 文件，0.1.11 是编译时指定的版本号。
+1. 编译完成后，会在当前目前下生成 build_v0.1.12.tar.gz 文件，0.1.12 是编译时指定的版本号。
 2. QuSprout 根目录下有个 service_qusprout.sh 脚本文件，这个脚本文件是用来对 QuSprout 进行安装部署的。
 3. 赋予部署脚本执行权限：
     ```Shell
     sudo chmod a+x service_qusprout.sh
     ```
-4. 执行部署脚本, 执行时会在当前目前下查找 build_v0.1.11.tar.gz 编译文件，0.1.11 是要安装部署的版本号。 
+4. 执行部署脚本, 执行时会在当前目前下查找 build_v0.1.12.tar.gz 编译文件，0.1.12 是要安装部署的版本号。 
     ```Shell
-    sudo ./service_qusprout.sh version 0.1.11
+    sudo ./service_qusprout.sh version 0.1.12
     ```
 
 ##### 启动：

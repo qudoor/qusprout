@@ -20,16 +20,16 @@ public:
     //取消任务
     void cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req);
 
-    //获取振幅
+    //获取单个计算基态的概率
     void getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req);
 
     //获取当前qubit的概率
     void getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req);
 
-    //获取所有qubit的概率
+    //获取所有计算基态的概率
     void getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req);
 
-    //获取所有的计算结果
+    //获取所有计算基态的振幅
     void getAllState(GetAllStateResp& resp, const GetAllStateReq& req);
 
     //执行任务
