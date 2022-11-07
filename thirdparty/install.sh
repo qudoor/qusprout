@@ -457,7 +457,7 @@ fi
 if [ ! -f "/usr/local/lib/libhv_static.a" ]; then
     echo "begin install libhv"
     rm -rf libhv-v1.2.6
-    unzip libhv-v1.2.6.zip
+    tar -zxvf libhv-v1.2.6.tar.gz
     cd libhv-v1.2.6
     mkdir build
     cd build
