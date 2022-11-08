@@ -4,9 +4,7 @@
 
 ## 2 QuSprout的docker安装
 ### 2.1 安装docker
-```
-curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
-```
+可以通过官网链接安装：https://docs.docker.com/get-docker/
 
 ### 2.2 编译镜像编译
 ```
