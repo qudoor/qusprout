@@ -22,6 +22,7 @@ WORKDIR /app
 
 RUN mkdir -p /usr/local/bin && mkdir -p /usr/local/etc/qusprout
 	
+COPY --from=builder /lib/x86_64-linux-gnu/libgomp.so.1.0.0 /lib/x86_64-linux-gnu/libgomp.so.1
 COPY --from=builder /usr/local/bin/qusprout /usr/local/bin/
 COPY --from=builder /usr/local/bin/quwork /usr/local/bin/
 COPY --from=builder /usr/local/etc/qusprout/qusprout.yaml /usr/local/etc/qusprout/
