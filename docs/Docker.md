@@ -24,5 +24,5 @@ docker build -t qusprout:1.0.0 .
 启动服务镜像后，服务容器里的qusprout服务自动启动，能接收处理量子线路。
 
 ```
-docker run -p 9091:9091 -p 9093:9093 -d --name qusprout --network host qusprout:1.0.0
+docker run --name qusprout -it --privileged -p 9091:9091 -p 9093:9093 -d qusprout:1.0.0
 ```
