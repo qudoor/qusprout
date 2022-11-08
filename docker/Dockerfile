@@ -20,7 +20,13 @@ MAINTAINER liubo <liubo@qudoor.cn>
 
 WORKDIR /app
 
-RUN mkdir -p /usr/local/bin && mkdir -p /usr/local/etc/qusprout
+RUN mkdir -p /usr/local/bin && mkdir -p /usr/local/etc/qusprout \
+	&& sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+	&& sed -i s@/security.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list \
+	&& apt-get clean \
+	&& apt-get update \
+	&& apt-get install -y gcc \ 
+	&& apt-get clean
 	
 COPY --from=builder /lib/x86_64-linux-gnu/libgomp.so.1.0.0 /lib/x86_64-linux-gnu/libgomp.so.1
 COPY --from=builder /usr/local/bin/qusprout /usr/local/bin/
