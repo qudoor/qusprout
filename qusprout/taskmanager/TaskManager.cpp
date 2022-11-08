@@ -1,5 +1,7 @@
 #include <sstream>
 #include <spawn.h>
+#include <sys/types.h>
+#include <signal.h>
 #include "config/Config.h"
 #include "common/qulog.h"
 #include "common/Singleton.h"
