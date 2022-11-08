@@ -79,7 +79,6 @@
 ---
 * [QuSprout API](./docs/ThriftApi.md)
 * [QuSprout Config](./docs/Config.md)
-* [QuSprout Metrics](./docs/Metrics.md)
 * [QuSprout Docker](./docs/Docker.md)
 
 
