@@ -456,8 +456,9 @@ fi
 #libhv安装
 if [ ! -f "/usr/local/lib/libhv_static.a" ]; then
     echo "begin install libhv"
-    unzip libhv-master.zip
-    cd libhv-master
+    rm -rf libhv-v1.2.6
+    tar -zxvf libhv-v1.2.6.tar.gz
+    cd libhv-v1.2.6
     mkdir build
     cd build
     cmake ..
@@ -478,6 +479,7 @@ fi
 #prometheus-cpp安装
 if [ ! -f "/usr/local/lib/libprometheus-cpp-core.a" ] && [ ! -f "/usr/local/lib64/libprometheus-cpp-core.a" ]; then
     echo "begin install prometheus-cpp"
+    rm -rf prometheus-cpp-1.0.1
     tar -zxvf prometheus-cpp-1.0.1.tar.gz 
     cd prometheus-cpp-1.0.1
     if [ ${OS} == "Darwin" ]; then
@@ -511,8 +513,10 @@ fi
 #rapidjson安装
 if [ ! -f "/usr/local/lib/pkgconfig/RapidJSON.pc" ]; then
     echo "begin install rapidjson"
+    rm -rf rapidjson-master
     unzip rapidjson-master.zip
     cd rapidjson-master
+    sed -i 's/-Werror//g' CMakeLists.txt
     mkdir build
     cd build
     cmake ..

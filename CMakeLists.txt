@@ -5,8 +5,7 @@ cmake_minimum_required(VERSION 3.7)
 project(QUSPROUT)
 
 #添加子模块
-add_subdirectory(work)
-add_subdirectory(slave)
-add_subdirectory(master)
+add_subdirectory(quwork)
+add_subdirectory(qusprout)
 add_subdirectory(unittest)
 add_subdirectory(examples)
