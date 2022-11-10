@@ -14,7 +14,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 #指定项目的名称
-project(testhttpapi)
+project(testapi)
 
 #set设置普通变量，缓存变量或环境变量
 #指定的编译器路径
