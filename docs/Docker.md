@@ -32,5 +32,5 @@ QuSprout提供了编译和服务两种镜像。编译镜像包含了编译QuSpro
 启动服务镜像后，服务容器里的qusprout服务自动启动，能接收处理量子线路。
 
 ```
-docker run --name qusprout -it --privileged -p 9091:9091 -p 9093:9093 -d qusprout:1.0.0
+docker run --name qusprout -it --privileged -p 9091:9091 -d qusprout:1.0.0
 ```

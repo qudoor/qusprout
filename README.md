@@ -80,6 +80,7 @@
 * [QuSprout API](./docs/ThriftApi.md)
 * [QuSprout Config](./docs/Config.md)
 * [QuSprout Docker](./docs/Docker.md)
+* [FAQ](./FAQ.md)
 
 
 ### **如何参与开发**
