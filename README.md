@@ -38,9 +38,11 @@
    ```Shell
     sudo chmod a+x install.sh
     sudo ./install.sh
-    Noted： 1. CentOS上需要使用root权限执行install.sh脚本。
-            2. 执行install.sh之前需要提前安装基本的开发工具包括gcc，g++, make, unzip。
-            3. 执行install.sh过程中，可能在不同的Linux平台会遇到个别依赖库安装失败的情况，您可以尝试解决或者在github上创建 Issue。
+    
+    Noted： 
+    1. CentOS上需要使用root权限执行install.sh脚本。
+    2. 执行install.sh之前需要提前安装基本的开发工具包括gcc，g++, make, unzip。
+    3. 执行install.sh过程中，可能在不同的Linux平台会遇到个别依赖库安装失败的情况，您可以尝试解决或者在github上创建 Issue。
     ```
 2. QuSprout 根目录下有个 build_qusprout.sh 脚本文件，这个脚本文件是用来对 QuSprout 进行编译的。
 3. 赋予编译脚本执行权限：
