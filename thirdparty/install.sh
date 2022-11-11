@@ -144,6 +144,9 @@ fi
 #boost安装
 if [ ! -f "/usr/local/lib/libboost_system.a" ]; then
     echo "begin install libboost"
+    if [ ! -f "./boost_1_79_0.tar.gz" ]; then
+        wget https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.gz  
+    fi
     rm -rf boost_1_79_0
     tar -zxvf boost_1_79_0.tar.gz
     cd ./boost_1_79_0
