@@ -9,7 +9,7 @@
 ---
 * QuSprout 是启科量子自主研发的一款免费、开源的量子计算模拟后端，用户在 QuTrunk 量子编程框架生成量子线路后, 如果需要更高的运行效率，需要连接到 QuSprout 计算后端来进行模拟计算。
 * QuSprout 支持多个量子线路的任务管理、单机MPI多进程并行计算。
-* QuSprout 使用 C++ 作为宿主语言，当前支持在 Ubuntu，CentOS系列上编译部署，建议使用Ubuntu22.04，CentOS7.9，后续会对MacOS系列支持。
+* QuSprout 使用 C++ 作为宿主语言，当前支持在 Ubuntu，CentOS，Kylin系列上编译部署，建议使用Ubuntu22.04，CentOS7.9，KylinV10，后续会对MacOS系列支持。
 * QuSprout 提供了 qusprout，quwork 服务模块来支持量子计算的模拟：
     * qusprout 服务通过 RPC 与 QuTrunk 量子编程框架连接，主要负责量子线路的任务管理、quwork 服务的启动等。
     * quwork 服务主要负责量子线路的计算并返回计算结果。
