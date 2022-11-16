@@ -2,7 +2,7 @@
 
 [![Documentation Status](https://img.shields.io/badge/docs-latest-brightgreen.svg)](docs/ThriftApi.md)
 [![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](LICENSE)
-[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/queco-quantum/qusprout/archive/refs/heads/main.zip)
+[![Download Code](https://img.shields.io/badge/download-zip-green.svg)](https://github.com/qudoor/qusprout/archive/refs/heads/main.zip)
 
 
 ### **概述**
