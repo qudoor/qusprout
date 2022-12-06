@@ -1,2 +1,0 @@
-thirdparty/boost_1_79_0.tar.gz filter=lfs diff=lfs merge=lfs -text
-./thirdparty/boost_1_79_0.tar.gz filter=lfs diff=lfs merge=lfs -text
