@@ -171,6 +171,9 @@ int CConfig::praseConfig(const std::string& configFile)
         if (handle["quwork"]["quworkBinName"].IsDefined())
             m_quworkBinName = handle["quwork"]["quworkBinName"].as<std::string>();
 
+       if (handle["quwork"]["quworkGpuBinName"].IsDefined())
+            m_quworkGpuBinName = handle["quwork"]["quworkGpuBinName"].as<std::string>();
+
         if (handle["quwork"]["quworkConfigPath"].IsDefined())
             m_quworkConfigPath = handle["quwork"]["quworkConfigPath"].as<std::string>();
         
@@ -239,6 +242,7 @@ std::string CConfig::getPrintStr()
 
         << "quwork[quworkBinPath:" << m_quworkBinPath
         << ",quworkBinName:" << m_quworkBinName
+        << ",m_quworkGpuBinName:" << m_quworkGpuBinName
         << ",quworkConfigPath:" << m_quworkConfigPath
         << ",quworkConfigName:" << m_quworkConfigName
         << ",waitRpcTimeout:" << m_waitRpcTimeout

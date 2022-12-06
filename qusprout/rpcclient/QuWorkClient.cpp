@@ -106,7 +106,7 @@ void CQuWorkClient::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCm
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -120,7 +120,7 @@ void CQuWorkClient::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
 
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -133,23 +133,11 @@ void CQuWorkClient::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
     CALL_WITH_SERVICE(m_client->getProbAmp(resp, req), req);
-}
-
-//获取当前qubit的概率
-void CQuWorkClient::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req)
-{
-    if (!isInit())
-    {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
-        return;
-    }
-
-    CALL_WITH_SERVICE(m_client->getProbOfOutcome(resp, req), req);
 }
 
 //获取所有qubit的概率
@@ -157,7 +145,7 @@ void CQuWorkClient::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetP
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -169,7 +157,7 @@ void CQuWorkClient::getAllState(GetAllStateResp& resp, const GetAllStateReq& req
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -181,35 +169,11 @@ void CQuWorkClient::run(RunCircuitResp& resp, const RunCircuitReq& req)
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
     CALL_WITH_SERVICE(m_client->run(resp, req), req);
-}
-
-//对部分量子比特应用量子傅立叶变换
-void CQuWorkClient::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
-{
-    if (!isInit())
-    {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
-        return;
-    }
-
-    CALL_WITH_SERVICE(m_client->applyQFT(resp, req), req);
-}
-
-//对所有量子比特应用量子傅立叶变换
-void CQuWorkClient::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req)
-{
-    if (!isInit())
-    {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
-        return;
-    }
-
-    CALL_WITH_SERVICE(m_client->applyFullQFT(resp, req), req);
 }
 
 //获取泡利算子乘积的期望值
@@ -217,7 +181,7 @@ void CQuWorkClient::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpe
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -229,7 +193,7 @@ void CQuWorkClient::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecP
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -241,7 +205,7 @@ void CQuWorkClient::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsRe
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -253,7 +217,7 @@ void CQuWorkClient::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -265,7 +229,7 @@ void CQuWorkClient::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitRe
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -277,7 +241,7 @@ void CQuWorkClient::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& 
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -289,7 +253,7 @@ void CQuWorkClient::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -301,7 +265,7 @@ void CQuWorkClient::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const Get
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 
@@ -313,7 +277,7 @@ void CQuWorkClient::getProbabilities(GetProbabilitiesResp& resp, const GetProbab
 {
     if (!isInit())
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "not connected to work process.");
         return;
     }
 

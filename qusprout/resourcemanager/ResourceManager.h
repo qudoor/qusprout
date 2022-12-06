@@ -35,7 +35,7 @@ public:
     int init();
 
     //检查资源是否足够
-    ErrCode::type getResource(const InitQubitsReq& req, ResourceData& resourcebytes);
+    BaseCode getResource(const InitQubitsReq& req, ResourceData& resourcebytes);
 
     //获取所有的资源
     void getAllResource(std::map<std::string, DeviceDetail>& devlist);
@@ -48,10 +48,13 @@ public:
 
 private:
     //获取mpi多个cpu资源的信息
-    ErrCode::type getMpiCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes);
+    BaseCode getMpiCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes);
+
+    //获取单个gpu资源的信息
+    BaseCode getSignalGpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes);
 
     //获取单个cpu资源的信息
-    ErrCode::type getSignalCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes);
+    BaseCode getSignalCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes);
 
     //计算单机需要的内存
     long long calcSingleBytes(const int qubits, const int density);
@@ -62,6 +65,7 @@ private:
 private:
     MachineSysInfo m_sys;
     MemUseInfo m_mem;
+    GpuUseInfo m_gpu;
 };
 
 #endif

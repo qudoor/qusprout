@@ -41,9 +41,11 @@ private:
     static int releaseEnv(HttpRequest* req, HttpResponse* resp);
     static int getTask(HttpRequest* req, HttpResponse* resp);
     static int getMeasure(HttpRequest* req, HttpResponse* resp);
-    static int applyQft(HttpRequest* req, HttpResponse* resp);
     static int getEPauli(HttpRequest* req, HttpResponse* resp);
     static int getEPauliSum(HttpRequest* req, HttpResponse* resp);
+    static int getRcardInfo(HttpRequest* req, HttpResponse* resp);
+    static int setRcard(HttpRequest* req, HttpResponse* resp);
+    static int getRand(HttpRequest* req, HttpResponse* resp);
 
     static int response_status(HttpResponse* resp, int code = 200, const char* message = NULL) {
         if (message == NULL) message = http_status_str((enum http_status)code);

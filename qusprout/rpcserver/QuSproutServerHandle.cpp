@@ -16,6 +16,7 @@
 #include "QuSproutServerHandle.h"
 #include "taskmanager/TaskManager.h"
 #include "metrics/metrics.h"
+#include "random/RandomCard.h"
 
 using namespace apache::thrift::transport;
 
@@ -23,12 +24,9 @@ const std::string CMD_STR_INITQUBITS = "initQubits";
 const std::string CMD_STR_SENDCIRCUITCMD = "sendCircuitCmd";
 const std::string CMD_STR_CANCELCMD = "cancelCmd";
 const std::string CMD_STR_GETPROBAMP = "getProbAmp";
-const std::string CMD_STR_GETPROBOFOUTCOME = "getProbOfOutcome";
 const std::string CMD_STR_GETPROBOFALLOUTCOME = "getProbOfAllOutcome";
 const std::string CMD_STR_GETALLSTATE = "getAllState";
 const std::string CMD_STR_RUN = "run";
-const std::string CMD_STR_APPLYQFT = "applyQFT";
-const std::string CMD_STR_APPLYFULLQFT = "applyFullQFT";
 const std::string CMD_STR_GETEXPECPAULIPROD = "getExpecPauliProd";
 const std::string CMD_STR_GETEXPECPAULISUM = "getExpecPauliSum";
 const std::string CMD_STR_MEASUREQUBITS = "measureQubits";
@@ -39,6 +37,9 @@ const std::string CMD_STR_RESETQUBITS = "resetQubits";
 const std::string CMD_STR_GETSTATEOFALLQUBITS = "getStateOfAllQubits";
 const std::string CMD_STR_GETPROBABILITIES = "getProbabilities";
 const std::string CMD_STR_GETTASKINFO = "getTaskInfo";
+const std::string CMD_STR_GETRANDOMCARDINFO = "getRandomCardInfo";
+const std::string CMD_STR_SETRANDOMCARD = "setRandomCard";
+const std::string CMD_STR_GETRANDOM = "getRandom";
 
 CQuSproutServerHandler::CQuSproutServerHandler()
 {
@@ -92,14 +93,6 @@ void CQuSproutServerHandler::getProbAmp(GetProbAmpResp& resp, const GetProbAmpRe
     SINGLETON(CTaskManager)->getProbAmp(resp, req);
 }
 
-//获取当前qubit的概率
-void CQuSproutServerHandler::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req)
-{
-    CMetricsGuard metrics(CMD_STR_GETPROBOFOUTCOME, (int)resp.base.code);
-
-    SINGLETON(CTaskManager)->getProbOfOutcome(resp, req);
-}
-
 //获取所有qubit的概率
 void CQuSproutServerHandler::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req)
 {
@@ -122,23 +115,6 @@ void CQuSproutServerHandler::run(RunCircuitResp& resp, const RunCircuitReq& req)
     CMetricsGuard metrics(CMD_STR_RUN, (int)resp.base.code);
 
     SINGLETON(CTaskManager)->run(resp, req);
-}
-
-//对部分量子比特应用量子傅立叶变换
-void CQuSproutServerHandler::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
-{
-    
-    CMetricsGuard metrics(CMD_STR_APPLYQFT, (int)resp.base.code);
-
-    SINGLETON(CTaskManager)->applyQFT(resp, req);
-}
-
-//对所有量子比特应用量子傅立叶变换
-void CQuSproutServerHandler::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req)
-{
-    CMetricsGuard metrics(CMD_STR_APPLYFULLQFT, (int)resp.base.code);
-    
-    SINGLETON(CTaskManager)->applyFullQFT(resp, req);
 }
 
 //获取泡利算子乘积的期望值
@@ -219,4 +195,28 @@ void CQuSproutServerHandler::getTaskInfo(GetTaskInfoResp& resp, const GetTaskInf
     CMetricsGuard metrics(CMD_STR_GETTASKINFO, (int)resp.base.code);
 
     SINGLETON(CTaskManager)->getTaskInfo(resp, req);
+}
+
+//获取随机数卡的信息
+void CQuSproutServerHandler::getRandomCardInfo(GetRandomCardInfoResp& resp, const GetRandomCardInfoReq& req)
+{
+    CMetricsGuard metrics(CMD_STR_GETRANDOMCARDINFO, (int)resp.base.code);
+
+    SINGLETON(CRandomCardManager)->getRandomCardInfo(resp, req);
+}
+
+//设置随机数卡
+void CQuSproutServerHandler::setRandomCard(SetRandomCardResp& resp, const SetRandomCardReq& req)
+{
+    CMetricsGuard metrics(CMD_STR_SETRANDOMCARD, (int)resp.base.code);
+
+    SINGLETON(CRandomCardManager)->setRandomCard(resp, req);
+}
+
+//获取随机数
+void CQuSproutServerHandler::getRandom(GetRandomResp& resp, const GetRandomReq& req)
+{
+    CMetricsGuard metrics(CMD_STR_GETRANDOM, (int)resp.base.code);
+
+    SINGLETON(CRandomCardManager)->getRandom(resp, req);
 }

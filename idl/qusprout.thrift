@@ -15,9 +15,6 @@ service QuSproutServer {
     //获取振幅
     qusproutdata.GetProbAmpResp getProbAmp(1:qusproutdata.GetProbAmpReq req)
 
-    //获取当前qubit的概率
-    qusproutdata.GetProbOfOutcomeResp getProbOfOutcome(1:qusproutdata.GetProbOfOutcomeReq req)
-
     //获取组合概率
     qusproutdata.GetProbOfAllOutcomResp getProbOfAllOutcome(1:qusproutdata.GetProbOfAllOutcomReq req)
 
@@ -26,12 +23,6 @@ service QuSproutServer {
 
     //重复线路操作
     qusproutdata.RunCircuitResp run(1:qusproutdata.RunCircuitReq req)
-
-    //对部分量子比特应用量子傅立叶变换
-    qusproutdata.ApplyQFTResp applyQFT(1:qusproutdata.ApplyQFTReq req)
-
-    //对所有量子比特应用量子傅立叶变换
-    qusproutdata.ApplyFullQFTResp applyFullQFT(1:qusproutdata.ApplyFullQFTReq req)
 
     //获取泡利算子乘积的期望值
     qusproutdata.GetExpecPauliProdResp getExpecPauliProd(1:qusproutdata.GetExpecPauliProdReq req)
@@ -62,4 +53,13 @@ service QuSproutServer {
 
     //获取任务状态
     qusproutdata.GetTaskInfoResp getTaskInfo(1:qusproutdata.GetTaskInfoReq req)
+
+    //获取随机数卡的信息
+    qusproutdata.GetRandomCardInfoResp getRandomCardInfo(1:qusproutdata.GetRandomCardInfoReq req)
+
+    //设置随机数卡
+    qusproutdata.SetRandomCardResp setRandomCard(1:qusproutdata.SetRandomCardReq req)
+
+    //获取随机数
+    qusproutdata.GetRandomResp getRandom(1:qusproutdata.GetRandomReq req)
 }

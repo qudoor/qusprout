@@ -41,7 +41,7 @@ void CWorkServerHandler::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCirc
         if (req.id.empty() || (req.final == false && req.circuit.cmds.size() <= 0))
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty() || (req.final == false && req.circuit.cmds.size() <= 0)) in CWorkServerHandler::sendCircuitCmd()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id or final.");
             return;
         }
 
@@ -55,7 +55,7 @@ void CWorkServerHandler::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCirc
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::sendCircuitCmd exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -67,7 +67,7 @@ void CWorkServerHandler::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::cancelCmd()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -83,7 +83,7 @@ void CWorkServerHandler::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::cancelCmd exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -95,7 +95,7 @@ void CWorkServerHandler::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& r
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getProbAmp()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -109,33 +109,7 @@ void CWorkServerHandler::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& r
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getProbAmp exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
-    }
-}
-
-//获取当前qubit的概率
-void CWorkServerHandler::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req)
-{
-    try
-    {
-        if (req.id.empty())
-        {
-            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getProbOfOutcome()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-            return;
-        }
-
-        //Broadcast getProbOutcome to all node
-        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
-            workNodeHandler.getProbOutcome(req.qubit, req.outcom);
-        
-        resp.__set_pro_outcome(m_executor.getProbOfOutcome(req.qubit, req.outcom));
-        setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    }
-    catch(const std::exception& e)
-    {
-        LOG(ERROR) << "CWorkServerHandler::getProbOfOutcome exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -147,7 +121,7 @@ void CWorkServerHandler::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getProbOfAllOutcome()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -163,7 +137,7 @@ void CWorkServerHandler::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getProbOfAllOutcome exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -175,7 +149,7 @@ void CWorkServerHandler::getAllState(GetAllStateResp& resp, const GetAllStateReq
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getAllState()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -191,7 +165,7 @@ void CWorkServerHandler::getAllState(GetAllStateResp& resp, const GetAllStateReq
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getAllState exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -203,7 +177,7 @@ void CWorkServerHandler::run(RunCircuitResp& resp, const RunCircuitReq& req)
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::run()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -211,7 +185,7 @@ void CWorkServerHandler::run(RunCircuitResp& resp, const RunCircuitReq& req)
         if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
             workNodeHandler.run(req.shots);
 
-        Result result;
+        MeasureResult result;
         m_executor.run(result, req.shots);
         resp.__set_result(result);
         setBase(resp.base, ErrCode::type::COM_SUCCESS);
@@ -219,59 +193,7 @@ void CWorkServerHandler::run(RunCircuitResp& resp, const RunCircuitReq& req)
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::run exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
-    }
-}
-
-//对部分量子比特应用量子傅立叶变换
-void CWorkServerHandler::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
-{
-    try
-    {
-        if (req.id.empty())
-        {
-            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::applyQFT()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-            return;
-        }
-
-        //Broadcast apply_QFT to all node
-        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
-            workNodeHandler.applyQFT(req.targets);
-
-        m_executor.apply_QFT(req.targets);
-        setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    }
-    catch(const std::exception& e)
-    {
-        LOG(ERROR) << "CWorkServerHandler::applyQFT exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
-    }
-}
-
-//对所有量子比特应用量子傅立叶变换
-void CWorkServerHandler::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req)
-{
-    try
-    {
-        if (req.id.empty())
-        {
-            LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::applyFullQFT()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-            return;
-        }
-
-        //Broadcast apply_Full_QFT to all node
-        if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
-            workNodeHandler.applyFullQFT();
-
-        m_executor.apply_Full_QFT();
-        setBase(resp.base, ErrCode::type::COM_SUCCESS);
-    }
-    catch(const std::exception& e)
-    {
-        LOG(ERROR) << "CWorkServerHandler::applyFullQFT exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -283,7 +205,7 @@ void CWorkServerHandler::getExpecPauliProd(GetExpecPauliProdResp& resp, const Ge
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getExpecPauliProd()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -297,7 +219,7 @@ void CWorkServerHandler::getExpecPauliProd(GetExpecPauliProdResp& resp, const Ge
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getExpecPauliProd exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -309,7 +231,7 @@ void CWorkServerHandler::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetE
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getExpecPauliSum()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -323,7 +245,7 @@ void CWorkServerHandler::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetE
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getExpecPauliSum exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -335,20 +257,19 @@ void CWorkServerHandler::measureQubits(MeasureQubitsResp& resp, const MeasureQub
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::measureQubits()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
-        Result result;
+        MeasureResult result;
         m_executor.getMeasureResult(req.qubits, result);
-        resp.__set_results(result.measureSet);
-        resp.__set_outcomes(result.outcomeSet);
+        resp.__set_result(result);
         setBase(resp.base, ErrCode::type::COM_SUCCESS);
     }
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::measureQubits exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -360,7 +281,7 @@ void CWorkServerHandler::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, 
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::addCustomGateByMatrix()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -374,7 +295,7 @@ void CWorkServerHandler::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, 
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::addCustomGateByMatrix exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -402,14 +323,14 @@ void CWorkServerHandler::appendQubits(AppendQubitsResp& resp, const AppendQubits
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::appendQubits()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
         if (SINGLETON(CmdParams)->execType == (int)ExecCmdType::type::ExecTypeCpuMpi)
         {
             LOG(ERROR) << "operator is not support mpi.";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of execType.");
             return;
         }
 
@@ -417,7 +338,7 @@ void CWorkServerHandler::appendQubits(AppendQubitsResp& resp, const AppendQubits
         if (ret != 0)
         {
             LOG(ERROR) << "appendQubits failed(ret:" << ret << ").";
-            setBase(resp.base, ErrCode::type::COM_OTHRE);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of add_qubits.");
             return;
         }
         setBase(resp.base, ErrCode::type::COM_SUCCESS);
@@ -425,7 +346,7 @@ void CWorkServerHandler::appendQubits(AppendQubitsResp& resp, const AppendQubits
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::appendQubits exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -437,7 +358,7 @@ void CWorkServerHandler::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::resetQubits()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -451,7 +372,7 @@ void CWorkServerHandler::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::resetQubits exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -463,7 +384,7 @@ void CWorkServerHandler::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, cons
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getStateOfAllQubits()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -487,7 +408,7 @@ void CWorkServerHandler::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, cons
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getStateOfAllQubits exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
@@ -499,7 +420,7 @@ void CWorkServerHandler::getProbabilities(GetProbabilitiesResp& resp, const GetP
         if (req.id.empty())
         {
             LOG(ERROR) << "Invaild parameters(req.id.empty()) in CWorkServerHandler::getProbabilities()";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
             return;
         }
 
@@ -515,14 +436,14 @@ void CWorkServerHandler::getProbabilities(GetProbabilitiesResp& resp, const GetP
     catch(const std::exception& e)
     {
         LOG(ERROR) << "CWorkServerHandler::getProbabilities exception: " << e.what();
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "interface exception of work.");
     }
 }
 
 //获取任务状态
 void CWorkServerHandler::getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req)
 {
-    setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+    setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "this interface is not support.");
 }
 
 //设置server 
@@ -531,9 +452,34 @@ void CWorkServerHandler::SetThreadedServer(std::shared_ptr<TThreadedServer> serv
     m_server = server;
 }
 
-void CWorkServerHandler::setBase(BaseCode& base, const ErrCode::type& code)
+void CWorkServerHandler::setBase(BaseCode& base, const ErrCode::type& code, const std::string& msg)
 {
     base.__set_code(code);
-    auto ptr = g_ecode_constants.ErrMsg.find(code);
-    base.__set_msg(ptr->second);
+    if (msg.empty())
+    {
+        auto ptr = g_ecode_constants.ErrMsg.find(code);
+        base.__set_msg(ptr->second);
+    }
+    else
+    {
+        base.__set_msg(msg);
+    }
+}
+
+//获取随机数卡的信息
+void CWorkServerHandler::getRandomCardInfo(GetRandomCardInfoResp& resp, const GetRandomCardInfoReq& req)
+{
+    setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "this interface is not support.");
+}
+
+//设置随机数卡
+void CWorkServerHandler::setRandomCard(SetRandomCardResp& resp, const SetRandomCardReq& req)
+{
+    setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "this interface is not support.");
+}
+
+//获取随机数
+void CWorkServerHandler::getRandom(GetRandomResp& resp, const GetRandomReq& req)
+{
+    setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "this interface is not support.");
 }

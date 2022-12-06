@@ -49,10 +49,13 @@ install() {
 				if [ -L $service_path/bin/$service_item ]; then
 					rm -rf $service_path/bin/$service_item
 				fi
-				if [ -f $service_path/bin/$service_item ]; then
-					rm -rf $service_path/bin/$service_item
-				fi
-                ln -s $release_path/$service_item/bin/$service_item $service_path/bin/$service_item
+				for sub_service_item in `ls $release_path/$service_item/bin`
+				do
+					if [ -f $service_path/bin/$sub_service_item ]; then
+						rm -rf $service_path/bin/$sub_service_item
+					fi
+					ln -s $release_path/$service_item/bin/$sub_service_item $service_path/bin/$sub_service_item
+				done
 
 				if [ ! -d $service_path/etc/qusprout ]; then
 					mkdir -p $service_path/etc/qusprout
@@ -80,10 +83,13 @@ install() {
 			if [ -L $service_path/bin/$2 ]; then
 				rm -rf $service_path/bin/$2
 			fi
-			if [ -f $service_path/bin/$2 ]; then
-				rm -rf $service_path/bin/$2
-			fi
-			ln -s $release_path/$2/bin/$2 $service_path/bin/$2
+			for sub_service_item in `ls $release_path/$2/bin`
+			do
+				if [ -f $service_path/bin/$sub_service_item ]; then
+					rm -rf $service_path/bin/$sub_service_item
+				fi
+				ln -s $release_path/$2/bin/$sub_service_item $service_path/bin/$sub_service_item
+			done
 
 			if [ ! -d $service_path/etc/qusprout ]; then
 				mkdir -p $service_path/etc/qusprout

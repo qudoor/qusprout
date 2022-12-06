@@ -51,6 +51,9 @@ struct ResourceDetail {
 
     //总显存，单位：byte
     4: optional i64 gpu_total_memory
+
+    //可用显存，单位：byte
+    5: optional i64 gpu_free_memory
 }
 
 //设备信息

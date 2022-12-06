@@ -99,10 +99,6 @@ int CHandler::router(HttpRequest* req, HttpResponse* resp)
         {
             getMeasure(req, resp);
         }
-        else if (headreq->cmd == CMD_STR_APPLYQFT)
-        {
-            applyQft(req, resp);
-        }
         else if (headreq->cmd == CMD_STR_GETPAULI)
         {
             getEPauli(req, resp);
@@ -111,6 +107,18 @@ int CHandler::router(HttpRequest* req, HttpResponse* resp)
         {
             getEPauliSum(req, resp);
         }
+        else if (headreq->cmd == CMD_STR_GETRCARDINFO)
+        {
+            getRcardInfo(req, resp);
+        }
+        else if (headreq->cmd == CMD_STR_SETRCARD)
+        {
+            setRcard(req, resp);
+        }
+        else if (headreq->cmd == CMD_STR_GETRAND)
+        {
+            getRand(req, resp);
+        }
 
         LOG(INFO) << "router(resp:" << resp->Body() << ").";
         return HTTP_STATUS_OK;
@@ -118,7 +126,7 @@ int CHandler::router(HttpRequest* req, HttpResponse* resp)
 
     LOG(ERROR) << "router decode failed(req:" << req->Body() << ").";
     std::shared_ptr<RespHead> headresp = std::make_shared<RespHead>();
-    headresp->setcode("", COMMON_PRASE_ERROR);
+    headresp->setcode("", COMMON_PRASE_ERROR, "decode req failed.");
     std::string respstr = "";
     headresp->encodehead(respstr);
     resp->SetBody(respstr);
@@ -135,7 +143,7 @@ int CHandler::initEnv(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "initEnv decode failed(req:" << envreq->getStr() << ").";
-        envresp->setcode(envreq->flowid, COMMON_PRASE_ERROR);
+        envresp->setcode(envreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -159,7 +167,7 @@ int CHandler::addCmd(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "addCmd decode failed(req:" << addreq->getStr() << ").";
-        addresp->setcode(addreq->flowid, COMMON_PRASE_ERROR);
+        addresp->setcode(addreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -183,7 +191,7 @@ int CHandler::runCmd(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "runCmd decode failed(req:" << runreq->getStr() << ").";
-        runresp->setcode(runreq->flowid, COMMON_PRASE_ERROR);
+        runresp->setcode(runreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -207,7 +215,7 @@ int CHandler::getAmp(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "getAmp decode failed(req:" << getreq->getStr() << ").";
-        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR);
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -231,7 +239,7 @@ int CHandler::getProb(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "getProb decode failed(req:" << getreq->getStr() << ").";
-        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR);
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -255,7 +263,7 @@ int CHandler::getState(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "getState decode failed(req:" << getreq->getStr() << ").";
-        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR);
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -279,7 +287,7 @@ int CHandler::releaseEnv(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "releaseEnv decode failed(req:" << releasereq->getStr() << ").";
-        releaseresp->setcode(releasereq->flowid, COMMON_PRASE_ERROR);
+        releaseresp->setcode(releasereq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -303,7 +311,7 @@ int CHandler::getTask(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "getTask decode failed(req:" << getreq->getStr() << ").";
-        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR);
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -327,7 +335,7 @@ int CHandler::getMeasure(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "getMeasure decode failed(req:" << getreq->getStr() << ").";
-        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR);
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -336,30 +344,6 @@ int CHandler::getMeasure(HttpRequest* req, HttpResponse* resp)
 
     std::string respstr = "";
     getresp->encode(respstr);
-    resp->SetBody(respstr);
-    resp->SetHeader("Content-Type", "application/json");
-
-    return HTTP_STATUS_OK;
-}
-
-int CHandler::applyQft(HttpRequest* req, HttpResponse* resp)
-{
-    std::shared_ptr<ApplyQftReq> applyreq = std::make_shared<ApplyQftReq>();
-    std::shared_ptr<ApplyQftResp> applyresp = std::make_shared<ApplyQftResp>();
-
-    bool rnt = applyreq->decode(req->Body());
-    if (false == rnt)
-    {
-        LOG(ERROR) << "applyQft decode failed(req:" << applyreq->getStr() << ").";
-        applyresp->setcode(applyreq->flowid, COMMON_PRASE_ERROR);
-    }
-    else
-    {
-        SINGLETON(CReqManager)->applyQft(applyreq, applyresp);
-    }
-
-    std::string respstr = "";
-    applyresp->encode(respstr);
     resp->SetBody(respstr);
     resp->SetHeader("Content-Type", "application/json");
 
@@ -375,7 +359,7 @@ int CHandler::getEPauli(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "getEPauli decode failed(req:" << getreq->getStr() << ").";
-        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR);
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
@@ -399,11 +383,83 @@ int CHandler::getEPauliSum(HttpRequest* req, HttpResponse* resp)
     if (false == rnt)
     {
         LOG(ERROR) << "getEPauliSum decode failed(req:" << getreq->getStr() << ").";
-        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR);
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
     }
     else
     {
         SINGLETON(CReqManager)->getEPauliSum(getreq, getresp);
+    }
+
+    std::string respstr = "";
+    getresp->encode(respstr);
+    resp->SetBody(respstr);
+    resp->SetHeader("Content-Type", "application/json");
+
+    return HTTP_STATUS_OK;
+}
+
+int CHandler::getRcardInfo(HttpRequest* req, HttpResponse* resp)
+{
+    std::shared_ptr<GetRCardInfoReq> getreq = std::make_shared<GetRCardInfoReq>();
+    std::shared_ptr<GetRCardInfoResp> getresp = std::make_shared<GetRCardInfoResp>();
+
+    bool rnt = getreq->decode(req->Body());
+    if (false == rnt)
+    {
+        LOG(ERROR) << "getRcardInfo decode failed(req:" << getreq->getStr() << ").";
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
+    }
+    else
+    {
+        SINGLETON(CReqManager)->getRcardInfo(getreq, getresp);
+    }
+
+    std::string respstr = "";
+    getresp->encode(respstr);
+    resp->SetBody(respstr);
+    resp->SetHeader("Content-Type", "application/json");
+
+    return HTTP_STATUS_OK;
+}
+
+int CHandler::setRcard(HttpRequest* req, HttpResponse* resp)
+{
+    std::shared_ptr<SetRCardReq> getreq = std::make_shared<SetRCardReq>();
+    std::shared_ptr<SetRCardResp> getresp = std::make_shared<SetRCardResp>();
+
+    bool rnt = getreq->decode(req->Body());
+    if (false == rnt)
+    {
+        LOG(ERROR) << "setRcard decode failed(req:" << getreq->getStr() << ").";
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
+    }
+    else
+    {
+        SINGLETON(CReqManager)->setRcard(getreq, getresp);
+    }
+
+    std::string respstr = "";
+    getresp->encode(respstr);
+    resp->SetBody(respstr);
+    resp->SetHeader("Content-Type", "application/json");
+
+    return HTTP_STATUS_OK;
+}
+
+int CHandler::getRand(HttpRequest* req, HttpResponse* resp)
+{
+    std::shared_ptr<GetRandReq> getreq = std::make_shared<GetRandReq>();
+    std::shared_ptr<GetRandResp> getresp = std::make_shared<GetRandResp>();
+
+    bool rnt = getreq->decode(req->Body());
+    if (false == rnt)
+    {
+        LOG(ERROR) << "getRand decode failed(req:" << getreq->getStr() << ").";
+        getresp->setcode(getreq->flowid, COMMON_PRASE_ERROR, "decode req failed.");
+    }
+    else
+    {
+        SINGLETON(CReqManager)->getRand(getreq, getresp);
     }
 
     std::string respstr = "";
@@ -423,4 +479,5 @@ int CHandler::metrics(HttpRequest* req, HttpResponse* resp)
     }
     
 	return HTTP_STATUS_OK;
+
 }

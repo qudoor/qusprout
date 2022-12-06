@@ -47,11 +47,18 @@ int CResourceManager::init()
         return -2;
     }
 
-    SINGLETON(CMetrics)->addResource(m_sys, m_mem);
+    ret = SINGLETON(CSystemHandle)->getGpuUseInfo(m_gpu);
+    if (ret != 0)
+    {
+        LOG(ERROR) << "getGpuUseInfo failed(ret:" << ret << ").";
+        return -3;
+    }
+
+    SINGLETON(CMetrics)->addResource(m_sys, m_mem, m_gpu);
     return 0;
 }
 
-ErrCode::type CResourceManager::getResource(const InitQubitsReq& req, ResourceData& resourcebytes)
+BaseCode CResourceManager::getResource(const InitQubitsReq& req, ResourceData& resourcebytes)
 {
     ResourceData resources;
     SINGLETON(CTaskManager)->getAllUseResourceBytes(resources);
@@ -60,7 +67,12 @@ ErrCode::type CResourceManager::getResource(const InitQubitsReq& req, ResourceDa
     {
         return getMpiCpuResource(req, resources, resourcebytes);
     }
-    
+
+    if (ExecCmdType::type::ExecTypeGpuSingle == req.exec_type)
+    {
+        return getSignalGpuResource(req, resources, resourcebytes);
+    }
+
     return getSignalCpuResource(req, resources, resourcebytes);
 }
 
@@ -95,37 +107,73 @@ std::string CResourceManager::getAddr()
     return m_sys.addr;
 }
 
-ErrCode::type CResourceManager::getMpiCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes)
+BaseCode CResourceManager::getMpiCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes)
 {
+    BaseCode base;
     int hostsize = (int)req.hosts.size();
     int numranks = getNumRanks(req.qubits, hostsize);
-    long long int mpibytes = calcMpiBytes(req.qubits, req.density, numranks);
+    long long mpibytes = calcMpiBytes(req.qubits, req.density, numranks);
 
-    long long allmemory = m_mem.totalRam;
+    long long allmemory = m_mem.total_memory;
     allmemory -= useresource.cpubytes;
     if (allmemory < mpibytes)
     {
         LOG(ERROR) << "memory is not enough(taskId:" << req.id << ",allmemory:" << allmemory  << ",mpibytes:" << mpibytes << ").";
-        return ErrCode::type::COM_MEM_NOT_ENOUGH;
+        setBase(base, ErrCode::type::COM_MEM_NOT_ENOUGH, "resource memory is not enough.");
+        return base;
     }
 
     resourcebytes.cpubytes = mpibytes;
-    return ErrCode::type::COM_SUCCESS;
+    resourcebytes.gpubytes = 0;
+    setBase(base, ErrCode::type::COM_SUCCESS);
+    return base;
 }
 
-ErrCode::type CResourceManager::getSignalCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes)
+BaseCode CResourceManager::getSignalGpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes)
 {
-    long long int singlebytes = calcSingleBytes(req.qubits, req.density);
-    long long allmemory = m_mem.totalRam;
+    BaseCode base;
+    if (m_gpu.gpu_type != GpuFactoryType_Nvidia)
+    {
+        LOG(ERROR) << "gpu type is not support or nvidia drive is not installed.";
+        setBase(base, ErrCode::type::COM_INVALID_PARAM, "invaild param of gpu_type.");
+        return base;
+    }
+
+    long long singlebytes = calcSingleBytes(req.qubits, req.density);
+    long long allmemory = m_mem.total_memory;
+    long long allgpumemory = m_gpu.total_memory;
+    allmemory -= useresource.cpubytes;
+    allgpumemory -= useresource.gpubytes;
+    if (allmemory < singlebytes || allgpumemory < singlebytes)
+    {
+        LOG(ERROR) << "memory is not enough(taskId:" << req.id << ",allmemory:" << allmemory << ",allgpumemory:" << allgpumemory  << ",singlebytes:" << singlebytes << ").";
+        setBase(base, ErrCode::type::COM_MEM_NOT_ENOUGH, "resource memory is not enough.");
+        return base;
+    }
+
+    resourcebytes.cpubytes = singlebytes;
+    resourcebytes.gpubytes = singlebytes;
+    setBase(base, ErrCode::type::COM_SUCCESS);
+    return base;
+}
+
+BaseCode CResourceManager::getSignalCpuResource(const InitQubitsReq& req, const ResourceData& useresource, ResourceData& resourcebytes)
+{
+    BaseCode base;
+    long long singlebytes = calcSingleBytes(req.qubits, req.density);
+    long long allmemory = m_mem.total_memory;
     allmemory -= useresource.cpubytes;
     if (allmemory < singlebytes)
     {
         LOG(ERROR) << "memory is not enough(taskId:" << req.id << ",allmemory:" << allmemory  << ",singlebytes:" << singlebytes << ").";
-        return ErrCode::type::COM_MEM_NOT_ENOUGH;
+        setBase(base, ErrCode::type::COM_MEM_NOT_ENOUGH, "resource memory is not enough.");
+        return base;
     }
 
     resourcebytes.cpubytes = singlebytes;
-    return ErrCode::type::COM_SUCCESS;
+    resourcebytes.gpubytes = 0;
+    setBase(base, ErrCode::type::COM_SUCCESS);
+    return base;
 }
 
 long long CResourceManager::calcSingleBytes(const int qubits, const int density)
@@ -167,8 +215,11 @@ void CResourceManager::getAllResource(std::map<std::string, DeviceDetail>& devli
     machine.__set_sys_machine(m_sys.sys_machine);
 
     ResourceDetail resource;
-    resource.__set_cpu_total_memory(m_mem.totalRam);
-    resource.__set_cpu_free_memory(m_mem.freeRam);
+    resource.__set_cpu_total_memory(m_mem.total_memory);
+    resource.__set_cpu_free_memory(m_mem.free_memory);
+    resource.__set_gpu_type((GpuType::type)m_gpu.gpu_type);
+    resource.__set_gpu_total_memory(m_gpu.total_memory);
+    resource.__set_gpu_free_memory(m_gpu.free_memory);
 
     DeviceDetail device;
     device.__set_machine(machine);

@@ -7,6 +7,9 @@ ARG work_dir=/app
 
 WORKDIR ${work_dir}
 
+COPY libqrpcie.so /usr/lib/
+COPY qrng_pcie.h /usr/include/
+
 RUN git config --global http.lowSpeedLimit 0 && git config --global http.lowSpeedTime 999999 && git config --global http.postBuffer 5242880 \
     && git clone https://github.com/qudoor/qusprout.git /app/qusprout \
 	&& cd /app/qusprout/thirdparty && chmod +x *.sh && ./install_QuEST.sh && cd /app/qusprout/thirdparty && rm -rf QuEST-3.5.0 \
@@ -29,6 +32,7 @@ RUN mkdir -p /usr/local/bin && mkdir -p /usr/local/etc/qusprout \
 COPY --from=builder /usr/local/bin/mpiexec /usr/local/bin/mpiexec
 COPY --from=builder /usr/local/bin/hydra_pmi_proxy /usr/local/bin/hydra_pmi_proxy
 COPY --from=builder /usr/local/lib/libhwloc.so.15 /usr/local/lib/libhwloc.so.15
+COPY --from=builder /usr/lib/libqrpcie.so /usr/lib/libqrpcie.so
 COPY --from=builder /usr/local/bin/qusprout /usr/local/bin/
 COPY --from=builder /usr/local/bin/quwork /usr/local/bin/
 COPY --from=builder /usr/local/etc/qusprout/qusprout.yaml /usr/local/etc/qusprout/

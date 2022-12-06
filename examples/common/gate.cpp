@@ -126,7 +126,7 @@ bool CGate::getProbAmp(const int index, double& amp)
     return true;
 }
 
-bool CGate::run(const int shots, Result& result)
+bool CGate::run(const int shots, MeasureResult& result)
 {
     RunCircuitReq runreq;
     RunCircuitResp runresp;
@@ -134,8 +134,7 @@ bool CGate::run(const int shots, Result& result)
     runreq.__set_shots(shots);
     CALL_WITH_TRY_SERVICE(m_client->run(runresp, runreq), runreq);
     ASSERT_CODE(runresp.base.code, runresp.base.msg);
-    result.__set_measureSet(runresp.result.measureSet);
-    result.__set_outcomeSet(runresp.result.outcomeSet);
+    result.__set_measures(runresp.result.measures);
     m_isrelease = true;
     return true;
 }

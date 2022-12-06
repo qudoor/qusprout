@@ -211,11 +211,13 @@ void setBase(BaseCode& base, const ErrCode::type& code, const std::string& msg)
 void ResourceData::reset()
 {
     cpubytes = 0;
+    gpubytes = 0;
 }
 
 ResourceData ResourceData::operator+=(const ResourceData& temp)
 {
     cpubytes += temp.cpubytes;
+    gpubytes += temp.gpubytes;
     return *this;
 }
 

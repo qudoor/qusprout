@@ -131,10 +131,7 @@ public:
     bool m_isexistmeasure{false};
 
     //测量结果
-    std::vector<MeasureResult> m_results;
-
-    //概率
-    std::vector<Outcome> m_outcomes;
+    MeasureResult m_results;
 
     //任务需要的资源大小，单位：byte
     ResourceData m_resourcebytes;
@@ -161,9 +158,6 @@ public:
     //获取振幅
     void getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req);
 
-    //获取当前qubit的概率
-    void getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req);
-
     //获取所有qubit的概率
     void getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req);
 
@@ -173,12 +167,6 @@ public:
     //执行任务
     void run(RunCircuitResp& resp, const RunCircuitReq& req);
 
-    //对部分量子比特应用量子傅立叶变换
-    void applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req);
-
-    //对所有量子比特应用量子傅立叶变换
-    void applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req);
-    
     //获取泡利算子乘积的期望值
     void getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req);
 
@@ -228,16 +216,16 @@ private:
     int addTask(const std::string& id, std::shared_ptr<CTask> task);
 
     //初始化进程
-    int initSubProcess(const InitQubitsReq& req, pid_t& childid, int& port);
+    BaseCode initSubProcess(const InitQubitsReq& req, pid_t& childid, int& port);
 
     //创建和执行子进程
-    int createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childid);
+    int createSubProcess(const InitQubitsReq& req, const std::string& execfilename, char* const* argv, pid_t& childid);
 
     //获取cpu执行子进程的参数
-    void getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
+    void getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param, std::string& workfilename, std::string& execfilename);
 
     ////获取cpu执行单个子进程的参数
-    void getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param);
+    void getSingleParam(const InitQubitsReq& req, const int port, const std::string& workfilename, std::vector<std::string>& param);
 
 private:
     std::mutex m_mutex;

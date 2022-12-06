@@ -294,41 +294,33 @@ client->sendCircuitCmd(cmdresp, cmdreq);
 |1 |base  |object   |y  |返回码 |
 |1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
 |1.2 |msg  |string   |y  |返回信息描述 |
-|2 |result  |object   |n  |响应数据 |
-|2.1 |measureSet  |arrary  |n  |数组,测量结果 |
-|2.1.1 |id  |int  |y  |目标比特位 |
-|2.1.2 |value  |int  |y  |测量的值（0或者1） |
-|2.2 |outcomeSet |arrary  |n  |数组，目标出现概率 |
-|2.2.1 |bitstr  |string  |y  |比特位组成的字符串，例如2个qubit时，那么有"00","01","10","11"的4个值 |
-|2.2.2 |count  |int  |y  |目标出现的次数 |
+|2 |result  |MeasureResult   |n  |响应数据 |
+|2.1 |measures  |arrary-MeasureQubits  |n  |数组,多次测量结果 |
+|2.1.1 |measure  |arrary-MeasureQubit  |n  |数组,单次测量结果 |
+|2.1.1.1 |target  |int  |y  |目标比特位 |
+|2.1.1.2 |value  |int  |y  |测量的值（0或者1） |
 
 请求和响应数据（qusproutdata.thrift）定义：
 ```
-//测量结果
-struct MeasureResult {
+//单个比特测量结果
+struct MeasureQubit {
     //量子比特
-    1: required i32 id
+    1: required i32 idx
 
     //测量结果
     2: required i32 value
 }
 
-//运行结果
-struct Outcome {
-    //比特位组成的字符串
-    1: required string bitstr
-
-    //出现次数
-    2: required i32 count
+//所有比特测量结果
+struct MeasureQubits {
+    //测量结果
+    1: required list<MeasureQubit> measure
 }
 
 //指令结果集
-struct Result {
-    //测量结果
-    1: required list<MeasureResult> measureSet
-
-    //结果集
-    2: required list<Outcome> outcomeSet
+struct MeasureResult {
+    //多次采样测量结果
+    1: required list<MeasureQubits> measures
 }
 
 //执行任务
@@ -345,7 +337,7 @@ struct RunCircuitResp {
     1: required ecode.BaseCode base 
 
     //返回结果
-    2: optional Result result
+    2: optional MeasureResult result
 }
 ```
 
@@ -464,90 +456,7 @@ client->getProbAmp(ampresp, ampreq);
 ......
 ```
 
-### 2.5 获取概率
-接口说明：
-1.获取概率;
-
-请求说明：
-| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
-| ---- | ---- | ---- | ---- | ---- |
-|1 |id  |string   |y  |任务id，同一任务保持一致 |
-|2 |qubit  |int  |y  |目标比特位，取值范围：[0, qubitnum) |
-|3 |outcom  |int  |y  |需要获取0或者1的概率 |
-
-响应说明：
-| 序号 | 字段名称 | 类型 | 是否必填 | 说明 |
-| ---- | ---- | ---- | ---- | ---- |
-|1 |base  |object   |y  |返回码 |
-|1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
-|1.2 |msg  |string   |y  |返回信息描述 |
-|2 |pro_outcome  |double  |y  |目标比特为0或者1的概率 |
-
-请求和响应数据（qusproutdata.thrift）定义：
-```
-//获取当前qubit的概率
-struct GetProbOfOutcomeReq {
-    //任务id
-    1: required string id
-
-    //qubit索引
-    2: required i32 qubit
-
-    //需要获取0或者1的概率
-    3: required i32 outcom
-}
-
-struct GetProbOfOutcomeResp {
-    //返回码
-    1: required ecode.BaseCode base
-
-    //概率
-    2: optional double pro_outcome
-}
-```
-
-接口文件（qusprout.thrift）定义：
-```
-service QuSproutServer {
-    //获取当前qubit的概率
-    qusproutdata.GetProbOfOutcomeResp getProbOfOutcome(1:qusproutdata.GetProbOfOutcomeReq req)
-
-}
-```
-
-c++示例：
-```
-//连接QuSprout
-std::shared_ptr<TSocket> socket = std::make_shared<TSocket>("127.0.0.1", 9091); 
-std::shared_ptr<TTransport> transport = std::make_shared<TBufferedTransport>(socket);
-std::shared_ptr<TProtocol> protocol = std::make_shared<TBinaryProtocol>(transport);
-std::shared_ptr<TMultiplexedProtocol> quest = std::make_shared<TMultiplexedProtocol>(protocol, "QuSproutServer");
-transport->open();
-std::shared_ptr<QuSproutServerClient> client = std::make_shared<QuSproutServerClient>(quest);
-
-std::ostringstream os("");
-os << time(NULL);
-auto id = os.str();
-
-//初始化量子环境
-......
-
-//添加量子指令
-......
-
-//获取振幅
-GetProbOfOutcomeReq alloutcomreq;
-alloutcomreq.__set_id(id);
-alloutcomreq.__set_qubit(0);
-alloutcomreq.__set_outcom(0);
-GetProbOfOutcomeResp alloutcomresp;
-client->getProbOfOutcome(alloutcomresp, alloutcomreq);
-
-//释放量子环境
-......
-```
-
-### 2.6 获取组合概率
+### 2.5 获取组合概率
 接口说明：
 1.获取组合概率;
 
@@ -630,7 +539,7 @@ client->getProbOfAllOutcome(alloutcomresp, alloutcomreq);
 ......
 ```
 
-### 2.7 获取量子执行状态
+### 2.6 获取量子执行状态
 接口说明：
 1.获取量子执行状态;
 
@@ -703,7 +612,7 @@ client->getAllState(stateresp, statereq);
 ......
 ```
 
-### 2.8 释放量子环境
+### 2.7 释放量子环境
 接口说明：
 1.释放量子环境;
 
@@ -766,7 +675,7 @@ CancelCmdResp cancelresp;
 client->cancelCmd(cancelresp, cancelreq);
 ```
 
-### 2.9 获取泡利算子乘积的期望值
+### 2.8 获取泡利算子乘积的期望值
 接口说明：
 1.获取泡利算子乘积的期望值;
 
@@ -868,7 +777,7 @@ client->getExpecPauliProd(pauliprodresp, pauliprodreq);
 ......
 ```
 
-### 2.10 获取泡利算子乘积之和的期望值
+### 2.9 获取泡利算子乘积之和的期望值
 接口说明：
 1.获取泡利算子乘积之和的期望值;
 
@@ -977,7 +886,7 @@ client->getExpecPauliSum(paulisumresp, paulisumreq);
 ......
 ```
 
-### 2.11 获取测量结果
+### 2.10 获取测量结果
 接口说明：
 1.获取测量结果；
 
@@ -993,31 +902,33 @@ client->getExpecPauliSum(paulisumresp, paulisumreq);
 |1 |base  |object   |y  |返回码 |
 |1.1 |code  |int   |y  |返回码，0：成功，其它值：参考ecode.thrift文件 |
 |1.2 |msg  |string   |y  |返回信息描述 |
-|2 |measureSet  |arrary  |n  |数组,测量结果 |
-|2.1 |id  |int  |y  |目标比特位 |
-|2.2 |value  |int  |y  |测量的值（0或者1） |
-|3 |outcomeSet |arrary  |n  |数组，目标出现概率 |
-|3.1 |bitstr  |string  |y  |比特位组成的字符串，例如2个qubit时，那么有"00","01","10","11"的4个值 |
-|3.2 |count  |int  |y  |目标出现的次数 |
+|2 |result  |MeasureResult   |n  |响应数据 |
+|2.1 |measures  |arrary-MeasureQubits  |n  |数组,多次测量结果 |
+|2.1.1 |measure  |arrary-MeasureQubit  |n  |数组,单次测量结果 |
+|2.1.1.1 |target  |int  |y  |目标比特位 |
+|2.1.1.2 |value  |int  |y  |测量的值（0或者1） |
 
 请求和响应数据（qusproutdata.thrift）定义：
 ```
-//测量结果
-struct MeasureResult {
+//单个比特测量结果
+struct MeasureQubit {
     //量子比特
-    1: required i32 id
+    1: required i32 idx
 
     //测量结果
     2: required i32 value
 }
 
-//运行结果
-struct Outcome {
-    //比特位组成的字符串
-    1: required string bitstr
+//所有比特测量结果
+struct MeasureQubits {
+    //测量结果
+    1: required list<MeasureQubit> measure
+}
 
-    //出现次数
-    2: required i32 count
+//指令结果集
+struct MeasureResult {
+    //多次采样测量结果
+    1: required list<MeasureQubits> measures
 }
 
 //获取测量结果
@@ -1034,10 +945,7 @@ struct MeasureQubitsResp {
     1: required ecode.BaseCode base
 
     //测量结果
-    2: optional list<MeasureResult> results
-
-    //结果集
-    3: required list<Outcome> outcomes
+    2: optional MeasureResult result
 }
 ```
 

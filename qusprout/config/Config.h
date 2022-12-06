@@ -93,6 +93,9 @@ public:
     //quwork的执行文件名称
     std::string m_quworkBinName{""};
 
+    //quwork的gpu执行文件名称
+    std::string m_quworkGpuBinName{""};
+
     //quwork的执行配置文件路径
     std::string m_quworkConfigPath{""};
 

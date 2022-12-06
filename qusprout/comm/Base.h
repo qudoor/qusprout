@@ -31,7 +31,7 @@ do { \
         } \
     } catch (const TTransportException& e) { \
         LOG(ERROR) << "call exception(req:" << getPrint(req) << ",err:" << e.what() << ")."; \
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+        setBase(resp.base, ErrCode::type::COM_EXCEPTION, "call interface exception of work."); \
         if (isNeedReConnectCode(e)) { \
             std::this_thread::sleep_for(std::chrono::seconds(1)); \
             reInit(); \
@@ -40,7 +40,7 @@ do { \
         break; \
     } catch (...) { \
         LOG(ERROR) << "call other exception(req:" << getPrint(req) << ")."; \
-        setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+        setBase(resp.base, ErrCode::type::COM_EXCEPTION, "call interface unknown exception of work."); \
         break; \
     } \
 } while(retry-- > 0);
@@ -50,10 +50,10 @@ try { \
     CALL; \
 } catch (const TTransportException& e) { \
     LOG(ERROR) << "call exception(req:" << getPrint(req) << ",err:" << e.what() << ")."; \
-    setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+    setBase(resp.base, ErrCode::type::COM_EXCEPTION, "call interface exception of quroot."); \
 } catch (...) { \
     LOG(ERROR) << "call other exception(req:" << getPrint(req) << ")."; \
-    setBase(resp.base, ErrCode::type::COM_EXCEPTION); \
+    setBase(resp.base, ErrCode::type::COM_EXCEPTION, "call interface unknown exception of quroot."); \
 }
 
 class CBase
@@ -98,6 +98,7 @@ public:
 
 public:
     long long int cpubytes{0};
+    long long int gpubytes{0};
 };
 
 //获取当前毫秒时间戳

@@ -91,8 +91,8 @@ CmdExecutor::CmdExecutor()
     m_qureg = SINGLETON(CQuESTIniter)->m_qureg;
 
     m_circuitCache.clear();
-    m_result.measureSet.clear();
-    m_result.outcomeSet.clear();
+    m_result.measures.clear();
+    m_runTimes = 0;
 }
 
 CmdExecutor::~CmdExecutor() 
@@ -137,115 +137,33 @@ void CmdExecutor::getProbOfAllOutcome(std::vector<double> & _return, const std::
     }
 }
 
-void CmdExecutor::writeStateToFile(const std::string& id)
-{
-    FILE *state;
-    char filename[100];
-    long long int index;
-    sprintf(filename, "state_rank_%s_%d.csv", id.c_str(), m_qureg.chunkId);
-    state = fopen(filename, "w");
-    if (m_qureg.chunkId==0) 
-    {
-        fprintf(state, "real, imag\n");
-    }
-
-    for(index=0; index<m_qureg.numAmpsPerChunk; index++)
-    {
-        # if QuEST_PREC==1 || QuEST_PREC==2
-        fprintf(state, "%.12f, %.12f\n", m_qureg.stateVec.real[index], m_qureg.stateVec.imag[index]);
-        # elif QuEST_PREC == 4
-        fprintf(state, "%.12Lf, %.12Lf\n", m_qureg.stateVec.real[index], m_qureg.stateVec.imag[index]);
-        #endif
-    }
-    fclose(state);
-}
-
 void CmdExecutor::getAllState(std::vector<std::string>& _return, const std::string& id) 
 {
     std::stringstream ss;
-    ss.precision(12);
-    for(long long index = 0; index < m_qureg.numAmpsPerChunk; index++)
+    long long int maxindex = 1LL << SINGLETON(CQuESTIniter)->m_qubits;
+    for (long long int index = 0; index < maxindex; ++index)
     {
-        qreal real = m_qureg.stateVec.real[index];
-        qreal imag = m_qureg.stateVec.imag[index];
-        if (real > -1e-15 && real < 1e-15)
+        ss.str("");
+        ss.precision(12);
+        Complex temp = getAmp(m_qureg, index);
+        if (temp.real > -1e-15 && temp.real < 1e-15)
         {
-            real = 0;
+            temp.real = 0;
         }
-        if (imag > -1e-15 && imag < 1e-15)
+        if (temp.imag > -1e-15 && temp.imag < 1e-15)
         {
-            imag = 0;
+            temp.imag = 0;
         }
-        ss << real << ", " << imag << '|';
+        ss << temp.real << ", " << temp.imag;
+        _return.push_back(ss.str());
     }
-
-    int gsize = 0;
-    MPI_Comm_size(MPI_COMM_WORLD, &gsize);
-
-    const std::string& str = ss.str();
-    
-    std::unique_ptr<char[]> rbuf(nullptr);
-    if(SINGLETON(CQuESTIniter)->m_env.rank == 0)
-    {
-        rbuf.reset(new(nothrow) char[gsize*(str.size())]{0});
-        if (!rbuf)
-        {
-            LOG(ERROR) << "CmdExecutor::getAllState : not enough memory";
-            return;
-        }
-    }
-    
-    MPI_Gather(str.c_str(), str.size(), MPI_CHAR, rbuf.get(), str.size(), MPI_CHAR, 0, MPI_COMM_WORLD);
-
-    if(SINGLETON(CQuESTIniter)->m_env.rank == 0)
-    {
-        rbuf[gsize*(str.size())-1] = 0;
-
-        char* substr = strtok(rbuf.get(), "|");
-        while (substr != NULL)
-        {
-            _return.push_back(substr);
-            substr = strtok(NULL, "|");
-        }
-    }
-    // if (!m_isExistResultFile)
-    // {
-    //     writeStateToFile(id);
-    //     m_isExistResultFile = true;
-    // }
-
-    // char filename[100];
-    // sprintf(filename, "state_rank_%s_%d.csv", id.c_str(), m_qureg.chunkId);
-    // fstream statefile;
-	// statefile.open(filename, ifstream::in);
-	// if (statefile.is_open())
-	// {
-	// 	string buff;
-	// 	while (getline(statefile, buff))
-	// 	{
-	// 		_return.push_back(buff);
-	// 	}
-    // } 
-    // statefile.close();
-}
-
-void CmdExecutor::apply_QFT(const std::vector<int32_t> & qubits) {
-    int bits[qubits.size()];
-    copy(qubits.begin(), qubits.end(), bits);
-    applyQFT(m_qureg, bits, qubits.size());
-}
-
-void CmdExecutor::apply_Full_QFT() {
-    applyFullQFT(m_qureg);
 }
 
 //Execute circuit
-void CmdExecutor::run(Result& result, int32_t shots) {
+void CmdExecutor::run(MeasureResult& result, int32_t shots) {
     // The circuit already run once when send
-    int run_times = shots - 1;
-    while (run_times > 0) {
-        m_result.measureSet.clear();
-        
+    m_runTimes = 1;
+    while ((int32_t)m_runTimes < shots) {
         initZeroState(m_qureg);
 
         for (const auto & circuit : m_circuitCache) {
@@ -255,11 +173,11 @@ void CmdExecutor::run(Result& result, int32_t shots) {
             }
         }
         packMeasureResult();
-        run_times -= 1;
+        ++m_runTimes;
     }
 
-    sort(m_result.outcomeSet.begin(), m_result.outcomeSet.end(), [](const Outcome& a, const Outcome& b) {return a.bitstr.compare(b.bitstr) < 0;});
     result = m_result;
+    m_runTimes = 0;
     return;
 }
 
@@ -269,27 +187,9 @@ void CmdExecutor::printCmd(const Cmd& cmd) {
 }
 
 void CmdExecutor::packMeasureResult() {
-    sort(m_result.measureSet.begin(), m_result.measureSet.end(), [](const MeasureResult& a, const MeasureResult& b) {return a.id < b.id;});
-    string bitstr = "";
-    for (auto &m : m_result.measureSet) {
-        int val = m.value;
-        bitstr.append(to_string(val));
-    }
-
-    int idx = -1;
-    for (unsigned int i = 0; i < m_result.outcomeSet.size(); ++i) {
-        if (m_result.outcomeSet[i].bitstr == bitstr) {
-            idx = i;
-            break; 
-        }
-    }
-    if (idx >= 0) {
-        m_result.outcomeSet[idx].count += 1;
-    } else {
-        Outcome out;
-        out.bitstr = bitstr;
-        out.count = 1;
-        m_result.outcomeSet.push_back(out);
+    size_t index = m_runTimes;
+    if (index < m_result.measures.size()) {
+        sort(m_result.measures[index].measure.begin(), m_result.measures[index].measure.end(), [](const MeasureQubit& a, const MeasureQubit& b) {return a.idx < b.idx;});
     }
 }
 
@@ -312,12 +212,20 @@ bool CmdExecutor::isInit()
 }
 
 void CmdExecutor::Measure(const Cmd& cmd) {
-    for (auto id : cmd.targets) {
-        int ret = measure(m_qureg, id);
-        MeasureResult mr;
-        mr.id = id;
+    size_t index = m_runTimes;
+    size_t meassize = m_result.measures.size();
+    if (index >= meassize)
+    {
+        MeasureQubits mrs;
+        m_result.measures.push_back(mrs);
+    }
+
+    for (auto idx : cmd.targets) {
+        int ret = measure(m_qureg, idx);
+        MeasureQubit mr;
+        mr.idx = idx;
         mr.value = ret;
-        this->m_result.measureSet.push_back(mr);
+        m_result.measures[index].measure.push_back(mr);
     }
 }
 
@@ -370,7 +278,7 @@ double CmdExecutor::getExpecPauliSum(const std::vector<PauliOperType::type>& ope
     return expectvalue;
 }
 
-void CmdExecutor::getMeasureResult(const std::vector<int32_t>& qubits, Result& result)
+void CmdExecutor::getMeasureResult(const std::vector<int32_t>& qubits, MeasureResult& result)
 {
     if (qubits.size() == 0)
     {
@@ -378,13 +286,21 @@ void CmdExecutor::getMeasureResult(const std::vector<int32_t>& qubits, Result& r
         return;
     }
 
-    for (auto id : qubits)
+    for (auto idx : qubits)
     {
-        for (auto measure: m_result.measureSet)
+        for (auto measure: m_result.measures)
         {
-            if (id == measure.id)
+            MeasureQubits mrs;
+            for (auto mr: measure.measure)
             {
-                result.measureSet.push_back(measure);
+                if (idx == mr.idx)
+                {
+                    mrs.measure.push_back(mr);
+                }
+            }
+            if (mrs.measure.size() > 0)
+            {
+                result.measures.push_back(mrs);
             }
         }
     }
@@ -443,8 +359,7 @@ void CmdExecutor::reInit(const int qubits)
     m_qureg = SINGLETON(CQuESTIniter)->m_qureg;
 
     m_circuitCache.clear();
-    m_result.measureSet.clear();
-    m_result.outcomeSet.clear();
+    m_result.measures.clear();
 }
 
 void CmdExecutor::resetQubits(const std::vector<int32_t>& qubits)

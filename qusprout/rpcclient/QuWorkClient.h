@@ -54,9 +54,6 @@ public:
     //获取振幅
     void getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req);
 
-    //获取当前qubit的概率
-    void getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req);
-
     //获取所有qubit的概率
     void getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req);
 
@@ -65,12 +62,6 @@ public:
 
     //执行任务
     void run(RunCircuitResp& resp, const RunCircuitReq& req);
-
-    //对部分量子比特应用量子傅立叶变换
-    void applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req);
-
-    //对所有量子比特应用量子傅立叶变换
-    void applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req);
 
     //获取泡利算子乘积的期望值
     void getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req);

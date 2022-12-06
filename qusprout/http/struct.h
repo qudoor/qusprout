@@ -27,9 +27,11 @@ const std::string CMD_STR_GETSTATE = "getstate";
 const std::string CMD_STR_RELEASEENV = "releaseenv";
 const std::string CMD_STR_GETTASK = "gettask";
 const std::string CMD_STR_GETMEASURE = "getmeasure";
-const std::string CMD_STR_APPLYQFT = "applyqft";
 const std::string CMD_STR_GETPAULI = "getpauli";
 const std::string CMD_STR_GETPAULISUM = "getpaulisum";
+const std::string CMD_STR_GETRCARDINFO = "getrcardinfo";
+const std::string CMD_STR_SETRCARD = "setrcard";
+const std::string CMD_STR_GETRAND = "getrand";
 
 //请求包头
 struct ReqHead 
@@ -37,7 +39,7 @@ struct ReqHead
     //必填| 流水号
     std::string flowid{""}; 
 
-    //必填| 会话id，同一会话保持一致            
+    //选填| 会话id，同一会话保持一致            
     std::string taskid{""};
 
     //必填| 指令类型        
@@ -66,12 +68,12 @@ struct RespHead
     bool decode(const rapidjson::Document& dom);
     std::string getStr();
 
-    void setcode(const std::string& flowid, const int code);
+    void setcode(const std::string& flowid, const int code, const std::string& msg = "");
     void encodehead(std::string& buf);
 };
 
-//测量结果
-struct MeasureInfo
+//单个比特测量结果
+struct MeasureQu
 {
     //必填| 目标比特位
     int target{0};
@@ -84,14 +86,11 @@ struct MeasureInfo
     std::string getStr();
 };
 
-//目标出现概率
-struct OutcomeInfo
+//所有比特测量结果
+struct MeasureQus
 {
-    //必填| 比特位组成的字符串，例如2个qubit时，那么有"00","01","10","11"的4个值
-    std::string bitstr{""};
-
-    //必填| 目标出现的次数
-    int count{0};
+    //必填| 所有比特测量结果
+    std::vector<MeasureQu> measure;
 
     void encode(rapidjson::Writer<rapidjson::StringBuffer>& writer);
     bool decode(const rapidjson::Value& dom);
@@ -200,10 +199,7 @@ struct RunGateCmdReq : public ReqHead
 struct RunGateCmdResp : public RespHead 
 {
     //选填| 测量结果
-    std::vector<MeasureInfo> measures;
-
-    //选填| 目标出现概率
-    std::vector<OutcomeInfo> outcomes;
+    std::vector<MeasureQus> measures;
 
     void encode(std::string& buf);
     bool decode(const std::string& buf);
@@ -317,29 +313,8 @@ struct GetMeasureReq : public ReqHead
 struct GetMeasureResp : public RespHead 
 {
     //选填| 测量结果
-    std::vector<MeasureInfo> measures;
+    std::vector<MeasureQus> measures;
 
-    //选填| 目标出现概率
-    std::vector<OutcomeInfo> outcomes;
-
-    void encode(std::string& buf);
-    bool decode(const std::string& buf);
-    std::string getStr();
-};
-
-//应用量子傅立叶变换
-struct ApplyQftReq : public ReqHead 
-{
-    //选填| 目标位，为空时，对所有量子比特应用量子傅立叶变换
-    std::vector<int> targets;
-
-    void encode(std::string& buf);
-    bool decode(const std::string& buf);
-    std::string getStr();
-};
-
-struct ApplyQftResp : public RespHead 
-{
     void encode(std::string& buf);
     bool decode(const std::string& buf);
     std::string getStr();
@@ -397,6 +372,121 @@ struct GetEPauliSumResp : public RespHead
 {
     //选填| 期望值
     double expect;
+
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+};
+
+//板卡信息
+struct RCardStateInfo
+{
+    //必填| 板上状态类型,重复计数状态(R_MC_S0):0,适配比例状态(R_MC_S1):1,eeprom参数状态(R_EEPROM_S):2,参数值状态(R_PAR_VALUE_S):3,校验状态(R_EEPROM_CHECK_S):4,EEPROM读写状态(R_EEPROM_RW_S):5,激光器温度状态(R_LD_TEMP_S):6,板上温度状态(R_BD_TEMP_S):7,链路状态(R_LINK_S):8
+    int type{0};
+
+    //必填| 状态，0：正常，1：异常
+    int state{0};
+
+    void encode(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    bool decode(const rapidjson::Value& dom);
+    std::string getStr();
+};
+
+//板卡信息
+struct RCardInfo
+{
+    //必填| 随机数卡编号
+    int deviceindex{0};
+
+    //必填| 随机数卡输出方式，0:NONE, 1:NET, 2:USB, 3:PCIE
+    int mode{0};
+
+    //必填| 激光器温度
+    double ldtemp{0};
+
+    //必填| 电路板温度
+    double bdtemp{0};
+
+    //选填| 板卡状态信息
+    std::vector<RCardStateInfo> states;
+
+    void encode(rapidjson::Writer<rapidjson::StringBuffer>& writer);
+    bool decode(const rapidjson::Value& dom);
+    std::string getStr();
+};
+
+//获取随机数卡的信息
+struct GetRCardInfoReq : public ReqHead 
+{
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+};
+
+struct GetRCardInfoResp : public RespHead
+{
+    //必填| 设备数量
+    int count{0};
+
+    //必填| 驱动版本号
+    int driverversion{0};
+
+    //必填| 接口库版本号
+    int libraryversion{0};
+
+    //选填| 板卡信息
+    std::vector<RCardInfo> cards;
+
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+};
+
+//设置随机数卡
+struct SetRCardReq : public ReqHead 
+{
+    //必填| 随机数卡编号
+    int deviceindex{0};
+
+    //选填| 随机数卡输出方式，0:NONE, 1:NET, 2:USB, 3:PCIE
+    int mode{-1};
+
+    //选填| 是否复位，0：否，1：是
+    int reset{0};
+
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+};
+
+struct SetRCardResp : public RespHead 
+{
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+}; 
+
+//获取随机数
+struct GetRandReq : public ReqHead 
+{
+    //必填| 随机数的长度
+    int randomlength{0};
+
+    //必填| 随机数的数量
+    int randomnum{0};
+
+    //选填| 指定随机数卡编号
+    int deviceindex{-1};
+
+    void encode(std::string& buf);
+    bool decode(const std::string& buf);
+    std::string getStr();
+};
+
+struct GetRandResp : public RespHead 
+{
+    //选填| 随机数，二进制字符串
+    std::vector<std::string> randoms;
 
     void encode(std::string& buf);
     bool decode(const std::string& buf);

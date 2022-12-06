@@ -43,6 +43,7 @@ http:
 quwork:
   quworkBinPath: /usr/local/bin
   quworkBinName: quwork
+  quworkGpuBinName: quwork-gpu
   quworkConfigPath: /usr/local/etc/qusprout
   quworkConfigName: quwork.yaml
   waitRpcTimeout: 60

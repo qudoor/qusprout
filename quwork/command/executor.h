@@ -29,13 +29,11 @@ public:
 
 public:
     void receiveCircuit(const ::Circuit& circuit, const bool final);
-    void run(Result& result, int32_t shots);
+    void run(MeasureResult& result, int32_t shots);
     double getProbOfAmp(const int64_t index);
     double getProbOfOutcome(const int32_t qubit, const int32_t outcome);
     void getProbOfAllOutcome(std::vector<double> & _return, const std::vector<int32_t> & qubits);
     void getAllState(std::vector<std::string> & _return, const std::string& id = "");
-    void apply_QFT(const std::vector<int32_t> & qubits);
-    void apply_Full_QFT();
     void packMeasureResult();
     void printCmd(const Cmd& cmd);
     bool isInit();
@@ -43,7 +41,7 @@ public:
     double getExpecPauliProd(const std::vector<PauliProdInfo>& pauli_prod);
     double getExpecPauliSum(const std::vector<PauliOperType::type>& oper_type_list, const std::vector<double>& term_coeff_list);
 
-    void getMeasureResult(const std::vector<int32_t>& qubits, Result& result);
+    void getMeasureResult(const std::vector<int32_t>& qubits, MeasureResult& result);
     int addCustomGateByMatrix(const GateMatrix& matrix);
     int appendQubits(const int add_qubits);
     void reInit(const int qubits);
@@ -53,9 +51,6 @@ public:
     void getProbabilities(std::vector<double>& probabilities);
 
     long long int getMaxAmpIndex();
-
-private:
-    void writeStateToFile(const std::string& id);
 
 public:
     void execCmd(const Cmd& cmd);
@@ -112,10 +107,12 @@ public:
 
 private:
     Qureg m_qureg;
-    Result m_result;
+    MeasureResult m_result;
 
     std::vector<::Circuit> m_circuitCache;
     std::map<std::string, GateMatrix> m_gateMatrix;
+
+    size_t m_runTimes;
 };
 
 END_NAMESPACE

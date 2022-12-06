@@ -26,11 +26,8 @@ public:
 
     void sendCircuitCmd(const std::vector<Cmd>& cmds, const int& final);
     void getProbAmp(const int& ampindex);
-    void getProbOutcome(const int& qubit, const int& outcome);
     void getProbOfAllOutcome(const std::vector<int>& targets);
     void getAllState();
-    void applyQFT(const std::vector<int>& targets);
-    void applyFullQFT();
     void run(const int& shots);
     void cancelCmd();
     

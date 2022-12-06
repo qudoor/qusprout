@@ -31,9 +31,11 @@ public:
     void releaseEnv(const std::shared_ptr<ReleaseEnvReq> req, std::shared_ptr<ReleaseEnvResp> resp);
     void getTask(const std::shared_ptr<GetTaskReq> req, std::shared_ptr<GetTaskResp> resp);
     void getMeasure(const std::shared_ptr<GetMeasureReq> req, std::shared_ptr<GetMeasureResp> resp);
-    void applyQft(const std::shared_ptr<ApplyQftReq> req, std::shared_ptr<ApplyQftResp> resp);
     void getEPauli(const std::shared_ptr<GetEPauliReq> req, std::shared_ptr<GetEPauliResp> resp);
     void getEPauliSum(const std::shared_ptr<GetEPauliSumReq> req, std::shared_ptr<GetEPauliSumResp> resp);
+    void getRcardInfo(const std::shared_ptr<GetRCardInfoReq> req, std::shared_ptr<GetRCardInfoResp> resp);
+    void setRcard(const std::shared_ptr<SetRCardReq> req, std::shared_ptr<SetRCardResp> resp);
+    void getRand(const std::shared_ptr<GetRandReq> req, std::shared_ptr<GetRandResp> resp);
 
 private:
     int switchCode(const ErrCode::type code);

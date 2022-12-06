@@ -40,6 +40,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #启动对C++11标准的支持
 set(CMAKE_CXX_STANDARD 11)
 
+find_package(CUDA)
+if(CUDA_FOUND)
+	set(CMAKE_EXE_LINKER_FLAGS "-DNVIDIA_CUDA")
+	add_compile_options(-DNVIDIA_CUDA)
+endif(CUDA_FOUND)
+
 #添加编译选项
 add_compile_options(-g -Wall -fPIC -DGLOG_CUSTOM_PREFIX_SUPPORT)
 
@@ -65,7 +71,7 @@ file(GLOB SRC_LIST
 )
 
 #头文件搜索路径，路径之间用空格分隔，相当于指定-I参数
-include_directories(${PROJECT_SOURCE_DIR}/../../include ${PROJECT_SOURCE_DIR}/../.. ${PROJECT_SOURCE_DIR}/../../quwork ${PROJECT_SOURCE_DIR} /usr/include /usr/local/include /usr/local/include/thrift)
+include_directories(${PROJECT_SOURCE_DIR}/../../include ${PROJECT_SOURCE_DIR}/../.. ${PROJECT_SOURCE_DIR}/../../quwork ${PROJECT_SOURCE_DIR} /usr/include /usr/local/include /usr/local/include/thrift ${CUDA_INCLUDE_DIRS})
 
 #动态链接库或静态链接库的搜索路径，相当于-L参数
 IF (APPLE)
@@ -77,8 +83,11 @@ ENDIF ()
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 #添加链接库,相同于指定-l参数
+target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libQuEST.a;libmpi.a;libhwloc.a;libgtest.a;dl;pthread)
 IF (APPLE)
-	target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libQuEST.a;libmpi.a;libhwloc.a;libgtest.a;dl;pthread)
 ELSE ()
-	target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libQuEST.a;libmpi.a;libhwloc.a;libgtest.a;rt;dl;pthread)
+	target_link_libraries(${PROJECT_NAME} rt)
 ENDIF ()
+if(CUDA_FOUND)
+	target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES})
+endif(CUDA_FOUND)

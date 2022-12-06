@@ -13,19 +13,20 @@
 #ifndef SystemHandle_H
 #define SystemHandle_H
 
+//内存信息
 struct MemUseInfo 
 {
-    //系统启动时间，单位：秒
-    long sysStartTime{0};
-
-    //接口调用时间，单位：秒
-    long currTime{0};
-
     //总可用内存大小，单位：byte
-    unsigned long totalRam{0};
+    long long total_memory{0};
 
     //可用内存大小，单位：byte
-    unsigned long freeRam{0};
+    long long free_memory{0};
+
+    //更新时间，单位：秒
+    long update_time{0};
+
+    //创建时间，单位：秒
+    long create_time{0};
 };
 
 //机器信息
@@ -45,7 +46,31 @@ struct MachineSysInfo {
     //当前硬件体系类型
     std::string sys_machine{""};
 
-    //注册时间戳，单位：秒
+    //创建时间，单位：秒
+    long create_time{0};
+};
+
+//显存类型
+enum GpuFactoryType {
+    //默认
+    GpuFactoryType_Default = 0,
+
+    //英伟达
+    GpuFactoryType_Nvidia = 1
+};
+
+//显存信息
+struct GpuUseInfo {
+    //显存类型
+    GpuFactoryType gpu_type{GpuFactoryType_Default};
+
+    //总显存，单位：byte
+    long long total_memory{0};
+
+    //可用内存大小，单位：byte
+    long long free_memory{0};
+
+    //创建时间，单位：秒
     long create_time{0};
 };
 
@@ -63,6 +88,9 @@ public:
 
     //获取CPU核心数
     int getCpuNum();
+
+    //获取gpu信息
+    int getGpuUseInfo(GpuUseInfo& cpu);
 };
 
 #endif

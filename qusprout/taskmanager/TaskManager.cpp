@@ -10,6 +10,7 @@
 *
 ****************************************************************************/
 
+#include <unistd.h>
 #include <sstream>
 #include <spawn.h>
 #include <sys/types.h>
@@ -159,8 +160,7 @@ void CTask::run(RunCircuitResp& resp, const RunCircuitReq& req)
 
     if (resp.base.code == ErrCode::type::COM_SUCCESS)
     {
-        m_results = resp.result.measureSet;
-        m_outcomes = resp.result.outcomeSet;
+        m_results = resp.result;
         m_isexistmeasure = true;
     }
 }
@@ -171,8 +171,7 @@ void CTask::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq& req)
     if (m_isexistmeasure)
     {
         setBase(resp.base, ErrCode::type::COM_SUCCESS);
-        resp.__set_results(m_results);
-        resp.__set_outcomes(m_outcomes);
+        resp.__set_result(m_results);
     }
     else
     {
@@ -229,11 +228,10 @@ CTaskManager::~CTaskManager()
 
 void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
 {
-    if (req.id.empty() || req.qubits <= 0 ||
-        req.exec_type == ExecCmdType::type::ExecTypeGpuSingle)
+    if (req.id.empty() || req.qubits <= 0)
     {
         LOG(ERROR) << "initQubits is invaild param(taskid:" << req.id << ",qubits:" << req.qubits << ",exec_type:" << req.exec_type << ").";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id or qubits.");
         return;
     }
 
@@ -246,24 +244,25 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     }
 
     ResourceData resourcebytes;
-    ErrCode::type retcode = SINGLETON(CResourceManager)->getResource(req, resourcebytes);
-    if (retcode != ErrCode::type::COM_SUCCESS)
+    auto base = SINGLETON(CResourceManager)->getResource(req, resourcebytes);
+    if (base.code != ErrCode::type::COM_SUCCESS)
     {
         LOG(ERROR) << "initEnv resource is not enough(taskid:" << req.id << ").";
-        setBase(resp.base, retcode);
+        setBase(resp.base, base.code, base.msg);
         return;
     }
 
     int port = 0;
     pid_t childid = -1;
-    int ret = initSubProcess(req, childid, port);
-    if (ret != 0)
+    base = initSubProcess(req, childid, port);
+    if (base.code != ErrCode::type::COM_SUCCESS)
     {
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, base.code, base.msg);
         return;
     }
 
     //5.创建work的客户端,等待子线程rpc启动成功(sleeptime*10为1秒)
+    int ret = -1;
     const int sleeptime = 100;
     int count = SINGLETON(CConfig)->m_waitRpcTimeout*(10);
     if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
@@ -284,7 +283,7 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     if (ret != 0)
     {
         LOG(ERROR) << "sub process start rpc failed(taskid:" << req.id << ",port:" << port<< ").";
-        setBase(resp.base, ErrCode::type::COM_OTHRE);
+        setBase(resp.base, ErrCode::type::COM_OTHRE, "create process exception.");
         kill(childid, SIGKILL);
         return;
     }
@@ -292,7 +291,7 @@ void CTaskManager::initQubits(InitQubitsResp& resp, const InitQubitsReq& req)
     ret = addTask(req.id, taskhandle);
     if (ret != 0)
     {
-        setBase(resp.base, ErrCode::type::COM_IS_EXIST);
+        setBase(resp.base, ErrCode::type::COM_IS_EXIST, "this task is exist.");
         return;
     }
 
@@ -304,7 +303,7 @@ void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
     if (req.id.empty() || (req.final == false && req.circuit.cmds.size() <= 0))
     {
         LOG(ERROR) << "sendCircuitCmd param is invalild(taskid:" << req.id << ",final:" << req.final << ").";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id or final.");
         return;
     } 
 
@@ -313,7 +312,7 @@ void CTaskManager::sendCircuitCmd(SendCircuitCmdResp& resp, const SendCircuitCmd
     if (taskhandle == nullptr)
     {
         LOG(ERROR) << "sendCircuitCmd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -325,7 +324,7 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     if (req.id.empty())
     {
         LOG(ERROR) << "cancelCmd taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -333,7 +332,7 @@ void CTaskManager::cancelCmd(CancelCmdResp& resp, const CancelCmdReq& req)
     auto taskhandle = getTask(req.id);
     if (taskhandle == nullptr)
     {
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -352,7 +351,7 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
     if (req.id.empty())
     {
         LOG(ERROR) << "getProbAmp taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -362,14 +361,14 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getProbAmp task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
     if (taskhandle->m_taskinfo.density)
     {
         LOG(ERROR) << "getProbAmp is not invaild operator of density(index:" << req.index << ").";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of density.");
         return;
     }
 
@@ -378,7 +377,7 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
     if (0 == qubitnum || req.index < 0 || req.index >= maxindex)
     {
         LOG(ERROR) << "getProbAmp index is invaild(qubitnum:" << qubitnum << ",index:" << req.index << ").";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of index or qubits.");
         return;
     }
 
@@ -386,43 +385,12 @@ void CTaskManager::getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req)
     taskhandle->m_client.getProbAmp(resp, req);
 }
 
-void CTaskManager::getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req)
-{
-    if (req.id.empty())
-    {
-        LOG(ERROR) << "getProbOfOutcome taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-        return;
-    } 
-
-    //1.判断任务是否已经初始化
-    auto taskhandle = getTask(req.id);
-    if (taskhandle == nullptr)
-    {
-        //任务不存在
-        LOG(ERROR) << "getProbOfOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
-        return;
-    }
-
-    auto qubitnum = taskhandle->getQubits();
-    if (req.qubit < 0 || req.qubit >= qubitnum)
-    {
-        LOG(ERROR) << "getProbOfOutcome qubit is invaild(qubitnum:" << qubitnum << ",qubit:" << req.qubit << ").";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-        return;
-    }
-
-    std::lock_guard<std::mutex> guard(taskhandle->m_mutex);
-    taskhandle->m_client.getProbOfOutcome(resp, req);
-}
-
 void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req)
 {
     if (req.id.empty())
     {
         LOG(ERROR) << "getProbOfAllOutcome taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -432,7 +400,7 @@ void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
     {
         //任务不存在
         LOG(ERROR) << "getProbOfAllOutcome task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -442,7 +410,7 @@ void CTaskManager::getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetPr
         if (target < 0 || target >= qubitnum)
         {
             LOG(ERROR) << "getProbOfAllOutcome qubit is invaild(qubitnum:" << qubitnum << ",target:" << target << ").";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of target.");
             return;
         }
     }
@@ -456,7 +424,7 @@ void CTaskManager::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
     if (req.id.empty())
     {
         LOG(ERROR) << "getAllState taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -466,7 +434,7 @@ void CTaskManager::getAllState(GetAllStateResp& resp, const GetAllStateReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getAllState task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -479,7 +447,7 @@ void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req)
     if (req.id.empty())
     {
         LOG(ERROR) << "run taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -489,7 +457,7 @@ void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req)
     {
         //任务不存在
         LOG(ERROR) << "run task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -501,59 +469,13 @@ void CTaskManager::run(RunCircuitResp& resp, const RunCircuitReq& req)
     cancelCmd(cancelresp, cancelreq);
 }
 
-void CTaskManager::applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req)
-{
-    if (req.id.empty())
-    {
-        LOG(ERROR) << "applyQFT taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-        return;
-    } 
-
-    //1.判断任务是否已经初始化
-    auto taskhandle = getTask(req.id);
-    if (taskhandle == nullptr)
-    {
-        //任务不存在
-        LOG(ERROR) << "applyQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
-        return;
-    }
-
-    std::lock_guard<std::mutex> guard(taskhandle->m_mutex);
-    taskhandle->m_client.applyQFT(resp, req);
-}
-
-void CTaskManager::applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req)
-{
-    if (req.id.empty())
-    {
-        LOG(ERROR) << "applyFullQFT taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
-        return;
-    } 
-
-    //1.判断任务是否已经初始化
-    auto taskhandle = getTask(req.id);
-    if (taskhandle == nullptr)
-    {
-        //任务不存在
-        LOG(ERROR) << "applyFullQFT task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
-        return;
-    }
-
-    std::lock_guard<std::mutex> guard(taskhandle->m_mutex);
-    taskhandle->m_client.applyFullQFT(resp, req);
-}
-
 //获取泡利算子乘积的期望值
 void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req)
 {
     if (req.id.empty())
     {
         LOG(ERROR) << "getExpecPauliProd taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -563,7 +485,7 @@ void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliProd task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -573,7 +495,7 @@ void CTaskManager::getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpec
         if (pauli.target < 0 || pauli.target >= qubitnum)
         {
             LOG(ERROR) << "getExpecPauliProd target is invaild(qubitnum:" << qubitnum << ",target:" << pauli.target << ").";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of target.");
             return;
         }
     }
@@ -588,7 +510,7 @@ void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
     if (req.id.empty())
     {
         LOG(ERROR) << "getExpecPauliSum taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -598,7 +520,7 @@ void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
     {
         //任务不存在
         LOG(ERROR) << "getExpecPauliSum task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -607,7 +529,7 @@ void CTaskManager::getExpecPauliSum(GetExpecPauliSumResp& resp, const GetExpecPa
     if (coeffsize * taskhandle->getQubits() != typesize) 
     {
         LOG(ERROR) << "typesize is not equal of coeffsize*qubitnum.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of oper_type_list size and term_coeff_list size .");
         return;
     }
 
@@ -621,7 +543,7 @@ void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
     if (req.id.empty())
     {
         LOG(ERROR) << "measureQubits taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -631,7 +553,7 @@ void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
     {
         //任务不存在
         LOG(ERROR) << "measureQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -641,7 +563,7 @@ void CTaskManager::measureQubits(MeasureQubitsResp& resp, const MeasureQubitsReq
         if (target < 0 || target >= qubitnum)
         {
             LOG(ERROR) << "measureQubits qubit is invaild(qubitnum:" << qubitnum << ",target:" << target << ").";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of target.");
             return;
         }
     }
@@ -655,7 +577,7 @@ void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const 
     if (req.id.empty())
     {
         LOG(ERROR) << "addCustomGateByMatrix taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -665,7 +587,7 @@ void CTaskManager::addCustomGateByMatrix(AddCustomGateByMatrixResp& resp, const 
     {
         //任务不存在
         LOG(ERROR) << "addCustomGateByMatrix task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -679,7 +601,7 @@ void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq
     if (req.id.empty())
     {
         LOG(ERROR) << "addSubCircuit taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -689,7 +611,7 @@ void CTaskManager::addSubCircuit(AddSubCircuitResp& resp, const AddSubCircuitReq
     {
         //任务不存在
         LOG(ERROR) << "addSubCircuit task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -703,7 +625,7 @@ void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& r
     if (req.id.empty())
     {
         LOG(ERROR) << "appendQubits taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -713,7 +635,7 @@ void CTaskManager::appendQubits(AppendQubitsResp& resp, const AppendQubitsReq& r
     {
         //任务不存在
         LOG(ERROR) << "appendQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -727,7 +649,7 @@ void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
     if (req.id.empty())
     {
         LOG(ERROR) << "resetQubits taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -737,7 +659,7 @@ void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
     {
         //任务不存在
         LOG(ERROR) << "resetQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -747,7 +669,7 @@ void CTaskManager::resetQubits(ResetQubitsResp& resp, const ResetQubitsReq& req)
         if (target < 0 || target >= qubitnum)
         {
             LOG(ERROR) << "resetQubits qubit is invaild(qubitnum:" << qubitnum << ",target:" << target << ").";
-            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+            setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of target.");
             return;
         }
     }
@@ -762,7 +684,7 @@ void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetS
     if (req.id.empty())
     {
         LOG(ERROR) << "getStateOfAllQubits taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -772,7 +694,7 @@ void CTaskManager::getStateOfAllQubits(GetStateOfAllQubitsResp& resp, const GetS
     {
         //任务不存在
         LOG(ERROR) << "getStateOfAllQubits task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -786,7 +708,7 @@ void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabi
     if (req.id.empty())
     {
         LOG(ERROR) << "getProbabilities taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -796,7 +718,7 @@ void CTaskManager::getProbabilities(GetProbabilitiesResp& resp, const GetProbabi
     {
         //任务不存在
         LOG(ERROR) << "getProbabilities task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -810,7 +732,7 @@ void CTaskManager::getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req)
     if (req.id.empty())
     {
         LOG(ERROR) << "getProbabilities taskid is null.";
-        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM);
+        setBase(resp.base, ErrCode::type::COM_INVALID_PARAM, "invaild param of id.");
         return;
     } 
 
@@ -820,7 +742,7 @@ void CTaskManager::getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req)
     {
         //任务不存在
         LOG(ERROR) << "getProbabilities task is not exist(taskid:" << req.id << ").";
-        setBase(resp.base, ErrCode::type::COM_NOT_INIT);
+        setBase(resp.base, ErrCode::type::COM_NOT_INIT, "this task is not exist.");
         return;
     }
 
@@ -941,8 +863,9 @@ int CTaskManager::killAllTask()
     return  killTask(SINGLETON(CConfig)->m_quworkBinName);
 }
 
-int CTaskManager::initSubProcess(const InitQubitsReq& req, pid_t& childid, int& port)
+BaseCode CTaskManager::initSubProcess(const InitQubitsReq& req, pid_t& childid, int& port)
 {
+    BaseCode base;
     //1.获取一个随机端口
     {
         std::lock_guard<std::mutex> guard(m_mutex);
@@ -951,7 +874,14 @@ int CTaskManager::initSubProcess(const InitQubitsReq& req, pid_t& childid, int& 
 
     //2.获取启动子进程的参数
     std::vector<std::string> param;
-    getParam(req, port, param);
+    std::string workfilename = "", execfilename = "";
+    getParam(req, port, param, workfilename, execfilename);
+    if (0 != access(workfilename.c_str(), W_OK) || 0 != access(execfilename.c_str(), W_OK))
+    {
+        LOG(ERROR) << "work process file is not install(workfilename:" << workfilename << ",execfilename:" << execfilename << ",exec_type:" << req.exec_type << ").";
+        setBase(base, ErrCode::type::COM_OTHRE, "work process file is not install.");
+        return base;
+    }
 
     //3.转换参数结构
     std::ostringstream os("");
@@ -966,19 +896,21 @@ int CTaskManager::initSubProcess(const InitQubitsReq& req, pid_t& childid, int& 
     argv[i] = NULL;
 
     //4.创建子进程
-    int ret = createSubProcess(req, argv, childid);
+    int ret = createSubProcess(req, execfilename, argv, childid);
     delete [] argv;
     if (ret != 0)
     {
         LOG(ERROR) << "createSubProcess failed(taskid:" << req.id << ",param:" << os.str() << ").";
-        return -1;
+        setBase(base, ErrCode::type::COM_OTHRE, "create work failed.");
+        return base;
     }
     LOG(INFO) << "createSubProcess success(taskid:" << req.id << ",param:" << os.str() << ").";
 
-    return 0;
+    setBase(base, ErrCode::type::COM_SUCCESS);
+    return base;
 }
 
-int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, pid_t& childid)
+int CTaskManager::createSubProcess(const InitQubitsReq& req, const std::string& execfilename, char* const* argv, pid_t& childid)
 {
     //2.创建子进程
     int ret = -1;
@@ -1022,15 +954,10 @@ int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, 
             break;
         }
 
-        std::string pathname = SINGLETON(CConfig)->m_quworkBinPath + "/" + SINGLETON(CConfig)->m_quworkBinName;
-        if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
-        {
-            pathname = "/usr/local/bin/mpiexec";
-        }
-        ret = posix_spawn(&childid, pathname.c_str(), &fact, &attr, argv, environ);
+        ret = posix_spawn(&childid, execfilename.c_str(), &fact, &attr, argv, environ);
         if (ret != 0)
         {
-            LOG(ERROR) << "posix_spawn failed(id:" << req.id << ",pathname:" << pathname << ",err:" << strerror(errno) << ").";
+            LOG(ERROR) << "posix_spawn failed(id:" << req.id << ",execfilename:" << execfilename << ",err:" << strerror(errno) << ").";
             destroyattr = true;
             destroyfact = true;
             break;
@@ -1065,14 +992,16 @@ int CTaskManager::createSubProcess(const InitQubitsReq& req, char* const* argv, 
     return 0;
 }
 //获取cpu执行子进程的参数
-void CTaskManager::getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param)
+void CTaskManager::getParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param, std::string& workfilename, std::string& execfilename)
 {
     if (ExecCmdType::ExecTypeCpuMpi == req.exec_type)
     {
         int hostsize = (int)req.hosts.size();
         std::ostringstream os("");
+        execfilename = "/usr/local/bin/mpiexec";
         //1.mpi命令
-        param.push_back("/usr/local/bin/mpiexec");
+        param.push_back(execfilename);
+        workfilename = SINGLETON(CConfig)->m_quworkBinPath + "/" + SINGLETON(CConfig)->m_quworkBinName;
 
         //2.执行进程数量
         param.push_back("-n");
@@ -1104,17 +1033,27 @@ void CTaskManager::getParam(const InitQubitsReq& req, const int port, std::vecto
             }
         }
         param.push_back(os.str());
+    } 
+    else if (ExecCmdType::ExecTypeGpuSingle == req.exec_type)
+    {
+        workfilename = SINGLETON(CConfig)->m_quworkBinPath + "/" + SINGLETON(CConfig)->m_quworkGpuBinName;
+        execfilename = workfilename;
+    }
+    else
+    {
+        workfilename = SINGLETON(CConfig)->m_quworkBinPath + "/" + SINGLETON(CConfig)->m_quworkBinName;
+        execfilename = workfilename;
     }
 
     //4.quwork执行的参数
-    getSingleParam(req, port, param);
+    getSingleParam(req, port, workfilename, param);
 }
 
-void CTaskManager::getSingleParam(const InitQubitsReq& req, const int port, std::vector<std::string>& param)
+void CTaskManager::getSingleParam(const InitQubitsReq& req, const int port, const std::string& workfilename, std::vector<std::string>& param)
 {
     std::ostringstream os("");
     //1.执行文件完整路径+文件名
-    std::string temp = SINGLETON(CConfig)->m_quworkBinPath + "/" + SINGLETON(CConfig)->m_quworkBinName;
+    std::string temp = workfilename;
     param.push_back(temp);
 
     //2.rpc端口

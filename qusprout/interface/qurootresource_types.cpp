@@ -362,6 +362,11 @@ void ResourceDetail::__set_gpu_total_memory(const int64_t val) {
   this->gpu_total_memory = val;
 __isset.gpu_total_memory = true;
 }
+
+void ResourceDetail::__set_gpu_free_memory(const int64_t val) {
+  this->gpu_free_memory = val;
+__isset.gpu_free_memory = true;
+}
 std::ostream& operator<<(std::ostream& out, const ResourceDetail& obj)
 {
   obj.printTo(out);
@@ -426,6 +431,14 @@ uint32_t ResourceDetail::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 5:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->gpu_free_memory);
+          this->__isset.gpu_free_memory = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -465,6 +478,11 @@ uint32_t ResourceDetail::write(::apache::thrift::protocol::TProtocol* oprot) con
     xfer += oprot->writeI64(this->gpu_total_memory);
     xfer += oprot->writeFieldEnd();
   }
+  if (this->__isset.gpu_free_memory) {
+    xfer += oprot->writeFieldBegin("gpu_free_memory", ::apache::thrift::protocol::T_I64, 5);
+    xfer += oprot->writeI64(this->gpu_free_memory);
+    xfer += oprot->writeFieldEnd();
+  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -476,6 +494,7 @@ void swap(ResourceDetail &a, ResourceDetail &b) {
   swap(a.cpu_free_memory, b.cpu_free_memory);
   swap(a.gpu_type, b.gpu_type);
   swap(a.gpu_total_memory, b.gpu_total_memory);
+  swap(a.gpu_free_memory, b.gpu_free_memory);
   swap(a.__isset, b.__isset);
 }
 
@@ -484,6 +503,7 @@ ResourceDetail::ResourceDetail(const ResourceDetail& other5) noexcept {
   cpu_free_memory = other5.cpu_free_memory;
   gpu_type = other5.gpu_type;
   gpu_total_memory = other5.gpu_total_memory;
+  gpu_free_memory = other5.gpu_free_memory;
   __isset = other5.__isset;
 }
 ResourceDetail& ResourceDetail::operator=(const ResourceDetail& other6) noexcept {
@@ -491,6 +511,7 @@ ResourceDetail& ResourceDetail::operator=(const ResourceDetail& other6) noexcept
   cpu_free_memory = other6.cpu_free_memory;
   gpu_type = other6.gpu_type;
   gpu_total_memory = other6.gpu_total_memory;
+  gpu_free_memory = other6.gpu_free_memory;
   __isset = other6.__isset;
   return *this;
 }
@@ -501,6 +522,7 @@ void ResourceDetail::printTo(std::ostream& out) const {
   out << ", " << "cpu_free_memory=" << to_string(cpu_free_memory);
   out << ", " << "gpu_type="; (__isset.gpu_type ? (out << to_string(gpu_type)) : (out << "<null>"));
   out << ", " << "gpu_total_memory="; (__isset.gpu_total_memory ? (out << to_string(gpu_total_memory)) : (out << "<null>"));
+  out << ", " << "gpu_free_memory="; (__isset.gpu_free_memory ? (out << to_string(gpu_free_memory)) : (out << "<null>"));
   out << ")";
 }
 

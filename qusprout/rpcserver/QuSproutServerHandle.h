@@ -35,9 +35,6 @@ public:
     //获取单个计算基态的概率
     void getProbAmp(GetProbAmpResp& resp, const GetProbAmpReq& req);
 
-    //获取当前qubit的概率
-    void getProbOfOutcome(GetProbOfOutcomeResp& resp, const GetProbOfOutcomeReq& req);
-
     //获取所有计算基态的概率
     void getProbOfAllOutcome(GetProbOfAllOutcomResp& resp, const GetProbOfAllOutcomReq& req);
 
@@ -46,12 +43,6 @@ public:
 
     //执行任务
     void run(RunCircuitResp& resp, const RunCircuitReq& req);
-
-    //对部分量子比特应用量子傅立叶变换
-    void applyQFT(ApplyQFTResp& resp, const ApplyQFTReq& req);
-
-    //对所有量子比特应用量子傅立叶变换
-    void applyFullQFT(ApplyFullQFTResp& resp, const ApplyFullQFTReq& req);
 
     //获取泡利算子乘积的期望值
     void getExpecPauliProd(GetExpecPauliProdResp& resp, const GetExpecPauliProdReq& req);
@@ -82,6 +73,15 @@ public:
 
     //获取任务状态
     void getTaskInfo(GetTaskInfoResp& resp, const GetTaskInfoReq& req);
+
+    //获取随机数卡的信息
+    void getRandomCardInfo(GetRandomCardInfoResp& resp, const GetRandomCardInfoReq& req);
+
+    //设置随机数卡
+    void setRandomCard(SetRandomCardResp& resp, const SetRandomCardReq& req);
+
+    //获取随机数
+    void getRandom(GetRandomResp& resp, const GetRandomReq& req);
 };
 
 #endif

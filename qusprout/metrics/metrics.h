@@ -62,6 +62,15 @@ public:
     //资源的可用内存
     prometheus::Family<prometheus::Gauge>& m_currRsFreeMemory;
 
+    //Gpu资源的显存类型
+    prometheus::Family<prometheus::Gauge>& m_currGpuType;
+
+    //Gpu资源的总显存
+    prometheus::Family<prometheus::Gauge>& m_currGpuAllMemory;
+
+    //Gpu资源的可用显存
+    prometheus::Family<prometheus::Gauge>& m_currGpuFreeMemory;
+
     //资源的更新时间
     prometheus::Family<prometheus::Gauge>& m_currRsUpdatetime;
 
@@ -82,7 +91,7 @@ public:
     void addInterfaceEscapeTime(const std::string& interfacename, const double ms);
     void addCodeCount(const std::string& interfacename, const std::string& code);
     void addTaskState(const std::string& qubits, const std::string& state);
-    void addResource(const MachineSysInfo& sys, const MemUseInfo& mem);
+    void addResource(const MachineSysInfo& sys, const MemUseInfo& mem, const GpuUseInfo& gpu);
     void updateStarttime(const int currtime);
 
     void addCurrTaskState(const CTaskStateMetrics& key);

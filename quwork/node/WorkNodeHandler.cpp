@@ -41,14 +41,6 @@ void CWorkNodeHandler::getProbAmp(const int& ampindex)
     mpiexecute(CMDTYPE_PROBAMP);
 }
 
-void CWorkNodeHandler::getProbOutcome(const int& qubit, const int& outcome)
-{
-    m_qubit = qubit;
-    m_outcome = outcome;
-
-    mpiexecute(CMDTYPE_PROBOUTCOME);
-}
-
 void CWorkNodeHandler::getProbOfAllOutcome(const std::vector<int>& targets)
 {
     m_targets = targets;
@@ -59,18 +51,6 @@ void CWorkNodeHandler::getProbOfAllOutcome(const std::vector<int>& targets)
 void CWorkNodeHandler::getAllState()
 {
     mpiexecute(CMDTYPE_ALLSTATE);
-}
-
-void CWorkNodeHandler::applyQFT(const std::vector<int>& targets)
-{
-    m_targets = targets;
-
-    mpiexecute(CMDTYPE_APPLYQFT);
-}
-
-void CWorkNodeHandler::applyFullQFT()
-{
-    mpiexecute(CMDTYPE_APPLYFULLQFT);
 }
 
 void CWorkNodeHandler::run(const int& shots)
@@ -171,20 +151,11 @@ void CWorkNodeHandler::packdata(int cmdtype, char* packbuf, int& packsize)
         case CMDTYPE_PROBAMP:
             data.packprobamp(m_ampindex, packbuf, packsize);
             break;
-        case CMDTYPE_PROBOUTCOME:
-            data.packproboutcome(m_qubit, m_outcome, packbuf, packsize);
-            break;
         case CMDTYPE_PROBALLOUTCOME:
             data.packproballoutcome(m_targets, packbuf, packsize);
             break;
         case CMDTYPE_ALLSTATE:
             data.packallstate(packbuf, packsize);
-            break;
-        case CMDTYPE_APPLYQFT:
-            data.packapplyqft(m_targets, packbuf, packsize);
-            break;
-        case CMDTYPE_APPLYFULLQFT:
-            data.packapplyfullqft(packbuf, packsize);
             break;
         case CMDTYPE_RUN:
             data.packrun(m_shots, packbuf, packsize);
@@ -227,20 +198,11 @@ void CWorkNodeHandler::unpackdata(NodeData& nodedata, char* packbuf, int& packsi
         case CMDTYPE_PROBAMP:
             nodedata.unpackprobamp(packbuf, packsize);
             break;
-        case CMDTYPE_PROBOUTCOME:
-            nodedata.unpackproboutcome(packbuf, packsize);
-            break;
         case CMDTYPE_PROBALLOUTCOME:
             nodedata.unpackproballoutcome(packbuf, packsize);
             break;
         case CMDTYPE_ALLSTATE:
             nodedata.unpackallstate(packbuf, packsize);
-            break;
-        case CMDTYPE_APPLYQFT:
-            nodedata.unpackapplyqft(packbuf, packsize);
-            break;
-        case CMDTYPE_APPLYFULLQFT:
-            nodedata.unpackapplyfullqft(packbuf, packsize);
             break;
         case CMDTYPE_RUN:
             nodedata.unpackrun(packbuf, packsize);
@@ -274,7 +236,7 @@ void CWorkNodeHandler::unpackdata(NodeData& nodedata, char* packbuf, int& packsi
 
 void CWorkNodeHandler::execute(NodeData& nodedata)
 {
-    Result result;
+    MeasureResult result;
     Circuit circuit;
     std::vector<double> dresult;
     std::vector<std::string> sresult;
@@ -291,20 +253,11 @@ void CWorkNodeHandler::execute(NodeData& nodedata)
     case CMDTYPE_PROBAMP:
         m_executor.getProbOfAmp(nodedata.m_ampindex);
         break;
-    case CMDTYPE_PROBOUTCOME:
-        m_executor.getProbOfOutcome(nodedata.m_qubit, nodedata.m_outcome);
-        break;
     case CMDTYPE_PROBALLOUTCOME:
         m_executor.getProbOfAllOutcome(dresult, nodedata.m_targets);
         break;
     case CMDTYPE_ALLSTATE:
         m_executor.getAllState(sresult);
-        break;
-    case CMDTYPE_APPLYQFT:
-        m_executor.apply_QFT(nodedata.m_targets);
-        break;
-    case CMDTYPE_APPLYFULLQFT:
-        m_executor.apply_Full_QFT();
         break;
     case CMDTYPE_RUN:
         m_executor.run(result, nodedata.m_shots);

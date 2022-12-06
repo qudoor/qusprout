@@ -55,8 +55,8 @@ public:
     bool createQCircuit();
     bool createPlusState();
     bool getProbAmp(const int index, double& amp);
-    bool run(const int shots, Result& result);
-     bool releaseQCircuit();
+    bool run(const int shots, MeasureResult& result);
+    bool releaseQCircuit();
 
 public:
     bool hGate(const std::vector<int>& targets);

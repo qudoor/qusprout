@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     rnt = handle.measureGate(targets);
     ASSERT_RNT(rnt);
 
-    Result result;
+    MeasureResult result;
     rnt = handle.run(100, result);
     ASSERT_RNT(rnt);
 

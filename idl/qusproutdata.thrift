@@ -82,31 +82,25 @@ struct Circuit {
     1: required list<Cmd> cmds
 }
 
-//测量结果
-struct MeasureResult {
+//单个比特测量结果
+struct MeasureQubit {
     //量子比特
-    1: required i32 id
+    1: required i32 idx
 
     //测量结果
     2: required i32 value
 }
 
-//运行结果
-struct Outcome {
-    //比特位组成的字符串
-    1: required string bitstr
-
-    //出现次数
-    2: required i32 count
+//所有比特测量结果
+struct MeasureQubits {
+    //测量结果
+    1: required list<MeasureQubit> measure
 }
 
 //指令结果集
-struct Result {
-    //测量结果
-    1: required list<MeasureResult> measureSet
-
-    //结果集
-    2: required list<Outcome> outcomeSet
+struct MeasureResult {
+    //多次采样测量结果
+    1: required list<MeasureQubits> measures
 }
 
 //初始化量子环境
@@ -177,26 +171,6 @@ struct GetProbAmpResp {
     2: optional double amp
 }
 
-//获取当前qubit的概率
-struct GetProbOfOutcomeReq {
-    //任务id
-    1: required string id
-
-    //qubit索引
-    2: required i32 qubit
-
-    //
-    3: required i32 outcom
-}
-
-struct GetProbOfOutcomeResp {
-    //返回码
-    1: required ecode.BaseCode base
-
-    //概率
-    2: optional double pro_outcome
-}
-
 //获取组合概率
 struct GetProbOfAllOutcomReq {
     //任务id
@@ -228,31 +202,6 @@ struct GetAllStateResp {
     2: optional list<string> all_state
 }
 
-//对部分量子比特应用量子傅立叶变换
-struct ApplyQFTReq {
-    //任务id
-    1: required string id
-
-    //目标比特位
-    2: required list<i32> targets
-}
-
-struct ApplyQFTResp {
-    //返回码
-    1: required ecode.BaseCode base
-}
-
-//对所有量子比特应用量子傅立叶变换
-struct ApplyFullQFTReq {
-    //任务id
-    1: required string id
-}
-
-struct ApplyFullQFTResp {
-    //返回码
-    1: required ecode.BaseCode base
-}
-
 //执行任务
 struct RunCircuitReq {
     //任务id
@@ -267,7 +216,7 @@ struct RunCircuitResp {
     1: required ecode.BaseCode base 
 
     //返回结果
-    2: optional Result result
+    2: optional MeasureResult result
 }
 
 //泡利算子操作类型
@@ -337,10 +286,7 @@ struct MeasureQubitsResp {
     1: required ecode.BaseCode base
 
     //测量结果
-    2: optional list<MeasureResult> results
-
-    //结果集
-    3: required list<Outcome> outcomes
+    2: optional MeasureResult result
 }
 
 //使用复矩阵表示的门，用于表达特殊值和优化
@@ -474,4 +420,111 @@ struct GetTaskInfoResp {
 
     //任务状态，0：initial, 1：initialized, 2:queued, 3:running, 4:done, 5:error 
     2: required i32 state
+}
+
+//获取随机数卡的信息
+struct GetRandomCardInfoReq {
+
+}
+
+struct GetRandomCardInfoResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //设备数量
+    2: required i32 count
+
+    //驱动版本号
+    3: required i32 driver_version
+
+    //接口库版本号
+    4: required i32 library_version
+
+    //板卡信息
+    5: required list<RandomCardInfo> cards
+}
+
+//板上状态类型
+enum RandomCardStateType {
+    //重复计数状态
+    RANDOM_MC_S0 = 0,
+
+    //适配比例状态
+    RANDOM_MC_S1 = 1,
+
+    //eeprom参数状态
+    RANDOM_EEPROM_S = 2,
+
+    //参数值状态
+    RANDOM_PAR_VALUE_S = 3,
+
+    //校验状态
+    RANDOM_EEPROM_CHECK_S = 4,
+
+    //EEPROM读写状态
+    RANDOM_EEPROM_RW_S = 5,
+
+    //激光器温度状态
+    RANDOM_LD_TEMP_S = 6,
+
+    //板上温度状态
+    RANDOM_BD_TEMP_S = 7,
+
+    //链路状态
+    RANDOM_LINK_S = 8
+}
+
+//板卡信息
+struct RandomCardInfo {
+    //随机数卡编号
+    1: required i32 device_index
+
+    //随机数卡输出方式，0:NONE, 1:NET, 2:USB, 3:PCIE
+    2: required i32 mode
+
+    //激光器温度
+    3: required double ld_temp
+
+    //电路板温度
+    4: required double bd_temp
+
+    //状态,key:RandomCardStateType，value: 0：正常，1：异常
+    5: required map<RandomCardStateType, i32> states 
+}
+
+//设置随机数卡
+struct SetRandomCardReq {
+    //随机数卡编号
+    1: required i32 device_index
+
+    //随机数卡输出方式，0:NONE, 1:NET, 2:USB, 3:PCIE
+    2: optional i32 mode
+
+    //是否复位
+    3: optional bool reset
+}
+
+struct SetRandomCardResp {
+    //返回码
+    1: required ecode.BaseCode base
+}
+
+//获取随机数
+struct GetRandomReq {
+    //随机数的长度
+    1: required i32 random_length
+
+    //随机数的数量
+    2: required i32 random_num
+
+    //指定随机数卡编号
+    3: optional i32 device_index
+}
+
+struct GetRandomResp {
+    //返回码
+    1: required ecode.BaseCode base
+
+    //随机数，二进制字符串
+    2: required list<binary> randoms
 }

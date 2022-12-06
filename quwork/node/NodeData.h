@@ -21,19 +21,16 @@ const int PACKSIZE = 1024 * 1024;
 
 #define CMDTYPE_CRICUIT         (1 << 0)
 #define CMDTYPE_PROBAMP         (1 << 1)
-#define CMDTYPE_PROBOUTCOME     (1 << 2)
-#define CMDTYPE_PROBALLOUTCOME  (1 << 3)
-#define CMDTYPE_ALLSTATE        (1 << 4)
-#define CMDTYPE_APPLYQFT        (1 << 5)
-#define CMDTYPE_APPLYFULLQFT    (1 << 6)
-#define CMDTYPE_RUN             (1 << 7)
-#define CMDTYPE_CANCEL          (1 << 8)
-#define CMDTYPE_PAULIPROD       (1 << 9)
-#define CMDTYPE_PAULISUM        (1 << 10)
-#define CMDTYPE_ADDGATE         (1 << 11)
-#define CMDTYPE_RESETQUBITS     (1 << 12)
-#define CMDTYPE_STATEOFALL      (1 << 13)
-#define CMDTYPE_PROBAMPALL      (1 << 14)
+#define CMDTYPE_PROBALLOUTCOME  (1 << 2)
+#define CMDTYPE_ALLSTATE        (1 << 3)
+#define CMDTYPE_RUN             (1 << 4)
+#define CMDTYPE_CANCEL          (1 << 5)
+#define CMDTYPE_PAULIPROD       (1 << 6)
+#define CMDTYPE_PAULISUM        (1 << 7)
+#define CMDTYPE_ADDGATE         (1 << 8)
+#define CMDTYPE_RESETQUBITS     (1 << 9)
+#define CMDTYPE_STATEOFALL      (1 << 10)
+#define CMDTYPE_PROBAMPALL      (1 << 11)
 
 class NodeData
 {
@@ -50,20 +47,11 @@ public:
     void packprobamp(const int& ampindex, char* packbuf, int& packsize);
     void unpackprobamp(char* packbuf, int& packsize);
 
-    void packproboutcome(const int& qubit, const int& outcome, char* packbuf, int& packsize);
-    void unpackproboutcome(char* packbuf, int& packsize);
-
     void packproballoutcome(const std::vector<int>& targets, char* packbuf, int& packsize);
     void unpackproballoutcome(char* packbuf, int& packsize);
 
     void packallstate(char* packbuf, int& packsize);
     void unpackallstate(char* packbuf, int& packsize);
-
-    void packapplyqft(const std::vector<int>& targets, char* packbuf, int& packsize);
-    void unpackapplyqft(char* packbuf, int& packsize);
-
-    void packapplyfullqft(char* packbuf, int& packsize);
-    void unpackapplyfullqft(char* packbuf, int& packsize);
 
     void packrun(const int& shots, char* packbuf, int& packsize);
     void unpackrun(char* packbuf, int& packsize);

@@ -62,7 +62,7 @@ void ReqHead::encode(Writer<StringBuffer>& writer)
 bool ReqHead::decode(const Document& dom)
 {
     DecodeString("flowid", dom, flowid, true);
-    DecodeString("taskid", dom, taskid, true);
+    DecodeString("taskid", dom, taskid, false);
     DecodeString("cmd", dom, cmd, true);
 
     return true;
@@ -114,11 +114,18 @@ std::string RespHead::getStr()
     return ss.str();
 }
 
-void RespHead::setcode(const std::string& flowid, const int code)
+void RespHead::setcode(const std::string& flowid, const int code, const std::string& msg)
 {
     this->flowid = flowid;
     this->code = code;
-    this->msg = g_errormsg[code];
+	if (msg.empty())
+    {
+		this->msg = g_errormsg[code];
+	}
+    else
+    {
+        this->msg = msg;
+    }
 }
 
 void RespHead::encodehead(std::string& buf)
@@ -135,13 +142,13 @@ void RespHead::encodehead(std::string& buf)
     buf = bufstream.GetString();
 }
 
-void MeasureInfo::encode(Writer<StringBuffer>& writer)
+void MeasureQu::encode(Writer<StringBuffer>& writer)
 {
     EncodeInt("target", target);
     EncodeInt("value", value);
 }
 
-bool MeasureInfo::decode(const Value& dom)
+bool MeasureQu::decode(const Value& dom)
 {
     DecodeInt("target", dom, target, true);
     DecodeInt("value", dom, value, true);
@@ -149,7 +156,7 @@ bool MeasureInfo::decode(const Value& dom)
     return true;
 }
 
-std::string MeasureInfo::getStr()
+std::string MeasureQu::getStr()
 {
     std::ostringstream ss;
     ss << "target:" << target
@@ -159,26 +166,53 @@ std::string MeasureInfo::getStr()
     return ss.str();
 }
 
-void OutcomeInfo::encode(Writer<StringBuffer>& writer)
+void MeasureQus::encode(Writer<StringBuffer>& writer)
 {
-    EncodeString("bitstr", bitstr);
-    EncodeInt("count", count);
+    writer.Key("measure");
+    writer.StartArray();
+    {
+        for (auto temp : measure)
+        {
+            writer.StartObject();
+            {
+                temp.encode(writer);
+            }
+            writer.EndObject();
+        }
+    }
+    writer.EndArray();
 }
 
-bool OutcomeInfo::decode(const Value& dom)
+bool MeasureQus::decode(const Value& dom)
 {
-    DecodeString("bitstr", dom, bitstr, true);
-    DecodeInt("count", dom, count, true);
+    if (dom.HasMember("measure") && dom["measure"].IsArray())
+    {
+        const rapidjson::Value& measuredom = dom["measure"];
+        for (unsigned int i = 0; i < measuredom.Size(); ++i) 
+        {
+            MeasureQu temp;
+            const rapidjson::Value& result = measuredom[i];
+            if (!temp.decode(result))
+            {
+                return false;
+            }
+            measure.push_back(temp);
+        }
+    }
 
     return true;
 }
 
-std::string OutcomeInfo::getStr()
+std::string MeasureQus::getStr()
 {
     std::ostringstream ss;
-    ss << "bitstr:" << bitstr
-        << ";count:" << count
-        << ";";
+    ss << "measure:size:" << measure.size()
+        << ":[";
+    for (auto temp : measure) 
+    {
+        ss << temp.getStr() << ";";
+    }
+    ss << "];";
 
     return ss.str();
 }
@@ -546,20 +580,6 @@ void RunGateCmdResp::encode(std::string& buf)
                 }
             }
             writer.EndArray();
-
-            writer.Key("outcomes");
-            writer.StartArray();
-            {
-                for (auto temp : outcomes)
-                {
-                    writer.StartObject();
-                    {
-                        temp.encode(writer);
-                    }
-                    writer.EndObject();
-                }
-            }
-            writer.EndArray();
         }
         writer.EndObject();
     }
@@ -580,28 +600,13 @@ bool RunGateCmdResp::decode(const std::string& buf)
             const rapidjson::Value& measureslist = datadom["measures"];
             for (unsigned int i = 0; i < measureslist.Size(); ++i) 
             {
-                MeasureInfo temp;
+                MeasureQus temp;
                 const rapidjson::Value& result = measureslist[i];
                 if (!temp.decode(result))
                 {
                     return false;
                 }
                 measures.push_back(temp);
-			}
-        }
-
-        if (datadom.HasMember("outcomes") && datadom["outcomes"].IsArray())
-        {
-            const rapidjson::Value& outcomelist = datadom["outcomes"];
-            for (unsigned int i = 0; i < outcomelist.Size(); ++i) 
-            {
-                OutcomeInfo temp;
-                const rapidjson::Value& result = outcomelist[i];
-                if (!temp.decode(result))
-                {
-                    return false;
-                }
-                outcomes.push_back(temp);
 			}
         }
     }
@@ -613,13 +618,9 @@ std::string RunGateCmdResp::getStr()
 {
     std::ostringstream ss;
     ss << "RunGateCmdResp:" << RespHead::getStr()
-        << ";measures:[";
+        << ";measures:size:" << measures.size()
+        << ":[";
     for (auto temp : measures)
-    {
-        ss << temp.getStr() << ";";
-    }
-    ss << "];outcomes:[";
-    for (auto temp : outcomes)
     {
         ss << temp.getStr() << ";";
     }
@@ -1113,20 +1114,6 @@ void GetMeasureResp::encode(std::string& buf)
                 }
             }
             writer.EndArray();
-
-            writer.Key("outcomes");
-            writer.StartArray();
-            {
-                for (auto temp : outcomes)
-                {
-                    writer.StartObject();
-                    {
-                        temp.encode(writer);
-                    }
-                    writer.EndObject();
-                }
-            }
-            writer.EndArray();
         }
         writer.EndObject();
     }
@@ -1147,28 +1134,13 @@ bool GetMeasureResp::decode(const std::string& buf)
             const rapidjson::Value& measureslist = datadom["measures"];
             for (unsigned int i = 0; i < measureslist.Size(); ++i) 
             {
-                MeasureInfo temp;
+                MeasureQus temp;
                 const rapidjson::Value& result = measureslist[i];
                 if (!temp.decode(result))
                 {
                     return false;
                 }
                 measures.push_back(temp);
-			}
-        }
-
-        if (datadom.HasMember("outcomes") && datadom["outcomes"].IsArray())
-        {
-            const rapidjson::Value& outcomelist = datadom["outcomes"];
-            for (unsigned int i = 0; i < outcomelist.Size(); ++i) 
-            {
-                OutcomeInfo temp;
-                const rapidjson::Value& result = outcomelist[i];
-                if (!temp.decode(result))
-                {
-                    return false;
-                }
-                outcomes.push_back(temp);
 			}
         }
     }
@@ -1180,96 +1152,13 @@ std::string GetMeasureResp::getStr()
 {
     std::ostringstream ss;
     ss << "GetMeasureResp:" << RespHead::getStr()
-        << ";measures:[";
+        << ";measures:size:" << measures.size()
+        << ":[";
     for (auto temp : measures)
     {
         ss << temp.getStr() << ";";
     }
-    ss << "];outcomes:[";
-    for (auto temp : outcomes)
-    {
-        ss << temp.getStr() << ";";
-    }
     ss << "];";
-
-    return ss.str();
-}
-
-void ApplyQftReq::encode(std::string& buf)
-{
-    cmd = CMD_STR_APPLYQFT;
-
-    StringBuffer bufstream;
-	Writer<StringBuffer> writer(bufstream);
- 
-	writer.StartObject();
-    {
-        ReqHead::encode(writer);
-
-        writer.Key("params");
-        writer.StartObject();
-        {
-            EncodeArraryInt("targets", targets);
-        }
-        writer.EndObject();
-    }
-    writer.EndObject();
-
-    buf = bufstream.GetString();
-}
-
-bool ApplyQftReq::decode(const std::string& buf)
-{
-    PraseReqJson();
-        
-    if (dom.HasMember("params") && dom["params"].IsObject())
-    {
-        const rapidjson::Value& paramsdom = dom["params"];
-        DecodeArraryInt("targets", paramsdom, targets, false);
-    }
-
-    return true;
-}
-
-std::string ApplyQftReq::getStr()
-{
-    std::ostringstream ss;
-    ss << ReqHead::getStr()
-        << ";targets:[";
-    for (auto temp : targets)
-    {
-        ss << temp << ";";
-    }
-    ss << "];";
-
-    return ss.str();
-}
-
-void ApplyQftResp::encode(std::string& buf)
-{
-    StringBuffer bufstream;
-	Writer<StringBuffer> writer(bufstream);
- 
-	writer.StartObject();
-    {
-        RespHead::encode(writer);
-    }
-    writer.EndObject();
-
-    buf = bufstream.GetString();
-}
-
-bool ApplyQftResp::decode(const std::string& buf)
-{
-    PraseRespJson();
-
-    return true;
-}
-
-std::string ApplyQftResp::getStr()
-{
-    std::ostringstream ss;
-    ss << "ApplyQftResp:" << RespHead::getStr();
 
     return ss.str();
 }
@@ -1517,6 +1406,391 @@ std::string GetEPauliSumResp::getStr()
     ss << "GetEPauliSumResp:" << RespHead::getStr()
         << ";expect:" << expect
         << ";";
+
+    return ss.str();
+}
+
+void RCardStateInfo::encode(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    EncodeInt("type", type);
+    EncodeInt("state", state);
+}
+
+bool RCardStateInfo::decode(const rapidjson::Value& dom)
+{
+    DecodeInt("type", dom, type, true);
+    DecodeInt("state", dom, state, true);
+
+    return true;
+}
+
+std::string RCardStateInfo::getStr()
+{
+    std::ostringstream ss;
+    ss << "type:" << type
+        << ";state:" << state
+        << ";";
+
+    return ss.str();
+}
+
+void RCardInfo::encode(rapidjson::Writer<rapidjson::StringBuffer>& writer)
+{
+    EncodeInt("deviceindex", deviceindex);
+    EncodeInt("mode", mode);
+    EncodeDouble("ldtemp", ldtemp);
+    EncodeDouble("bdtemp", bdtemp);
+
+    writer.Key("states");
+    writer.StartArray();
+    {
+        for (auto temp : states)
+        {
+            writer.StartObject();
+            {
+                temp.encode(writer);
+            }
+            writer.EndObject();
+        }
+    }
+    writer.EndArray();
+}
+
+bool RCardInfo::decode(const rapidjson::Value& dom)
+{
+    DecodeInt("deviceindex", dom, deviceindex, true);
+    DecodeInt("mode", dom, mode, true);
+    DecodeDouble("ldtemp", dom, ldtemp, true);
+    DecodeDouble("bdtemp", dom, bdtemp, true);
+
+    if (dom.HasMember("states") && dom["states"].IsArray())
+    {
+        const rapidjson::Value& statedom = dom["states"];
+        for (unsigned int i = 0; i < statedom.Size(); ++i) 
+        {
+            RCardStateInfo temp;
+            const rapidjson::Value& result = statedom[i];
+            if (!temp.decode(result))
+            {
+                return false;
+            }
+            states.push_back(temp);
+        }
+    }
+
+    return true;
+}
+
+std::string RCardInfo::getStr()
+{
+    std::ostringstream ss;
+    ss << "deviceindex:" << deviceindex
+        << ";mode:" << mode
+        << ";ldtemp:" << ldtemp
+        << ";bdtemp:" << bdtemp
+        << ";states:[";
+    for (auto temp : states) 
+    {
+        ss << temp.getStr() << ";";
+    }
+    ss << "];";
+
+    return ss.str();
+}
+
+void GetRCardInfoReq::encode(std::string& buf)
+{
+    cmd = CMD_STR_GETRCARDINFO;
+
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        ReqHead::encode(writer);
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool GetRCardInfoReq::decode(const std::string& buf)
+{
+    PraseReqJson();
+
+    return true;
+}
+
+std::string GetRCardInfoReq::getStr()
+{
+    std::ostringstream ss;
+    ss << "GetRCardInfoReq:" << ReqHead::getStr();
+
+    return ss.str();
+}
+
+void GetRCardInfoResp::encode(std::string& buf)
+{
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        RespHead::encode(writer);
+
+        writer.Key("data");
+        writer.StartObject();
+        {
+            EncodeInt("count", count);
+            EncodeInt("driverversion", driverversion);
+            EncodeInt("libraryversion", libraryversion);
+
+            writer.Key("cards");
+            writer.StartArray();
+            {
+                for (auto temp : cards)
+                {
+                    writer.StartObject();
+                    {
+                        temp.encode(writer);
+                    }
+                    writer.EndObject();
+                }
+            }
+            writer.EndArray();
+        }
+        writer.EndObject();
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool GetRCardInfoResp::decode(const std::string& buf)
+{
+    PraseRespJson();
+
+    if (dom.HasMember("data") && dom["data"].IsObject())
+    {
+        const rapidjson::Value& datadom = dom["data"];
+
+        DecodeInt("count", datadom, count, true);
+        DecodeInt("driverversion", datadom, driverversion, true);
+        DecodeInt("libraryversion", datadom, libraryversion, true);
+
+        if (datadom.HasMember("cards") && datadom["cards"].IsArray())
+        {
+            const rapidjson::Value& cardslist = datadom["cards"];
+            for (unsigned int i = 0; i < cardslist.Size(); ++i) 
+            {
+                RCardInfo temp;
+                const rapidjson::Value& result = cardslist[i];
+                if (!temp.decode(result))
+                {
+                    return false;
+                }
+                cards.push_back(temp);
+			}
+        }
+    }
+
+    return true;
+}
+
+std::string GetRCardInfoResp::getStr()
+{
+    std::ostringstream ss;
+    ss << "GetRCardInfoResp:" << RespHead::getStr()
+        << ";count:" << count
+        << ";driverversion:" << driverversion
+        << ";libraryversion:" << libraryversion
+        << ";cards:[";
+    for (auto temp : cards)
+    {
+        ss << temp.getStr() << ";";
+    }
+    ss << "];";
+
+    return ss.str();
+}
+
+void SetRCardReq::encode(std::string& buf)
+{
+    cmd = CMD_STR_SETRCARD;
+
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        ReqHead::encode(writer);
+
+        writer.Key("params");
+        writer.StartObject();
+        {
+            EncodeInt("deviceindex", deviceindex);
+            EncodeInt("mode", mode);
+            EncodeInt("reset", reset);
+        }
+        writer.EndObject();
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool SetRCardReq::decode(const std::string& buf)
+{
+    PraseReqJson();
+
+    if (dom.HasMember("params") && dom["params"].IsObject())
+    {
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeInt("deviceindex", paramsdom, deviceindex, true);
+        DecodeInt("mode", paramsdom, mode, false);
+        DecodeInt("reset", paramsdom, reset, false);
+    }
+
+    return true;
+}
+
+std::string SetRCardReq::getStr()
+{
+    std::ostringstream ss;
+    ss << "GetRCardInfoReq:" << ReqHead::getStr()
+        << ";deviceindex:" << deviceindex
+        << ";mode:" << mode
+        << ";reset:" << reset
+        << ";";
+
+    return ss.str();
+}
+
+void SetRCardResp::encode(std::string& buf)
+{
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        RespHead::encode(writer);
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool SetRCardResp::decode(const std::string& buf)
+{
+    PraseRespJson();
+
+    return true;
+}
+
+std::string SetRCardResp::getStr()
+{
+    std::ostringstream ss;
+    ss << "SetRCardResp:" << RespHead::getStr();
+
+    return ss.str();
+}
+
+void GetRandReq::encode(std::string& buf)
+{
+    cmd = CMD_STR_GETRAND;
+
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        ReqHead::encode(writer);
+
+        writer.Key("params");
+        writer.StartObject();
+        {
+            EncodeInt("randomlength", randomlength);
+            EncodeInt("randomnum", randomnum);
+            EncodeInt("deviceindex", deviceindex);
+        }
+        writer.EndObject();
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool GetRandReq::decode(const std::string& buf)
+{
+    PraseReqJson();
+
+    if (dom.HasMember("params") && dom["params"].IsObject())
+    {
+        const rapidjson::Value& paramsdom = dom["params"];
+        DecodeInt("randomlength", paramsdom, randomlength, true);
+        DecodeInt("randomnum", paramsdom, randomnum, true);
+        DecodeInt("deviceindex", paramsdom, deviceindex, false);
+    }
+
+    return true;
+}
+
+std::string GetRandReq::getStr()
+{
+    std::ostringstream ss;
+    ss << "GetRandReq:" << ReqHead::getStr()
+        << ";randomlength:" << randomlength
+        << ";randomnum:" << randomnum
+        << ";deviceindex:" << deviceindex
+        << ";";
+
+    return ss.str();
+}
+
+void GetRandResp::encode(std::string& buf)
+{
+    StringBuffer bufstream;
+	Writer<StringBuffer> writer(bufstream);
+ 
+	writer.StartObject();
+    {
+        RespHead::encode(writer);
+
+        writer.Key("data");
+        writer.StartObject();
+        {
+            EncodeArraryString("randoms", randoms);
+        }
+        writer.EndObject();
+    }
+    writer.EndObject();
+
+    buf = bufstream.GetString();
+}
+
+bool GetRandResp::decode(const std::string& buf)
+{
+    PraseRespJson();
+
+    if (dom.HasMember("data") && dom["data"].IsObject())
+    {
+        const rapidjson::Value& datadom = dom["data"];
+        DecodeArraryString("randoms", datadom, randoms, false);
+    }
+
+    return true;
+}
+
+std::string GetRandResp::getStr()
+{
+    std::ostringstream ss;
+    ss << "GetRandResp:" << RespHead::getStr()
+        << ";randoms:[";
+    for (auto temp : randoms)
+    {
+        ss << temp << ";";
+    }
+    ss << "];";
 
     return ss.str();
 }

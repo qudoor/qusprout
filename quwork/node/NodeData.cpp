@@ -107,27 +107,6 @@ void NodeData::unpackprobamp(char* packbuf, int& packsize)
     unpackint(m_ampindex, packbuf, packsize);
 }
 
-void NodeData::packproboutcome(const int& qubit, const int& outcome, char* packbuf, int& packsize)
-{
-    //pack command type
-    packcmdtype(CMDTYPE_PROBOUTCOME, packbuf, packsize);
-
-    //pack qubit
-    packint(qubit, packbuf, packsize);
-
-    //pack outcome
-    packint(outcome, packbuf, packsize);
-}
-
-void NodeData::unpackproboutcome(char* packbuf, int& packsize)
-{
-    //unpack qubit
-    unpackint(m_qubit, packbuf, packsize);
-
-    //unpack outcome
-    unpackint(m_outcome, packbuf, packsize);
-}
-
 void NodeData::packproballoutcome(const std::vector<int>& targets, char* packbuf, int& packsize)
 {
     //pack command type
@@ -150,31 +129,6 @@ void NodeData::packallstate(char* packbuf, int& packsize)
 }
 
 void NodeData::unpackallstate(char* packbuf, int& packsize)
-{
-}
-
-void NodeData::packapplyqft(const std::vector<int>& targets, char* packbuf, int& packsize)
-{
-    //pack command type
-    packcmdtype(CMDTYPE_APPLYQFT, packbuf, packsize);
-
-    //pack targets
-    packvectorint(targets, packbuf, packsize);
-}
-
-void NodeData::unpackapplyqft(char* packbuf, int& packsize)
-{
-    //unpack targets
-    unpackvectorint(m_targets, packbuf, packsize);
-}
-
-void NodeData::packapplyfullqft(char* packbuf, int& packsize)
-{
-    //pack command type
-    packcmdtype(CMDTYPE_APPLYFULLQFT, packbuf, packsize);
-}
-
-void NodeData::unpackapplyfullqft(char* packbuf, int& packsize)
 {
 }
 

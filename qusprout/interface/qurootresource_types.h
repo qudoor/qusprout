@@ -183,9 +183,10 @@ void swap(MachineDetail &a, MachineDetail &b);
 std::ostream& operator<<(std::ostream& out, const MachineDetail& obj);
 
 typedef struct _ResourceDetail__isset {
-  _ResourceDetail__isset() : gpu_type(false), gpu_total_memory(false) {}
+  _ResourceDetail__isset() : gpu_type(false), gpu_total_memory(false), gpu_free_memory(false) {}
   bool gpu_type :1;
   bool gpu_total_memory :1;
+  bool gpu_free_memory :1;
 } _ResourceDetail__isset;
 
 class ResourceDetail : public virtual ::apache::thrift::TBase {
@@ -197,7 +198,8 @@ class ResourceDetail : public virtual ::apache::thrift::TBase {
                  : cpu_total_memory(0),
                    cpu_free_memory(0),
                    gpu_type(static_cast<GpuType::type>(0)),
-                   gpu_total_memory(0) {
+                   gpu_total_memory(0),
+                   gpu_free_memory(0) {
   }
 
   virtual ~ResourceDetail() noexcept;
@@ -209,6 +211,7 @@ class ResourceDetail : public virtual ::apache::thrift::TBase {
    */
   GpuType::type gpu_type;
   int64_t gpu_total_memory;
+  int64_t gpu_free_memory;
 
   _ResourceDetail__isset __isset;
 
@@ -219,6 +222,8 @@ class ResourceDetail : public virtual ::apache::thrift::TBase {
   void __set_gpu_type(const GpuType::type val);
 
   void __set_gpu_total_memory(const int64_t val);
+
+  void __set_gpu_free_memory(const int64_t val);
 
   bool operator == (const ResourceDetail & rhs) const
   {
@@ -233,6 +238,10 @@ class ResourceDetail : public virtual ::apache::thrift::TBase {
     if (__isset.gpu_total_memory != rhs.__isset.gpu_total_memory)
       return false;
     else if (__isset.gpu_total_memory && !(gpu_total_memory == rhs.gpu_total_memory))
+      return false;
+    if (__isset.gpu_free_memory != rhs.__isset.gpu_free_memory)
+      return false;
+    else if (__isset.gpu_free_memory && !(gpu_free_memory == rhs.gpu_free_memory))
       return false;
     return true;
   }

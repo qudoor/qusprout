@@ -64,6 +64,24 @@ m_currRsFreeMemory(
     .Help("qusprout_resource_curr_cpu_free_memory gauge")
     .Register(*registry)
 ),
+m_currGpuType(
+    prometheus::BuildGauge()
+    .Name("qusprout_resource_curr_gpu_type")
+    .Help("qusprout_resource_curr_gpu_type gauge")
+    .Register(*registry)
+),
+m_currGpuAllMemory(
+    prometheus::BuildGauge()
+    .Name("qusprout_resource_curr_gpu_all_memory")
+    .Help("qusprout_resource_curr_gpu_all_memory gauge")
+    .Register(*registry)
+),
+m_currGpuFreeMemory(
+    prometheus::BuildGauge()
+    .Name("qusprout_resource_curr_gpu_free_memory")
+    .Help("qusprout_resource_curr_gpu_free_memory gauge")
+    .Register(*registry)
+),
 m_currRsUpdatetime(
     prometheus::BuildGauge()
     .Name("qusprout_resource_curr_updatetime")
@@ -178,7 +196,7 @@ void CMetrics::addCurrTaskState(const CTaskStateMetrics& key)
     }
 }
 
-void CMetrics::addResource(const MachineSysInfo& sys, const MemUseInfo& mem)
+void CMetrics::addResource(const MachineSysInfo& sys, const MemUseInfo& mem, const GpuUseInfo& gpu)
 {
     //资源的总内存
     auto& allcpumemorygauge = m_metrics->m_currRsAllMemory.Add(
@@ -190,7 +208,7 @@ void CMetrics::addResource(const MachineSysInfo& sys, const MemUseInfo& mem)
             {"sysmachine", sys.sys_machine}
         }
     );
-    allcpumemorygauge.Set(mem.totalRam);
+    allcpumemorygauge.Set(mem.total_memory);
         
     //资源的可用内存
     auto& freecpumemorygauge = m_metrics->m_currRsFreeMemory.Add(
@@ -202,7 +220,43 @@ void CMetrics::addResource(const MachineSysInfo& sys, const MemUseInfo& mem)
             {"sysmachine", sys.sys_machine}
         }
     );
-    freecpumemorygauge.Set(mem.freeRam);
+    freecpumemorygauge.Set(mem.free_memory);
+
+    //GPU资源的可用显存
+    auto& gputypememorygauge = m_metrics->m_currGpuType.Add(
+        {
+            {"addr", sys.addr},
+            {"sysname", sys.sys_name},
+            {"sysrelease", sys.sys_release},
+            {"sysversion", sys.sys_version},
+            {"sysmachine", sys.sys_machine}
+        }
+    );
+    gputypememorygauge.Set(gpu.gpu_type);
+
+    //GPU资源的总显存
+    auto& allgpumemorygauge = m_metrics->m_currGpuAllMemory.Add(
+        {
+            {"addr", sys.addr},
+            {"sysname", sys.sys_name},
+            {"sysrelease", sys.sys_release},
+            {"sysversion", sys.sys_version},
+            {"sysmachine", sys.sys_machine}
+        }
+    );
+    allgpumemorygauge.Set(gpu.total_memory);
+
+    //GPU资源的可用显存
+    auto& freegpumemorygauge = m_metrics->m_currGpuFreeMemory.Add(
+        {
+            {"addr", sys.addr},
+            {"sysname", sys.sys_name},
+            {"sysrelease", sys.sys_release},
+            {"sysversion", sys.sys_version},
+            {"sysmachine", sys.sys_machine}
+        }
+    );
+    freegpumemorygauge.Set(gpu.free_memory);
 
     //资源的启动时间
     auto& starttimegauge = m_metrics->m_currRsUpdatetime.Add(
@@ -236,6 +290,9 @@ std::string CMetrics::getMetricsStr()
     auto currstatemetrics = m_metrics->m_currTaskState.Collect();
     auto rsallmrmorymetrics = m_metrics->m_currRsAllMemory.Collect();
     auto rsfreememorymetrics = m_metrics->m_currRsFreeMemory.Collect();
+    auto gputypemetrics =m_metrics->m_currGpuType.Collect();
+    auto gpuallmemorymetrics =m_metrics->m_currGpuAllMemory.Collect();
+    auto gpufreememorymetrics =m_metrics->m_currGpuFreeMemory.Collect();
     auto rsstarttimemetrics = m_metrics->m_currRsUpdatetime.Collect();
     auto starttimemetrics = m_metrics->m_currStartTime.Collect();
 
@@ -246,6 +303,9 @@ std::string CMetrics::getMetricsStr()
     taskescapemetrics.insert(taskescapemetrics.end(), currstatemetrics.begin(), currstatemetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), rsallmrmorymetrics.begin(), rsallmrmorymetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), rsfreememorymetrics.begin(), rsfreememorymetrics.end());
+    taskescapemetrics.insert(taskescapemetrics.end(), gputypemetrics.begin(), gputypemetrics.end());
+    taskescapemetrics.insert(taskescapemetrics.end(), gpuallmemorymetrics.begin(), gpuallmemorymetrics.end());
+    taskescapemetrics.insert(taskescapemetrics.end(), gpufreememorymetrics.begin(), gpufreememorymetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), rsstarttimemetrics.begin(), rsstarttimemetrics.end());
     taskescapemetrics.insert(taskescapemetrics.end(), starttimemetrics.begin(), starttimemetrics.end());
 

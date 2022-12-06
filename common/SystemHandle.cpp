@@ -24,6 +24,9 @@
 #else
     #include <sys/sysinfo.h>
 #endif
+#ifdef NVIDIA_CUDA
+    #include <cuda_runtime.h>
+#endif
 #include "SystemHandle.h"
 #include "qulog.h"
 
@@ -61,10 +64,10 @@ int CSystemHandle::getMemUseInfo(MemUseInfo& mem)
 
     long long freememory = (int64_t)vmstats.free_count * (int64_t)pagesize;
     long long usedmemory = ((int64_t)vmstats.active_count +  (int64_t)vmstats.inactive_count + (int64_t)vmstats.wire_count) *  (int64_t)pagesize;
-    mem.currTime = time(NULL);
-    mem.sysStartTime = 0;
-    mem.totalRam = freememory + usedmemory;
-    mem.freeRam = freememory;
+    mem.update_time = time(NULL);
+    mem.create_time = 0;
+    mem.total_memory = freememory + usedmemory;
+    mem.free_memory = freememory;
 #else
     struct sysinfo info;
     int ret = sysinfo(&info);
@@ -74,10 +77,10 @@ int CSystemHandle::getMemUseInfo(MemUseInfo& mem)
         return -1;
     }
 
-    mem.currTime = time(NULL);
-    mem.sysStartTime = mem.currTime - info.uptime;
-    mem.totalRam = info.totalram;
-    mem.freeRam = info.freeram;
+    mem.update_time = time(NULL);
+    mem.create_time = mem.update_time - info.uptime;
+    mem.total_memory = info.totalram;
+    mem.free_memory = info.freeram;
 #endif
 
     return 0;
@@ -134,4 +137,22 @@ int CSystemHandle::getCpuNum()
 
     return ret;
 #endif
+}
+
+int CSystemHandle::getGpuUseInfo(GpuUseInfo& cpu)
+{
+    cpu.create_time = time(NULL);
+#ifdef NVIDIA_CUDA
+    size_t total_memory = 0, free_memory = 0;
+    cudaError_t status = cudaMemGetInfo(&free_memory, &total_memory);
+    if (cudaSuccess != status) {
+        LOG(ERROR) << "cudaMemGetInfo fails(error:" << cudaGetErrorString(status) << ").";
+        return -1;
+    }
+
+    cpu.gpu_type = GpuFactoryType_Nvidia;
+    cpu.total_memory = (long long)total_memory;
+    cpu.free_memory = (long long)free_memory;
+#endif
+    return 0;
 }

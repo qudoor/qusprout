@@ -51,7 +51,7 @@ void CReqManager::initEnv(const std::shared_ptr<InitEnvReq> req, std::shared_ptr
 
     InitQubitsResp initresp;
     SINGLETON(CQuSproutServerHandler)->initQubits(initresp, initreq);
-    resp->setcode(req->flowid, switchCode(initresp.base.code));
+    resp->setcode(req->flowid, switchCode(initresp.base.code), initresp.base.msg);
 }
 
 void CReqManager::addCmd(const std::shared_ptr<AddGateCmdReq> req, std::shared_ptr<AddGateCmdResp> resp)
@@ -97,7 +97,7 @@ void CReqManager::addCmd(const std::shared_ptr<AddGateCmdReq> req, std::shared_p
 
     SendCircuitCmdResp sendresp;
     SINGLETON(CQuSproutServerHandler)->sendCircuitCmd(sendresp, sendreq);
-    resp->setcode(req->flowid, switchCode(sendresp.base.code));
+    resp->setcode(req->flowid, switchCode(sendresp.base.code), sendresp.base.msg);
 }
 
 void CReqManager::runCmd(const std::shared_ptr<RunGateCmdReq> req, std::shared_ptr<RunGateCmdResp> resp)
@@ -108,22 +108,22 @@ void CReqManager::runCmd(const std::shared_ptr<RunGateCmdReq> req, std::shared_p
 
     RunCircuitResp runresp;
     SINGLETON(CQuSproutServerHandler)->run(runresp, runreq);
-    resp->setcode(req->flowid, switchCode(runresp.base.code));
+    resp->setcode(req->flowid, switchCode(runresp.base.code), runresp.base.msg);
 
-    for (auto temp : runresp.result.measureSet)
+    for (auto templist : runresp.result.measures)
     {
-        MeasureInfo measure;
-        measure.target = temp.id;
-        measure.value = temp.value;
-        resp->measures.push_back(measure);
-    }
-
-    for (auto temp : runresp.result.outcomeSet)
-    {
-        OutcomeInfo outcome;
-        outcome.bitstr =  temp.bitstr;
-        outcome.count =  temp.count;
-        resp->outcomes.push_back(outcome);
+        MeasureQus meas;
+        for (auto temp : templist.measure)
+        {
+            MeasureQu mr;
+            mr.target = temp.idx;
+            mr.value = temp.value;
+            meas.measure.push_back(mr);
+        }
+        if (meas.measure.size() > 0)
+        {
+            resp->measures.push_back(meas);
+        }
     }
 }
 
@@ -139,7 +139,7 @@ void CReqManager::getAmp(const std::shared_ptr<GetAmpReq> req, std::shared_ptr<G
 
         GetProbAmpResp getresp;
         SINGLETON(CQuSproutServerHandler)->getProbAmp(getresp, getreq);
-        resp->setcode(req->flowid, switchCode(getresp.base.code));
+        resp->setcode(req->flowid, switchCode(getresp.base.code), getresp.base.msg);
         if (getresp.base.code != ErrCode::type::COM_SUCCESS)
         {
             break;
@@ -158,22 +158,6 @@ void CReqManager::getProb(const std::shared_ptr<GetProbReq> req, std::shared_ptr
         return;
     }
 
-    if (req->targets.size() == 1)
-    {
-        GetProbOfOutcomeReq getreq;
-        getreq.__set_id(req->taskid);
-        getreq.__set_qubit(req->targets[0]);
-        getreq.__set_outcom(0);
-        GetProbOfOutcomeResp getresp;
-        SINGLETON(CQuSproutServerHandler)->getProbOfOutcome(getresp, getreq);
-        resp->setcode(req->flowid, switchCode(getresp.base.code));
-        if (getresp.base.code == ErrCode::type::COM_SUCCESS)
-        {
-            resp->outcomes.push_back(getresp.pro_outcome);
-        }
-        return;
-    }
-
     GetProbOfAllOutcomReq getreq;
     getreq.__set_id(req->taskid);
     std::vector<int32_t> targets;
@@ -184,7 +168,7 @@ void CReqManager::getProb(const std::shared_ptr<GetProbReq> req, std::shared_ptr
     getreq.__set_targets(targets);
     GetProbOfAllOutcomResp getresp;
     SINGLETON(CQuSproutServerHandler)->getProbOfAllOutcome(getresp, getreq);
-    resp->setcode(req->flowid, switchCode(getresp.base.code));
+    resp->setcode(req->flowid, switchCode(getresp.base.code), getresp.base.msg);
     if (getresp.base.code == ErrCode::type::COM_SUCCESS)
     {
         for (auto temp : getresp.pro_outcomes)
@@ -201,7 +185,7 @@ void CReqManager::getState(const std::shared_ptr<GetStateReq> req, std::shared_p
 
     GetAllStateResp getresp;
     SINGLETON(CQuSproutServerHandler)->getAllState(getresp, getreq);
-    resp->setcode(req->flowid, switchCode(getresp.base.code));
+    resp->setcode(req->flowid, switchCode(getresp.base.code), getresp.base.msg);
 
     resp->states = getresp.all_state;
 }
@@ -213,7 +197,7 @@ void CReqManager::releaseEnv(const std::shared_ptr<ReleaseEnvReq> req, std::shar
 
     CancelCmdResp cancelresp;
     SINGLETON(CQuSproutServerHandler)->cancelCmd(cancelresp, cancelreq);
-    resp->setcode(req->flowid, switchCode(cancelresp.base.code));
+    resp->setcode(req->flowid, switchCode(cancelresp.base.code), cancelresp.base.msg);
 }
 
 void CReqManager::getTask(const std::shared_ptr<GetTaskReq> req, std::shared_ptr<GetTaskResp> resp)
@@ -224,7 +208,7 @@ void CReqManager::getTask(const std::shared_ptr<GetTaskReq> req, std::shared_ptr
     GetTaskInfoResp taskresp;
     SINGLETON(CQuSproutServerHandler)->getTaskInfo(taskresp, taskreq);
     resp->state = taskresp.state;
-    resp->setcode(req->flowid, switchCode(taskresp.base.code));
+    resp->setcode(req->flowid, switchCode(taskresp.base.code), taskresp.base.msg);
 }
 
 void CReqManager::getMeasure(const std::shared_ptr<GetMeasureReq> req, std::shared_ptr<GetMeasureResp> resp)
@@ -240,51 +224,23 @@ void CReqManager::getMeasure(const std::shared_ptr<GetMeasureReq> req, std::shar
 
     MeasureQubitsResp measresp;
     SINGLETON(CQuSproutServerHandler)->measureQubits(measresp, measreq);
-    resp->setcode(req->flowid, switchCode(measresp.base.code));
+    resp->setcode(req->flowid, switchCode(measresp.base.code), measresp.base.msg);
 
-    for (auto temp : measresp.results)
+    for (auto templist : measresp.result.measures)
     {
-        MeasureInfo measure;
-        measure.target = temp.id;
-        measure.value = temp.value;
-        resp->measures.push_back(measure);
+        MeasureQus meas;
+        for (auto temp : templist.measure)
+        {
+            MeasureQu mr;
+            mr.target = temp.idx;
+            mr.value = temp.value;
+            meas.measure.push_back(mr);
+        }
+        if (meas.measure.size() > 0)
+        {
+            resp->measures.push_back(meas);
+        }
     }
-
-    for (auto temp : measresp.outcomes)
-    {
-        OutcomeInfo outcome;
-        outcome.bitstr =  temp.bitstr;
-        outcome.count =  temp.count;
-        resp->outcomes.push_back(outcome);
-    }
-}
-
-void CReqManager::applyQft(const std::shared_ptr<ApplyQftReq> req, std::shared_ptr<ApplyQftResp> resp)
-{
-    if (req->targets.size() == 0)
-    {
-        ApplyFullQFTReq applyreq;
-        applyreq.__set_id(req->taskid);
-
-        ApplyFullQFTResp applyresp;
-        SINGLETON(CQuSproutServerHandler)->applyFullQFT(applyresp, applyreq);
-        resp->setcode(req->flowid, switchCode(applyresp.base.code));
-        return;
-    }
-
-    ApplyQFTReq applyreq;
-    applyreq.__set_id(req->taskid);
-    std::vector<int32_t>  targets;
-    for (auto target : req->targets)
-    {
-        targets.push_back(target);
-    }
-    applyreq.__set_targets(targets);
-
-    ApplyQFTResp applyresp;
-    SINGLETON(CQuSproutServerHandler)->applyQFT(applyresp, applyreq);
-    resp->setcode(req->flowid, switchCode(applyresp.base.code));
-    return;
 }
 
 void CReqManager::getEPauli(const std::shared_ptr<GetEPauliReq> req, std::shared_ptr<GetEPauliResp> resp)
@@ -304,7 +260,7 @@ void CReqManager::getEPauli(const std::shared_ptr<GetEPauliReq> req, std::shared
     GetExpecPauliProdResp getresp;
     SINGLETON(CQuSproutServerHandler)->getExpecPauliProd(getresp, getreq);
     resp->expect = getresp.expect;
-    resp->setcode(req->flowid, switchCode(getresp.base.code));
+    resp->setcode(req->flowid, switchCode(getresp.base.code), getresp.base.msg);
 }
 
 void CReqManager::getEPauliSum(const std::shared_ptr<GetEPauliSumReq> req, std::shared_ptr<GetEPauliSumResp> resp)
@@ -322,7 +278,66 @@ void CReqManager::getEPauliSum(const std::shared_ptr<GetEPauliSumReq> req, std::
     GetExpecPauliSumResp getresp;
     SINGLETON(CQuSproutServerHandler)->getExpecPauliSum(getresp, getreq);
     resp->expect = getresp.expect;
-    resp->setcode(req->flowid, switchCode(getresp.base.code));
+    resp->setcode(req->flowid, switchCode(getresp.base.code), getresp.base.msg);
+}
+
+void CReqManager::getRcardInfo(const std::shared_ptr<GetRCardInfoReq> req, std::shared_ptr<GetRCardInfoResp> resp)
+{
+    GetRandomCardInfoReq getreq;
+    GetRandomCardInfoResp getresp;
+    SINGLETON(CQuSproutServerHandler)->getRandomCardInfo(getresp, getreq);
+    resp->count = getresp.count;
+    resp->driverversion = getresp.driver_version;
+    resp->libraryversion = getresp.library_version;
+    for (auto temp: getresp.cards)
+    {
+        RCardInfo card;
+        card.deviceindex = temp.device_index;
+        card.mode = temp.mode;
+        card.ldtemp = temp.ld_temp;
+        card.bdtemp = temp.bd_temp;
+        auto iter = temp.states.begin();
+        for (; iter != temp.states.end(); ++iter)
+        {
+            RCardStateInfo cardstaate;
+            cardstaate.type = (int)iter->first;
+            cardstaate.state = (int)iter->second;
+            card.states.push_back(cardstaate);
+        }
+        resp->cards.push_back(card);
+    }
+    resp->setcode(req->flowid, switchCode(getresp.base.code), getresp.base.msg);
+}
+
+void CReqManager::setRcard(const std::shared_ptr<SetRCardReq> req, std::shared_ptr<SetRCardResp> resp)
+{
+    SetRandomCardReq setreq;
+    setreq.__set_device_index(req->deviceindex);
+    setreq.__set_mode(req->mode);
+    setreq.__set_reset(req->reset);
+
+    SetRandomCardResp setresp;
+    SINGLETON(CQuSproutServerHandler)->setRandomCard(setresp, setreq);
+    resp->setcode(req->flowid, switchCode(setresp.base.code), setresp.base.msg);
+}
+
+void CReqManager::getRand(const std::shared_ptr<GetRandReq> req, std::shared_ptr<GetRandResp> resp)
+{
+    GetRandomReq getreq;
+    getreq.__set_random_length(req->randomlength);
+    getreq.__set_random_num(req->randomnum);
+    if (req->deviceindex >= 0)
+    {
+        getreq.__set_device_index(req->deviceindex);
+    }
+
+    GetRandomResp getresp;
+    SINGLETON(CQuSproutServerHandler)->getRandom(getresp, getreq);
+    for (auto random : getresp.randoms)
+    {
+        resp->randoms.push_back(random);
+    }
+    resp->setcode(req->flowid, switchCode(getresp.base.code), getresp.base.msg);
 }
 
 int CReqManager::switchCode(const ErrCode::type code)

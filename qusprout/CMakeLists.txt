@@ -46,8 +46,19 @@ set(CMAKE_CXX_STANDARD 11)
 #链接参数
 set(CMAKE_EXE_LINKER_FLAGS "-DGLOG_CUSTOM_PREFIX_SUPPORT")
 
+find_package(CUDA)
+if(CUDA_FOUND)
+	set(CMAKE_EXE_LINKER_FLAGS "-DNVIDIA_CUDA")
+	add_compile_options(-DNVIDIA_CUDA)
+endif(CUDA_FOUND)
+
 #添加编译选项
 add_compile_options(-g -Wall -fPIC -DGLOG_CUSTOM_PREFIX_SUPPORT)
+
+IF ((CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64") AND (NOT APPLE) AND (EXISTS "/usr/lib/libqrpcie.so") AND (EXISTS "/usr/include/qrng_pcie.h"))
+	set(CMAKE_EXE_LINKER_FLAGS "-DQRNG_PCIE")
+	add_compile_options(-DQRNG_PCIE)
+ENDIF ()
 
 #使用 GLOB 命令使用通配符模式匹配查找文件
 file(GLOB SRC_LIST
@@ -64,10 +75,11 @@ file(GLOB SRC_LIST
 	"timertask/*.cpp"
 	"http/*.cpp"
 	"metrics/*.cpp"
+	"random/*.cpp"
 )
 
 #头文件搜索路径，路径之间用空格分隔，相当于指定-I参数
-include_directories(${PROJECT_SOURCE_DIR}/.. ${PROJECT_SOURCE_DIR} /usr/include /usr/local/include /usr/local/include/thrift)
+include_directories(${PROJECT_SOURCE_DIR}/.. ${PROJECT_SOURCE_DIR} /usr/include /usr/local/include /usr/local/include/thrift ${CUDA_INCLUDE_DIRS})
 
 #动态链接库或静态链接库的搜索路径，相当于-L参数
 IF (APPLE)
@@ -80,11 +92,19 @@ ENDIF ()
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 #添加链接库,相同于指定-l参数
-IF (APPLE)
-	target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;hv;libprometheus-cpp-core.a;pthread)
+target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libprometheus-cpp-core.a;pthread)
+IF ((CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64") AND (NOT APPLE) AND (EXISTS "/usr/lib/libqrpcie.so") AND (EXISTS "/usr/include/qrng_pcie.h"))
+	target_link_libraries(${PROJECT_NAME} libhv_static.a;qrpcie;resolv;udev;z)
 ELSE ()
-	target_link_libraries(${PROJECT_NAME} libglog.a;libyaml-cpp.a;libthrift.a;libgflags.a;libhv_static.a;libprometheus-cpp-core.a;pthread)
+	IF (APPLE)
+		target_link_libraries(${PROJECT_NAME} hv)
+	ELSE ()
+		target_link_libraries(${PROJECT_NAME} libhv_static.a)
+	ENDIF ()
 ENDIF ()
+if(CUDA_FOUND)
+	target_link_libraries(${PROJECT_NAME} ${CUDA_LIBRARIES})
+endif(CUDA_FOUND)
 
 #安装
 INSTALL(TARGETS ${PROJECT_NAME}
