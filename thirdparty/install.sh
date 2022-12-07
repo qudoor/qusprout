@@ -100,6 +100,7 @@ if [ ! -f "/usr/bin/autoconf" ] && [ ! -f "/usr/local/bin/autoconf" ]; then
 fi
 
 #automake
+#centos7.9:sed -i 's/$(update_mans) automake-$(APIVERSION)/$(update_mans) automake-$(APIVERSION) --no-discard-stderr/g' Makefile 
 if [ ! -f "/usr/bin/automake" ] && [ ! -f "/usr/local/bin/automake" ]; then
     echo "begin install automake"
 	rm -rf automake-1.16.5
@@ -201,6 +202,7 @@ if [ ! -f "/usr/local/lib/liby.a" ]; then
 fi
 
 #flex安装
+#ubuntu18:./configure CFLAGS=-D_GNU_SOURCE
 if [ ! -f "/usr/local/lib/libfl.a" ]; then
     echo "begin install flex"
     rm -rf flex-2.6.4

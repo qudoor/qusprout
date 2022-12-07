@@ -5,21 +5,6 @@ CURRDIR=$(pwd)
 OS=`uname -s`
 OSMachine=`uname -m`
 
-function isCmdExist() {
-	local cmd="$1"
-  	if [ -z "$cmd" ]; then
-		echo "Usage isCmdExist yourCmd"
-		return 1
-	fi
-
-	which "$cmd" >/dev/null 2>&1
-	if [ $? -eq 0 ]; then
-		return 0
-	fi
-
-	return 2
-}
-
 #QuEST安装
 if [ ! -f "../lib/libQuEST.a" ]; then
     echo "begin install QuEST"
@@ -57,8 +42,7 @@ if [ ! -f "../lib/libQuEST.a" ]; then
 fi
 
 if [ ! -f "../lib/libQuEST-GPU.a" ]; then
-    isCmdExist "nvidia-smi"
-    if [ $? -eq "0" ]; then
+    if [ -f "/usr/bin/nvidia-smi" ]; then
         ComputeCapability=`nvidia-smi --query-gpu=compute_cap --format=csv,noheader | sed 's/\.//g'`
         ComputeCapabilityStr="set(GPU_COMPUTE_CAPABILITY ${ComputeCapability} CACHE STRING \"GPU hardware dependent, lookup at https:\/\/developer.nvidia.com\/cuda-gpus. Write without fullstop\")"
         echo "begin install QuEST-GPU"

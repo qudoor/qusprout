@@ -12,7 +12,8 @@ COPY qrng_pcie.h /usr/include/
 
 RUN git config --global http.lowSpeedLimit 0 && git config --global http.lowSpeedTime 999999 && git config --global http.postBuffer 5242880 \
     && git clone https://github.com/qudoor/qusprout.git /app/qusprout \
-	&& cd /app/qusprout/thirdparty && chmod +x *.sh && ./install_QuEST.sh && cd /app/qusprout/thirdparty && rm -rf QuEST-3.5.0 \
+	&& cd /app/qusprout/lib && rm -rf *.a \
+	&& cd /app/qusprout/thirdparty && chmod +x *.sh && ./install.sh \
 	&& cd /app/qusprout && chmod +x *.sh && ./build_qusprout.sh version 1.0 && ./service_qusprout.sh version 1.0 \
 	&& rm -rf /app/qusprout
 	
