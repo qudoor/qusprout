@@ -29,6 +29,8 @@ QuSprout 是启科量子自主研发的一款免费、开源、支持Linux平台
 * 增加量子随机数功能。
 * 删除不用的接口（getProbOfOutcome、applyQFT、applyFullQFT）。
 * 运行线路增加gpu的方式。
+* 支持基于共享内存的并行计算改造-OMP。
+* 完成计算架构调整，支持主从模式+多用户/多任务+多计算模式
   
 [Back to Top](#0)
 
